@@ -1,0 +1,25 @@
+{
+  "name": "mimetic",
+  "version": "0.0.1",
+  "description": "Geometrical Normalizer",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "?git"
+  },
+  "author": "Julien Etienne",
+  "license": "NA",
+  "devDependencies": {
+    "browser-sync": "^2.5.0",
+    "gulp": "^3.8.11",
+    "gulp-connect": "^2.2.0",
+    "gulp-inject": "^1.2.0",
+    "gulp-inline-source": "^1.2.0",
+    "gulp-jshint": "^1.9.4",
+    "gulp-livereload": "^3.8.0",
+    "gulp-replace": "^0.5.3"
+  }
+}

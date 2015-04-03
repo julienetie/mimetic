@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0">
+    <title>MM</title>
+<style>
+/*! normalize.css v3.0.2 | MIT License | github.com/necolas/normalize.css */html{font-family:sans-serif;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%}body{margin:0}article,aside,details,figcaption,figure,footer,header,hgroup,main,menu,nav,section,summary{display:block}audio,canvas,progress,video{display:inline-block;vertical-align:baseline}audio:not([controls]){display:none;height:0}[hidden],template{display:none}a{background-color:transparent}a:active,a:hover{outline:0}abbr[title]{border-bottom:1px dotted}b,strong{font-weight:700}dfn{font-style:italic}h1{font-size:2em;margin:.67em 0}mark{background:#ff0;color:#000}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sup{top:-.5em}sub{bottom:-.25em}img{border:0}svg:not(:root){overflow:hidden}figure{margin:1em 40px}hr{box-sizing:content-box;height:0}pre{overflow:auto}code,kbd,pre,samp{font-family:monospace,monospace;font-size:1em}button,input,optgroup,select,textarea{color:inherit;font:inherit;margin:0}button{overflow:visible}button,select{text-transform:none}button,html input[type=button],input[type=reset],input[type=submit]{-webkit-appearance:button;cursor:pointer}button[disabled],html input[disabled]{cursor:default}button::-moz-focus-inner,input::-moz-focus-inner{border:0;padding:0}input{line-height:normal}input[type=checkbox],input[type=radio]{box-sizing:border-box;padding:0}input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{height:auto}input[type=search]{-webkit-appearance:textfield;box-sizing:content-box}input[type=search]::-webkit-search-cancel-button,input[type=search]::-webkit-search-decoration{-webkit-appearance:none}fieldset{border:1px solid silver;margin:0 2px;padding:.35em .625em .75em}legend{border:0;padding:0}textarea{overflow:auto}optgroup{font-weight:700}table{border-collapse:collapse;border-spacing:0}td,th{padding:0}
+/*
+
+H1 is strange ...add to primer
+
+h1{
+padding: 0;
+margin: 0;
+}
+
+*/
+
+/* test if have media queries */
+@media all and (min-width:1px) {
+    body{background:pink;}
+}
+
+
+
+/* Small screens */
+@media only screen { } /* Define mobile styles */
+
+@media only screen and (max-width: 40em) {
+html{ font-size: 32px;  }
+	} /* max-width 640px, mobile-only styles, use when QAing mobile issues */
+
+
+/* Medium screens */
+@media only screen and (min-width: 40.063em) { } /* min-width 641px, medium screens */
+
+@media only screen and (min-width: 40.063em) and (max-width: 64em) { } /* min-width 641px and max-width 1024px, use when QAing tablet-only issues */
+
+
+
+
+
+h1{
+padding: 0;
+margin: 0;
+}
+
+header{
+    width:100%;
+    background: #00FFDD;
+    top:0;
+    border-bottom: 1px dashed blue;
+    color: #03003B;
+  }
+header h1{
+	font-size: 7em;
+}
+header h2{
+	font-size: 2em;
+	margin: 0 0 0.5em 0;
+}
+
+header h1,header h2{
+text-align: center;
+
+}
+
+aside,section{
+position: relative;
+float:left;
+}
+
+#middle-sec{
+	width: 50%;
+
+}
+aside{
+	width: 25%;
+	background: orange;
+}
+#content-body{
+	background: #fff;
+	width: 100%;
+
+}
+#middle-sec{
+
+}
+
+
+p{
+margin: 1em 1em 0;
+}
+
+h2{
+margin: 1em 1em 0;
+
+}
+
+/*scaled transition*/
+p{
+	-webkit-transition: all 0.2s linear;
+-moz-transition: all 0.2s linear;
+-o-transition: all 0.2s linear;
+transition: all 0.2s linear;
+}
+
+</style>
+<script>
+/**
+* @preserve HTML5 Shiv 3.7.3-pre | @afarkas @jdalton @jon_neal @rem | MIT/GPL2 Licensed
+*/
+!function(a,b){function c(a,b){var c=a.createElement("p"),d=a.getElementsByTagName("head")[0]||a.documentElement;return c.innerHTML="x<style>"+b+"</style>",d.insertBefore(c.lastChild,d.firstChild)}function d(){var a=t.elements;return"string"==typeof a?a.split(" "):a}function e(a,b){var c=t.elements;"string"!=typeof c&&(c=c.join(" ")),"string"!=typeof a&&(a=a.join(" ")),t.elements=c+" "+a,j(b)}function f(a){var b=s[a[q]];return b||(b={},r++,a[q]=r,s[r]=b),b}function g(a,c,d){if(c||(c=b),l)return c.createElement(a);d||(d=f(c));var e;return e=d.cache[a]?d.cache[a].cloneNode():p.test(a)?(d.cache[a]=d.createElem(a)).cloneNode():d.createElem(a),!e.canHaveChildren||o.test(a)||e.tagUrn?e:d.frag.appendChild(e)}function h(a,c){if(a||(a=b),l)return a.createDocumentFragment();c=c||f(a);for(var e=c.frag.cloneNode(),g=0,h=d(),i=h.length;i>g;g++)e.createElement(h[g]);return e}function i(a,b){b.cache||(b.cache={},b.createElem=a.createElement,b.createFrag=a.createDocumentFragment,b.frag=b.createFrag()),a.createElement=function(c){return t.shivMethods?g(c,a,b):b.createElem(c)},a.createDocumentFragment=Function("h,f","return function(){var n=f.cloneNode(),c=n.createElement;h.shivMethods&&("+d().join().replace(/[\w\-:]+/g,function(a){return b.createElem(a),b.frag.createElement(a),'c("'+a+'")'})+");return n}")(t,b.frag)}function j(a){a||(a=b);var d=f(a);return!t.shivCSS||k||d.hasCSS||(d.hasCSS=!!c(a,"article,aside,dialog,figcaption,figure,footer,header,hgroup,main,nav,section{display:block}mark{background:#FF0;color:#000}template{display:none}")),l||i(a,d),a}var k,l,m="3.7.3-pre",n=a.html5||{},o=/^<|^(?:button|map|select|textarea|object|iframe|option|optgroup)$/i,p=/^(?:a|b|code|div|fieldset|h1|h2|h3|h4|h5|h6|i|label|li|ol|p|q|span|strong|style|table|tbody|td|th|tr|ul)$/i,q="_html5shiv",r=0,s={};!function(){try{var a=b.createElement("a");a.innerHTML="<xyz></xyz>",k="hidden"in a,l=1==a.childNodes.length||function(){b.createElement("a");var a=b.createDocumentFragment();return"undefined"==typeof a.cloneNode||"undefined"==typeof a.createDocumentFragment||"undefined"==typeof a.createElement}()}catch(c){k=!0,l=!0}}();var t={elements:n.elements||"abbr article aside audio bdi canvas data datalist details dialog figcaption figure footer header hgroup main mark meter nav output picture progress section summary template time video",version:m,shivCSS:n.shivCSS!==!1,supportsUnknownElements:l,shivMethods:n.shivMethods!==!1,type:"default",shivDocument:j,createElement:g,createDocumentFragment:h,addElements:e};a.html5=t,j(b),"object"==typeof module&&module.exports&&(module.exports=t)}("undefined"!=typeof window?window:this,document);
+
+
+</script>
+
+</head>
+<body>
+<header>
+<h1>Mimetic</h1>
+<h2>Geometric Normalizer</h2>
+</header>
+
+<section id='content-body'>
+<aside>
+<article>
+<p>
+Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through
+</p>
+</article>
+<article>
+<p class='ham'>
+the cites of the word in classical literature, discovered the undoubtable source. Lorem Ipsum comes from sections 1.10.32 and 1.10.33 of "de Finibus Bonorum et Malorum" (The Extremes of Good and Evil) by Cicero, written in 45 BC. This book is a treatise on the theory of ethics, very popular during the Renaissance. The first line of Lorem Ipsum, "Lorem ipsum dolor sit amet..", comes from a line in section 1.10.32.
+</p>
+</article>
+</aside>
+<section id="middle-sec">
+<h2>What Is This?</h2>
+<p>
+Mimetic is a "Display Normalizer". Mimetic uses a 'Design once scale for all' philosophy that alows you to maximize visual development for all platforms.
+</p>
+</section>
+<section id="middle-sec">
+<p>
+Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through the cites of the word in classical literature, discovered the undoubtable source. Lorem Ipsum comes from sections 1.10.32 and 1.10.33 of "de Finibus Bonorum et Malorum" (The Extremes of Good and Evil) by Cicero, written in 45 BC. This book is a treatise on the theory of ethics, very popular during the Renaissance. The first line of Lorem Ipsum, "Lorem ipsum dolor sit amet..", comes from a line in section 1.10.32.
+</p>
+</section>
+<aside style="position: absolute;right:0;top:0; ">
+<h2>Mimetic In A Nutshell</h2>
+<dl>
+<dt class='potatoe'>Mimetic.scale</dt>
+<dd>The layout is constructied to a fixed width or height, the layout, fonts and
+images are scaled to fit any device. Your website is of full width/ height on eveery device.</dd>
+<dt>Mimetic.baseLayer (.base)</dt>
+<dd>This is the most simplified layer of the website without content. This layer only contains layout tags and maybe color fills, it is not appriximate.
+</dd>
+<dt>Mimetic.interfaceLayer (.ui)</dt>
+<dd>The interface layer defines UI elements primarilay using SVG.</dd>
+<dt>Mimetic.contentLayer (.con)</dt>
+<dd>This layer is strictly for content, the "layout" shoud only consist of the main content</dd>
+</dl>
+
+</aside>
+</section>
+<canvas></canvas>
+
+<script>
+var body = document.getElementsByTagName('body')[0];
+var tags = body.getElementsByTagName('*');
+
+
+var p = document.getElementsByTagName('p');
+var scr = document.getElementsByTagName('script');
+
+var a = 'la';
+(function(){
+
+/* Variables*/
+var
+
+
+mimeticScale = {
+
+options:{
+  excludeTags: ['script','canvas','h1','h2']
+},
+
+
+// Convert pt & px to px value as number
+getPixelVal: function(prop){
+  if( prop.indexOf("pt") > -1){
+       prop = parseInt(prop,10)*96 / 72 ;
+  }else{
+    prop = parseInt(prop,10);
+  }
+return prop;
+},
+
+
+// HTML COLLECTIOIN TO ARRAY
+colToArray: function(x){
+    for(var i = 0, a = []; i < x.length; i++){
+        a.push(x[i]);
+      }
+    return a;
+},
+
+  // GET COMPUTED STYLE ::github /twolfson/computedStyle
+  computedStyle: function (el, prop, getComputedStyle, style) {
+      getComputedStyle = window.getComputedStyle;
+      style = getComputedStyle ? getComputedStyle(el) : el.currentStyle;
+      if (style) {return style[prop.replace(/-(\w)/gi, function (word, letter) {
+      return letter.toUpperCase();
+      })];
+    }},
+
+initVal:{
+  getPixelVal: function(prop){
+  if( prop.indexOf("pt") > -1){
+       prop = parseInt(prop,10)*96 / 72 ;
+  }else{
+    prop = parseInt(prop,10);
+  }
+return prop;
+},
+  winWidth: window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth,
+  fontSizeNow: parseInt( (this.winWidth / 102.4)),
+  fontRatio: this.initVal.getPixelVal(this.fontSizeNow) / 10
+},
+// TEST
+test: function(){
+// Convert HTMLCollecton to Array
+//var tg = this.colToArray(tags);
+var tempArr = [];
+var excludedArr = [];
+var g = 0; // don't print
+
+          var remove = this.options.excludeTags;
+
+// Ignore specific tags from body
+for (var i = 0; i < tags.length; i++) {
+ tempArr.push(tags[i].tagName);
+ for (var j = 0; j < remove.length; j++) {
+   if (tempArr[i] === remove[j].toUpperCase()) {
+     g += 1;
+   } else {}
+ }
+ if (g === 0) {
+   excludedArr.push(tags[i]);
+ } else {
+   g = 0;
+ }
+}
+excludedArr[8].style.color = 'blue';
+
+//var lastFontSize = parseInt( (winWidth / 102.4));
+//alert(parseInt(1024,10));
+//
+var getPixelVal = function(prop){
+  if( prop.indexOf("pt") > -1){
+       prop = parseInt(prop,10)*96 / 72 ;
+  }else{
+    prop = parseInt(prop,10);
+  }
+return prop;
+};
+//
+
+var fontRatio = getPixelVal(fontSizeNowww) / 10;
+
+  var winWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+  var    fontSizeNow = parseInt( (winWidth / 102.4));
+
+
+
+
+for(i = 0;i < excludedArr.length;i++){
+  var getStyle = this.computedStyle( excludedArr[i],'font-size');
+var fontSizeNowww = this.computedStyle(p[0],'font-size' );
+
+           excludedArr[i].style.fontSize = parseInt(fontSizeNowww * initVal.fontRatio ) + 'px';
+
+}
+
+
+} // test
+
+
+};  //mimeticScale obj
+
+
+
+
+
+
+
+return{
+exe: //mimeticScale.test()
+
+function(){
+
+var scale = function(){
+  mimeticScale.test();
+};
+
+if(window.attachEvent){
+window.attachEvent("onresize",scale);
+}else{
+window.addEventListener("resize",scale,false);
+}
+
+
+}()
+
+
+};
+
+}());
+
+
+
+</script>
+</body>
+</html>
+
