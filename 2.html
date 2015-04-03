@@ -212,7 +212,9 @@ util = {
       newVal = parseInt(val, 10);
     } else if (val.indexOf('pt') > -1) {
       newVal = parseInt(val, 10) * 96 / 72;
-    } else {
+    } else if (val.indexOf('em') > -1) {
+      newVal = parseInt(val, 10) * 16;
+    }else {
       switch (val) {
         case 'xx-small':
           newVal = 9;
@@ -248,6 +250,7 @@ util = {
           break;
       }
     }
+
     return newVal;
   }
 },
@@ -275,10 +278,12 @@ getPageElem = {
           i], 'font-size')));
         this.lineHtArr.push(util.namedSizeToPx(util.computedStyle(this.tags[
           i], 'line-height')));
+        //alert( util.namedSizeToPx(  util.computedStyle(this.tags[i], 'font-size')  )) ;
       } else {
         g = 0;
       }
     }
+
     return [this.excludedArr, this.fontSizeArr, this.lineHtArr];
   }
 },
@@ -289,33 +294,38 @@ ftArr = getPageElem.elemLoop()[1],
 lhArr = getPageElem.elemLoop()[2],
 
 
+
 MimeticScale = {
   scale: function() {
       // winWidth left in function for performance.
       var winWidth = window.innerWidth || document.documentElement.clientWidth ||
         document.body.clientWidth;
-      var lineHightNow = fontSizeNow;
+    //  var lineHightNow = fontSizeNow;
       if (winWidth > 1024) {
         for (var i = 0; i < elems.length; i++) {
-          var fontSizeNow = winWidth / (options.designWidth * 0.1);
-          elems[i].style.fontSize = parseInt(fontSizeNow * (ftArr[i] / 10)) +
+          var fontSizeNow = (winWidth / (options.designWidth * 0.1));
+          elems[i].style.fontSize = Math.round(fontSizeNow * (ftArr[i] / 10)) +
             'px';
-          elems[i].style.lineHeight = parseInt(lineHightNow * (lhArr[i] / 10)) +
+          elems[i].style.lineHeight = Math.round(fontSizeNow * (lhArr[i] / 10)) +
             'px';
-          console.log(fontSizeNow);
+          //console.log(fontSizeNow);
         }
       }
     } //end of scale
 };
 
+//alert(ftArr[5]);
 
 MimeticScale.scale();
 // Basic reisze needs to be revised with debounce /throttle
+
 if (window.attachEvent) {
   window.attachEvent("onresize", MimeticScale.scale);
 } else {
   window.addEventListener("resize", MimeticScale.scale, false);
 }
+
+
 
 }());
 </script>
