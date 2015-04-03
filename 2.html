@@ -55,6 +55,7 @@ header{
   }
 header h1{
 	font-size: 7em;
+
 }
 header h2{
 	font-size: 2em;
@@ -91,8 +92,8 @@ aside{
 
 p{
 margin: 1em 1em 0;
-font-size: xx-large;
-line-height: 30px
+font-size: 1em;
+
 }
 
 h2{
@@ -171,7 +172,7 @@ images are scaled to fit any device. Your website is of full width/ height on ev
 
 options ={
   designWidth: 1024,
-  excludeTags: ['script','canvas','h2']
+  excludeTags: ['script','canvas']
 };
 
 
@@ -311,14 +312,16 @@ var MimeticScale = {
     scale: function () {
         // winWidth left in function for performance.
         var winWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
-        var fontSizeNow = parseInt( winWidth / (options.designWidth  * 0.1));
+
         var lineHightNow = fontSizeNow;
 
-        if (winWidth > 1024) {
+       // if (winWidth > 1024) {
             for (var i = 0; i < elems.length; i++) {
-
+                 var fontSizeNow =  winWidth / (options.designWidth  * 0.1);
                   elems[i].style.fontSize = parseInt(fontSizeNow * (  ftArr[i]  / 10)) + 'px';
                   elems[i].style.fontSize = parseInt(lineHightNow * (  lhArr[i]  / 10)) + 'px';
+
+                  console.log(fontSizeNow);
                   //window.getPageElem.elemLoop()[0].style.fontSize = parseInt(fontSizeNow * fontRatio) + 'px';
               //  .style.fontSize = parseInt(fontSizeNow * fontRatio) + 'px';
 /*
@@ -332,7 +335,7 @@ var MimeticScale = {
             }
 
 
-        }
+     //   }
 
     }
 };
