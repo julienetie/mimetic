@@ -28,18 +28,22 @@ margin: 0;
 @media only screen { } /* Define mobile styles */
 
 @media only screen and (max-width: 40em) {
-html{ font-size: 32px;  }
+/*html{ font-size: 32px;  } */
 	} /* max-width 640px, mobile-only styles, use when QAing mobile issues */
 
 
 /* Medium screens */
 @media only screen and (min-width: 40.063em) { } /* min-width 641px, medium screens */
 
-@media only screen and (min-width: 40.063em) and (max-width: 64em) { } /* min-width 641px and max-width 1024px, use when QAing tablet-only issues */
+@media only screen and (min-device-width: 40.063em) {
+body{min-width: 998px;}
+  } /* min-width 641px and max-width 1024px, use when QAing tablet-only issues */
 
 
 
-
+html{
+font-family: arial, sans-serif; /* FF sans-serif too heavy */
+}
 
 h1{
 padding: 0;
@@ -55,6 +59,7 @@ header{
   }
 header h1{
 	font-size: 7em;
+  line-height: 1em;
 
 }
 header h2{
@@ -93,7 +98,7 @@ aside{
 p{
 margin: 1em 1em 0;
 font-size: 1em;
-
+line-height: 1em;
 }
 
 h2{
@@ -165,15 +170,18 @@ images are scaled to fit any device. Your website is of full width/ height on ev
 
 </aside>
 </section>
-<canvas></canvas>
 
 <script>
-// github /twolfson/computedStyle
+(function(){
 
-options ={
+
+var body = document.getElementsByTagName('body')[0],
+
+
+options = {
   designWidth: 1024,
-  excludeTags: ['script','canvas']
-};
+  excludeTags: ['script', 'canvas']
+},
 
 
 util = {
@@ -195,67 +203,57 @@ util = {
     return prop;
   },
   toArray: function(x) {
-    for (var i = 0, a = []; i < x.length; i++)
-    a.push(x[i]);
+    for (var i = 0, a = []; i < x.length; i++) a.push(x[i]);
     return a;
   },
   namedSizeToPx: function(val) {
-
     var newVal;
-   if(val.indexOf('px') > -1){
-        newVal = parseInt(val,10);
-   }else if(val.indexOf('pt') > -1){
-        newVal = parseInt(val,10)*96 / 72;
-   }else{
-    switch (val) {
-      case 'xx-small':
-        newVal = 9;
-        break;
-      case 'x-small':
-        newVal = 10;
-        break;
-      case 'small':
-        newVal = 13;
-        break;
-      case 'normal':
-        newVal = 16;
-        break;
-      case 'medium':
-        newVal = 16;
-        break;
-      case 'large':
-        newVal = 18;
-        break;
-      case 'x-large':
-        newVal = 24;
-        break;
-      case 'xx-large':
-        newVal = 32;
-        break;
-      case 'larger':
-        console.log('font-size: "larger" is not supported');
-        newVal = 16;
-        break;
-      case 'smaller':
-        console.log('font-size: "smaller" is not supported');
-        newVal = 16;
-        break;
+    if (val.indexOf('px') > -1) {
+      newVal = parseInt(val, 10);
+    } else if (val.indexOf('pt') > -1) {
+      newVal = parseInt(val, 10) * 96 / 72;
+    } else {
+      switch (val) {
+        case 'xx-small':
+          newVal = 9;
+          break;
+        case 'x-small':
+          newVal = 10;
+          break;
+        case 'small':
+          newVal = 13;
+          break;
+        case 'normal':
+          newVal = 16;
+          break;
+        case 'medium':
+          newVal = 16;
+          break;
+        case 'large':
+          newVal = 18;
+          break;
+        case 'x-large':
+          newVal = 24;
+          break;
+        case 'xx-large':
+          newVal = 32;
+          break;
+        case 'larger':
+          console.log('font-size: "larger" is not supported');
+          newVal = 16;
+          break;
+        case 'smaller':
+          console.log('font-size: "smaller" is not supported');
+          newVal = 16;
+          break;
+      }
     }
-}
     return newVal;
-
-}
-};
-
-var p = document.getElementsByTagName('p');
-var dd = document.getElementsByTagName('dd');
-var dt = document.getElementsByTagName('dt');
-var body = document.getElementsByTagName('body');
-var h1 = document.getElementsByTagName('h1');
-var body = document.getElementsByTagName('body')[0];
+  }
+},
 
 
-var getPageElem = {
+getPageElem = {
   tags: body.getElementsByTagName('*'),
   tempArr: [],
   excludedArr: [],
@@ -273,84 +271,53 @@ var getPageElem = {
       }
       if (g === 0) {
         this.excludedArr.push(this.tags[i]);
-        this.fontSizeArr.push(util.namedSizeToPx(util.computedStyle(this.tags[i],'font-size')));
-        this.lineHtArr.push(util.namedSizeToPx(util.computedStyle(this.tags[i],'line-height')));
+        this.fontSizeArr.push(util.namedSizeToPx(util.computedStyle(this.tags[
+          i], 'font-size')));
+        this.lineHtArr.push(util.namedSizeToPx(util.computedStyle(this.tags[
+          i], 'line-height')));
       } else {
         g = 0;
       }
     }
     return [this.excludedArr, this.fontSizeArr, this.lineHtArr];
-  },
-  ln: function(){
-    return this.elemLoop.length;
   }
+},
+
+
+elems = getPageElem.elemLoop()[0],
+ftArr = getPageElem.elemLoop()[1],
+lhArr = getPageElem.elemLoop()[2],
+
+
+MimeticScale = {
+  scale: function() {
+      // winWidth left in function for performance.
+      var winWidth = window.innerWidth || document.documentElement.clientWidth ||
+        document.body.clientWidth;
+      var lineHightNow = fontSizeNow;
+      if (winWidth > 1024) {
+        for (var i = 0; i < elems.length; i++) {
+          var fontSizeNow = winWidth / (options.designWidth * 0.1);
+          elems[i].style.fontSize = parseInt(fontSizeNow * (ftArr[i] / 10)) +
+            'px';
+          elems[i].style.lineHeight = parseInt(lineHightNow * (lhArr[i] / 10)) +
+            'px';
+          console.log(fontSizeNow);
+        }
+      }
+    } //end of scale
 };
 
-var elems = getPageElem.elemLoop()[0];
-var ftArr = getPageElem.elemLoop()[1];
-var lhArr = getPageElem.elemLoop()[2];
-
-//console.log( util.computedStyle( elems[0],'font-size') );
-
-
-
-  var fontSizeOutput = util.computedStyle.call( this ,p[0], 'font-size'),
-  lineHeightOutput = util.computedStyle.call( this ,p[0], 'line-height'),
-  fontSize = util.namedSizeToPx(fontSizeOutput),
-  lineHeight = util.namedSizeToPx(lineHeightOutput);
-
-
-console.log(  lhArr[5] );
-// Get px values for...
-var fontRatio = fontSize / 10,
-    lineHeightRatio = lineHeight / 10;
-
-// screen width
-var screenWidth = screen.width;
-
-var MimeticScale = {
-    scale: function () {
-        // winWidth left in function for performance.
-        var winWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
-
-        var lineHightNow = fontSizeNow;
-
-       // if (winWidth > 1024) {
-            for (var i = 0; i < elems.length; i++) {
-                 var fontSizeNow =  winWidth / (options.designWidth  * 0.1);
-                  elems[i].style.fontSize = parseInt(fontSizeNow * (  ftArr[i]  / 10)) + 'px';
-                  elems[i].style.fontSize = parseInt(lineHightNow * (  lhArr[i]  / 10)) + 'px';
-
-                  console.log(fontSizeNow);
-                  //window.getPageElem.elemLoop()[0].style.fontSize = parseInt(fontSizeNow * fontRatio) + 'px';
-              //  .style.fontSize = parseInt(fontSizeNow * fontRatio) + 'px';
-/*
-                p[i].style.lineHeight = parseInt(lineHightNow * lineHeightRatio) + 'px';
-                p[i].style.fontSize = parseInt(fontSizeNow * fontRatio) + 'px';
-                dd[i].style.lineHeight = parseInt(lineHightNow * lineHeightRatio) + 'px';
-                dd[i].style.fontSize = parseInt(fontSizeNow * fontRatio) + 'px';
-                dt[i].style.lineHeight = parseInt(lineHightNow * lineHeightRatio) + 'px';
-                dt[i].style.fontSize = parseInt(fontSizeNow * fontRatio) + 'px';
- */
-            }
-
-
-     //   }
-
-    }
-};
 
 MimeticScale.scale();
-
 // Basic reisze needs to be revised with debounce /throttle
 if (window.attachEvent) {
-    window.attachEvent("onresize", MimeticScale.scale);
+  window.attachEvent("onresize", MimeticScale.scale);
 } else {
-    window.addEventListener("resize", MimeticScale.scale, false);
+  window.addEventListener("resize", MimeticScale.scale, false);
 }
 
-
-//alert(util.computedStyle.call(this,p[0],'font-size'));
+}());
 </script>
 </body>
 </html>
