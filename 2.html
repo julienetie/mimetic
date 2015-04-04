@@ -96,14 +96,14 @@ aside{
 
 
 p{
-margin: 1em 1em 0;
+margin: 20% 3em 50px 15pt;  /*  51.2px, 48px, 50px, 20px  */
 font-size: 1em;
 line-height: 1em;
 }
 
 h2{
 margin: 1em 1em 0;
-
+line-height: 1em;
 }
 
 /*scaled transition*/
@@ -175,16 +175,29 @@ images are scaled to fit any device. Your website is of full width/ height on ev
 (function(){
 
 
-var body = document.getElementsByTagName('body')[0],
-
-
-options = {
+var options = {
   designWidth: 1024,
   excludeTags: ['script', 'canvas']
 },
 
+body = document.getElementsByTagName('body')[0],
 
 util = {
+
+   getCSS: function(style, selector) {
+    for (var i = 0; i < document.styleSheets.length; i++) {
+        var mysheet = document.styleSheets[i];
+        var myrules = mysheet.cssRules ? mysheet.cssRules : mysheet.rules;
+        for (var j = 0; j < myrules.length; j++) {
+            if (myrules[j].selectorText && myrules[j].selectorText.toLowerCase() === selector) {
+                return myrules[j].style[style];
+            }
+        }
+
+    }
+},
+
+
   computedStyle: function(el, prop, getComputedStyle, style) {
     getComputedStyle = window.getComputedStyle;
     style = getComputedStyle ? getComputedStyle(el) : el.currentStyle;
@@ -252,7 +265,28 @@ util = {
     }
 
     return newVal;
-  }
+  },
+    normalizeMargins: function(margins) {
+      var marginDef = margins.split(' ');
+
+     var removeUnits = function(quantity){
+     return quantity.substr(0, quantity.length -2);
+     };
+    //
+    for(var i = 0; i < marginDef.length; i++){
+
+         if( marginDef[i].slice(-2) === 'px'){
+           marginDef[i] = removeUnits( marginDef[i]); //console.log( marginDef[i] +' px');
+         }else if(marginDef[i].slice(-2) === 'em'){
+           marginDef[i] = removeUnits( marginDef[i]) * 16; //console.log( marginDef[i] +'em');
+         }else if(marginDef[i].slice(-2) === '%'){
+           marginDef[i] = 1024 / removeUnits( marginDef[i]); //console.log( marginDef[i] +'%');
+         }else if( marginDef[i].indexOf('pt') >  -1){
+           marginDef[i] = removeUnits( marginDef[i]) * 96 / 72; //console.log( marginDef[i] +'pt');
+         }//...
+    }
+return marginDef;
+    }
 },
 
 
@@ -262,6 +296,7 @@ getPageElem = {
   excludedArr: [],
   fontSizeArr: [],
   lineHtArr: [],
+  marginArr: [],
   remove: options.excludeTags,
   elemLoop: function() {
     var g = 0;
@@ -278,13 +313,15 @@ getPageElem = {
           i], 'font-size')));
         this.lineHtArr.push(util.namedSizeToPx(util.computedStyle(this.tags[
           i], 'line-height')));
-        //alert( util.namedSizeToPx(  util.computedStyle(this.tags[i], 'font-size')  )) ;
+        this.marginArr.push(util.normalizeMargins( util.computedStyle(this.tags[6], 'margin'))); //2D array
       } else {
         g = 0;
       }
     }
+     // var margins = util.normalizeMargins( util.computedStyle(this.tags[6], 'margin'));
+ //console.log(margins);
+    return [this.excludedArr, this.fontSizeArr, this.lineHtArr, this.marginArr];
 
-    return [this.excludedArr, this.fontSizeArr, this.lineHtArr];
   }
 },
 
@@ -292,7 +329,7 @@ getPageElem = {
 elems = getPageElem.elemLoop()[0],
 ftArr = getPageElem.elemLoop()[1],
 lhArr = getPageElem.elemLoop()[2],
-
+mgArr = getPageElem.elemLoop()[3],
 
 
 MimeticScale = {
@@ -307,14 +344,15 @@ MimeticScale = {
           elems[i].style.fontSize = Math.round(fontSizeNow * (ftArr[i] / 10)) +
             'px';
           elems[i].style.lineHeight = Math.round(fontSizeNow * (lhArr[i] / 10)) +
+            'px';  //alert(util.computedStyle(elems[i],'margin'));
+        elems[i].style.lineHeight = Math.round(fontSizeNow * (lhArr[i] / 10)) +
             'px';
-          //console.log(fontSizeNow);
         }
       }
     } //end of scale
 };
 
-//alert(ftArr[5]);
+
 
 MimeticScale.scale();
 // Basic reisze needs to be revised with debounce /throttle
