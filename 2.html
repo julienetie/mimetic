@@ -36,7 +36,7 @@ margin: 0;
 @media only screen and (min-width: 40.063em) { } /* min-width 641px, medium screens */
 
 @media only screen and (min-device-width: 40.063em) {
-body{min-width: 998px;}
+/* body{min-width: 998px;} */
   } /* min-width 641px and max-width 1024px, use when QAing tablet-only issues */
 
 
@@ -108,10 +108,12 @@ line-height: 1em;
 
 /*scaled transition*/
 p{
+  /*
 	-webkit-transition: all 0.2s linear;
 -moz-transition: all 0.2s linear;
 -o-transition: all 0.2s linear;
 transition: all 0.2s linear;
+*/
 }
 
 </style>
@@ -176,205 +178,194 @@ images are scaled to fit any device. Your website is of full width/ height on ev
 <canvas></canvas>
 
 <script>
-(function(){
-
-
-
-
-
-var tempArr = [],
-  cleanArr = [],
-  fontSizeArr = [],
-  lineHtArr = [],
-  marginArr = [],
-  tmpMgVal = [];
-
-
-var options = {
-  designWidth: 1024,
-  excludeTags: ['script', 'canvas']
-},
-
-allTags = document.getElementsByTagName('body')[0].getElementsByTagName('*'),
-
-util = {
-
-   getCSS: function(style, selector) {
-    for (var i = 0; i < document.styleSheets.length; i++) {
-        var mysheet = document.styleSheets[i];
-        var myrules = mysheet.cssRules ? mysheet.cssRules : mysheet.rules;
-        for (var j = 0; j < myrules.length; j++) {
-            if (myrules[j].selectorText && myrules[j].selectorText.toLowerCase() === selector) {
-                return myrules[j].style[style];
-            }
-        }
-
-    }
-},
-
-
-  computedStyle: function(el, prop, getComputedStyle, style) {
-    getComputedStyle = window.getComputedStyle;
-    style = getComputedStyle ? getComputedStyle(el) : el.currentStyle;
-    if (style) {
-      return style[prop.replace(/-(\w)/gi, function(word, letter) {
-        return letter.toUpperCase();
-      })];
-    }
-  },
-  getPixelVal: function(prop) {
-    if (prop.indexOf("pt") > -1) {
-      prop = parseInt(prop, 10) * 96 / 72;
-    } else {
-      prop = parseInt(prop, 10);
-    }
-    return prop;
-  },
-  toArray: function(x) {
-    for (var i = 0, a = []; i < x.length; i++) a.push(x[i]);
-    return a;
-  },
-  namedSizeToPx: function(val) {
-    var newVal;
-    if (val.indexOf('px') > -1) {
-      newVal = parseInt(val, 10);
-    } else if (val.indexOf('pt') > -1) {
-      newVal = parseInt(val, 10) * 96 / 72;
-    } else if (val.indexOf('em') > -1) {
-      newVal = parseInt(val, 10) * 16;
-    }else {
-      switch (val) {
-        case 'xx-small':
-          newVal = 9;
-          break;
-        case 'x-small':
-          newVal = 10;
-          break;
-        case 'small':
-          newVal = 13;
-          break;
-        case 'normal':
-          newVal = 16;
-          break;
-        case 'medium':
-          newVal = 16;
-          break;
-        case 'large':
-          newVal = 18;
-          break;
-        case 'x-large':
-          newVal = 24;
-          break;
-        case 'xx-large':
-          newVal = 32;
-          break;
-        case 'larger':
-          console.log('font-size: "larger" is not supported');
-          newVal = 16;
-          break;
-        case 'smaller':
-          console.log('font-size: "smaller" is not supported');
-          newVal = 16;
-          break;
-      }
-    }
-
-    return newVal;
-  },
-    normalizeMargins: function(margins) { // Percenage is not currently working
-      var marginDef = margins.split(' ');
-
-     var removeUnits = function(quantity){
-     return quantity.substr(0, quantity.length -2);
-     };
-    //
-    for(var i = 0; i < marginDef.length; i++){
-
-         if( marginDef[i].slice(-2) === 'px'){
-           marginDef[i] = removeUnits( marginDef[i]); //console.log( marginDef[i] +' px');
-         }else if(marginDef[i].slice(-2) === 'em'){
-           marginDef[i] = removeUnits( marginDef[i]) * 16; //console.log( marginDef[i] +'em');
-         }else if(marginDef[i].slice(-2) === '%'){
-           marginDef[i] = 1024 / removeUnits( marginDef[i]); //console.log( marginDef[i] +'%');
-         }else if( marginDef[i].indexOf('pt') >  -1){
-           marginDef[i] = removeUnits( marginDef[i]) * 96 / 72; //console.log( marginDef[i] +'pt');
-         }//...
-    }
-return marginDef;
-    }
-},
-
-
-  elemLoop = (function() {
-
- var remove = options.excludeTags;
-    var g = 0;
-    for (var i = 0; i < allTags.length; i++) {
-      tempArr.push(allTags[i].tagName);
-      for (var j = 0; j < remove.length; j++) {
-        if (tempArr[i] === remove[j].toUpperCase()) {
-
-          tempArr[i] = undefined;
-        }
-      }
-
-        fontSizeArr.push(util.namedSizeToPx(util.computedStyle(allTags[
-          i], 'font-size')));
-        lineHtArr.push(util.namedSizeToPx(util.computedStyle(allTags[
-          i], 'line-height')));
-        marginArr.push(util.normalizeMargins(util.computedStyle(allTags[
-          i], 'margin')) );
-    }
-
-    cleanArr =  tempArr;
-  }()),
-
-
-MimeticScale = {
-  scale: function() {
-
-      // winWidth left in function for performance.
-      var winWidth = window.innerWidth || document.documentElement.clientWidth ||
-        document.body.clientWidth;
-    //  var lineHightNow = fontSizeNow;
-      if (winWidth > 1024) {
-
-        for (var i = 0; i < cleanArr.length; i++) {
-                var fontSizeNow = (winWidth / (options.designWidth * 0.1));
-          if(tempArr[i] !== undefined){
-          allTags[i].style.fontSize = Math.round(fontSizeNow * (fontSizeArr[i] / 10)) +  'px';
-          allTags[i].style.lineHeight = Math.round(fontSizeNow * (lineHtArr[i] / 10)) + 'px';
-          //console.log(i);
-          //alert(util.computedStyle(elems[i],'margin'));
+(function() {
   /*
-          for(j = 0; j < marginArr[i].length; j++){
-            if(tempArr[i] !== undefined){
-            tmpMgVal.push( Math.round(fontSizeNow * (marginArr[i][j] / 10)) + 'px');
-
-              }
+   *  MIMETIC  metric normalizer  **ALPHA**
+   *    Version:  0.5.0   
+   *      License: MIT
+   *        Author:  Julien Etienne
+   *          Contact:  julienetie@gmail.com
+   *            github:  https://github.com/julienetie/mimetic
+   *              twitter:  @julienetienne_
+   *‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
+   *  Place/ inject Mimetic directly into the page before </body>
+   *  for the best loading performance.
+   *
+   */
+  var options = {
+      designWidth: 1024,  /*  Design to this width  */
+      excludeTags: ['script', 'canvas'  /*  Add tags here  */ ]
+    },
+    tempArr = [],
+    cleanArr = [],
+    fontSizeArr = [],
+    lineHtArr = [],
+    marginArr = [],
+    tmpMgVal = [],
+    allTags = document.getElementsByTagName('body')[0].getElementsByTagName(
+      '*'),
+    util = {
+      getCSS: function(style, selector) {
+        for (var i = 0; i < document.styleSheets.length; i++) {
+          var mysheet = document.styleSheets[i];
+          var myrules = mysheet.cssRules ? mysheet.cssRules : mysheet.rules;
+          for (var j = 0; j < myrules.length; j++) {
+            if (myrules[j].selectorText && myrules[j].selectorText.toLowerCase() ===
+              selector) {
+              return myrules[j].style[style];
+            }
           }
-
-          */
-           allTags[i].style.margin =   tmpMgVal.join(' ');
-
-           }
         }
+      },
+
+
+      computedStyle: function(el, prop, getComputedStyle, style) {
+        getComputedStyle = window.getComputedStyle;
+        style = getComputedStyle ? getComputedStyle(el) : el.currentStyle;
+        if (style) {
+          return style[prop.replace(/-(\w)/gi, function(word, letter) {
+            return letter.toUpperCase();
+          })];
+        }
+      },
+
+
+      getPixelVal: function(prop) {
+        if (prop.indexOf("pt") > -1) {
+          prop = parseInt(prop, 10) * 96 / 72;
+        } else {
+          prop = parseInt(prop, 10);
+        }
+        return prop;
+      },
+      toArray: function(x) {
+        for (var i = 0, a = []; i < x.length; i++) a.push(x[i]);
+        return a;
+      },
+      namedSizeToPx: function(val) {
+        var newVal;
+        if (val.indexOf('px') > -1) {
+          newVal = parseInt(val, 10);
+        } else if (val.indexOf('pt') > -1) {
+          newVal = parseInt(val, 10) * 96 / 72;
+        } else if (val.indexOf('em') > -1) {
+          newVal = parseInt(val, 10) * 16;
+        } else {
+          switch (val) {
+            case 'xx-small':
+              newVal = 9;
+              break;
+            case 'x-small':
+              newVal = 10;
+              break;
+            case 'small':
+              newVal = 13;
+              break;
+            case 'normal':
+              newVal = 16;
+              break;
+            case 'medium':
+              newVal = 16;
+              break;
+            case 'large':
+              newVal = 18;
+              break;
+            case 'x-large':
+              newVal = 24;
+              break;
+            case 'xx-large':
+              newVal = 32;
+              break;
+            case 'larger':
+              console.log('font-size: "larger" is not supported');
+              newVal = 16;
+              break;
+            case 'smaller':
+              console.log('font-size: "smaller" is not supported');
+              newVal = 16;
+              break;
+          }
+        }
+        return newVal;
+      },
+      normalizeMargins: function(margins) { 
+        var marginDef = margins.split(' ');
+        var removeUnits = function(quantity) {
+          return quantity.substr(0, quantity.length - 2);
+        };
+        //
+        for (var i = 0; i < marginDef.length; i++) {
+          if (marginDef[i].slice(-2) === 'px') {
+            marginDef[i] = removeUnits(marginDef[i]); //console.log( marginDef[i] +' px');
+          } else if (marginDef[i].slice(-2) === 'em') {
+            marginDef[i] = removeUnits(marginDef[i]) * 16; //console.log( marginDef[i] +'em');
+          } else if (marginDef[i].slice(-2) === '%') {
+            marginDef[i] = 1024 / removeUnits(marginDef[i]); //console.log( marginDef[i] +'%');
+          } else if (marginDef[i].indexOf('pt') > -1) {
+            marginDef[i] = removeUnits(marginDef[i]) * 96 / 72; //console.log( marginDef[i] +'pt');
+          } //...
+        }
+        return marginDef;
       }
-    } //end of scale
-};
+    },
+    elemLoop = (function() {
+      var remove = options.excludeTags;
+      var g = 0;
+      for (var i = 0; i < allTags.length; i++) {
+        tempArr.push(allTags[i].tagName);
+        for (var j = 0; j < remove.length; j++) {
+          if (tempArr[i] === remove[j].toUpperCase()) {
+            tempArr[i] = undefined;
+          }
+        }
+        fontSizeArr.push(util.namedSizeToPx(util.computedStyle(allTags[i],
+          'font-size')));
+        lineHtArr.push(util.namedSizeToPx(util.computedStyle(allTags[i],
+          'line-height')));
+        marginArr.push(util.normalizeMargins(util.computedStyle(allTags[i],
+          'margin')));
+      }
+      cleanArr = tempArr;
+    }()),
+    MimeticScale = {
+      scale: function() {
+        var winWidth = window.innerWidth || document.documentElement.clientWidth ||
+          document.body.clientWidth;
+    //    if (winWidth > 1024) {
+          for (var i = 0; i < cleanArr.length; i++) {
+            var fontSizeNow = (winWidth / (options.designWidth * 0.1));
+            if (tempArr[i] !== undefined) {
+              allTags[i].style.fontSize = Math.round(fontSizeNow * (
+                fontSizeArr[i] / 10)) + 'px';
+              allTags[i].style.lineHeight = Math.round(fontSizeNow * (
+                lineHtArr[i] / 10)) + 'px';
+              
+for (j = 0; j < marginArr[i].length; j++) {
 
+    tmpMgVal.push(Math.round(fontSizeNow * (marginArr[i][j] / 10)) + 'px');
 
-MimeticScale.scale();
-// Basic reisze needs to be revised with debounce /throttle
-
-if (window.attachEvent) {
-  window.attachEvent("onresize", MimeticScale.scale);
-} else {
-  window.addEventListener("resize", MimeticScale.scale, false);
+}
+if(marginArr[i].length === j){
+allTags[i].style.margin = tmpMgVal.join(' ');
+console.log(allTags[i].style.margin = tmpMgVal.join(' '));
+tmpMgVal = [];
 }
 
 
 
+
+         
+            }
+          }
+    //    }
+      }
+    };
+  MimeticScale.scale();
+  if (window.attachEvent) {
+    window.attachEvent("onresize", MimeticScale.scale);
+  } else {
+    window.addEventListener("resize", MimeticScale.scale, false);
+  }
 }());
 </script>
 </body>
