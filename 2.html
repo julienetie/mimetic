@@ -96,10 +96,10 @@ aside{
 
 
 p{
-margin: 1em;  /*  51.2px, 48px, 50px, 20px  */
+margin: 20px;  /*  51.2px, 48px, 50px, 20px  */
 font-size: 1em;
 line-height: 1em;
-padding: 4em;
+padding: 64px;
 }
 
 h2{
@@ -180,6 +180,7 @@ images are scaled to fit any device. Your website is of full width/ height on ev
 
 <script>
 (function() {
+  'use strict';
   /*
    *  MIMETIC  metric normalizer  **ALPHA**
    *    Version:  0.5.0   
@@ -213,7 +214,7 @@ images are scaled to fit any device. Your website is of full width/ height on ev
 */
 
     },
-    k,
+    i,
     pxVal,
     designWidthRatio,
     tempArr = [],
@@ -227,8 +228,6 @@ images are scaled to fit any device. Your website is of full width/ height on ev
     allTags = document.getElementsByTagName('body')[0].getElementsByTagName(
       '*'),
     util = {
-
-
 
       computedStyle: function(el, prop, getComputedStyle, style) {
         getComputedStyle = window.getComputedStyle;
@@ -300,41 +299,76 @@ images are scaled to fit any device. Your website is of full width/ height on ev
         return pxVal;
       },
 
+      convertUnits: function(propDef, iter){
+        var preSfx = propDef[iter].slice(-2),
+           cleanPropDef = parseInt(propDef[iter],10),
+         suffix = {
+            'px': cleanPropDef,
+            'em': cleanPropDef * 16,
+            '%': 1024 / cleanPropDef,
+            'pt': cleanPropDef * 96 / 72,
+            cutSuffix: function(suffixType){
+                propDef[iter] = this[suffixType];
+              return propDef;
+            }
+          }.cutSuffix(preSfx); 
+      },
+
       sanitizeShorthand: function(propVal) { 
         var propValDef = propVal.split(' ');
-        var removeUnits = function(quantity) {
-          return parseInt(quantity, 10);
-        };
-        //
+
         for (var i = 0; i < propValDef.length; i++) {
-          if (propValDef[i].slice(-2) === 'px') {
-            propValDef[i] = removeUnits(propValDef[i]); //console.log( propValDef[i] +' px');
-          } else if (propValDef[i].slice(-2) === 'em') {
-            propValDef[i] = removeUnits(propValDef[i]) * 16; //console.log( propValDef[i] +'em');
-          } else if (propValDef[i].slice(-2) === '%') {
-            propValDef[i] = 1024 / removeUnits(propValDef[i]); //console.log( propValDef[i] +'%');
-          } else if (propValDef[i].indexOf('pt') > -1) {
-            propValDef[i] = removeUnits(propValDef[i]) * 96 / 72; //console.log( propValDef[i] +'pt');
-          } 
+          this.convertUnits(propValDef, i);
         }
         return propValDef;
-      }
-    }, // End of util
+
+      },
+
+      setBoundaryProp: function(propType,tempPropVal,propArr,iterI){
+        tempPropVal = [];
+        i = 0;
+          while (i < propArr[iterI].length) {
+            tempPropVal.push(Math.round(designWidthRatio * (propArr[iterI][i] / 10)) + 'px');
+          if (i === propArr[iterI].length - 1) {
+            allTags[iterI].style[propType] = tempPropVal.join(' ');
+          }
+          i++;
+        }
+      },
+    }, //
 
     elemLoop = (function() {
       var remove = options.excludeTags;
-      var g = 0;
       for (var i = 0; i < allTags.length; i++) {
         tempArr.push(allTags[i].tagName);
         for (var j = 0; j < remove.length; j++) {
-          if (tempArr[i] === remove[j].toUpperCase()) {
+          if (tempArr[i] === remove[j].toUpperCase())
             tempArr[i] = undefined;
-          }
         }
-        fontSizeArr.push(util.nameValTopx(util.computedStyle(allTags[i], 'font-size')));
-        lineHtArr.push(util.nameValTopx(util.computedStyle(allTags[i], 'line-height')));
-        marginArr.push(util.sanitizeShorthand(util.computedStyle(allTags[i], 'margin')));
-        paddingArr.push(util.sanitizeShorthand(util.computedStyle(allTags[i], 'padding')));
+        fontSizeArr.push(
+          util.nameValTopx(
+            util.computedStyle(
+              allTags[i], 'font-size')
+            )
+          );
+        lineHtArr.push(
+          util.nameValTopx(
+            util.computedStyle(
+              allTags[i], 'line-height')
+            )
+          );
+        marginArr.push(
+          util.sanitizeShorthand(
+            util.computedStyle(
+              allTags[i], 'margin')
+            )
+          );
+        paddingArr.push(
+          util.sanitizeShorthand(
+            util.computedStyle(
+              allTags[i], 'padding')
+            )
+          );
       }
       cleanArr = tempArr;
     }()),
@@ -350,27 +384,11 @@ images are scaled to fit any device. Your website is of full width/ height on ev
               allTags[i].style.fontSize = Math.round(designWidthRatio * (fontSizeArr[i] / 10)) + 'px';
               //  line-height
               allTags[i].style.lineHeight = Math.round(designWidthRatio * (lineHtArr[i] / 10)) + 'px';
-              //  margin Array
-              for (j = 0; j < marginArr[i].length; j++) {
-                tmpMgVal.push(Math.round(designWidthRatio * (marginArr[i][j] / 10)) + 'px');
-              }
-              //  padding Array
-              for (k = 0; k < paddingArr[i].length; k++) {
-                tmpPdVal.push(Math.round(designWidthRatio * (paddingArr[i][k] / 10)) + 'px');
-              }
-              //  set margin
-              if (marginArr[i].length === j) {
-                allTags[i].style.margin = tmpMgVal.join(' ');
-               // console.log(allTags[i].style.margin = tmpMgVal.join(' '));
-                tmpMgVal = [];
-              }
-              //  set padding
-              if (paddingArr[i].length === k) {
-                allTags[i].style.padding = tmpPdVal.join(' ');
-                
-                console.log(allTags[i].style.padding = tmpPdVal.join(' '));
-                tmpPdVal = [];
-              }
+              // margin 
+              util.setBoundaryProp('margin', tmpMgVal,marginArr,i);
+              // padding
+              util.setBoundaryProp('padding', tmpPdVal,paddingArr,i);
+
             }else{
               // set to default values 
             }
@@ -378,17 +396,14 @@ images are scaled to fit any device. Your website is of full width/ height on ev
       // }
       }
     };
-  Mimetic.scale();
 
+  Mimetic.scale();
 
   if (window.attachEvent) {
     window.attachEvent("onresize", Mimetic.scale);
   } else {
     window.addEventListener("resize", Mimetic.scale, false);
   }
-
-
-
 }());
 </script>
 </body>
