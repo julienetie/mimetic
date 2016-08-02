@@ -38,40 +38,18 @@
 
 
     var util = {
-        computedStyle: function(el, prop) {
-          var getComputedStyle = window.getComputedStyle;
-          var style = getComputedStyle ? getComputedStyle(el) : el.currentStyle;
-          if (style) {
-            return style[prop.replace(/-(\w)/gi, function(word, letter) {
-              return letter.toUpperCase();
-            })];
-          }
+        computedStyle: function(element, property) {
+          return window.getComputedStyle(element, null).getPropertyValue(property);
         },
 
 
-        getPixelVal: function(prop) {
-          if (prop.indexOf("pt") > -1) {
-            prop = parseInt(prop, 10) * 96 / 72;
-          } else {
-            prop = parseInt(prop, 10);
-          }
-          return prop;
-        },
-
-
-        toArray: function(x) {
-          for (var i = 0, a = []; i < x.length; i++) a.push(x[i]);
-          return a;
-        },
-
-
-        nameValTopx: function(val) {
-
-          if (val.indexOf('px') > -1) {
+        unitsToREM: function(val) {
+          console.log(val)
+          if (val.indexOf('px') >= 0) {
             pxVal = parseInt(val, 10);
-          } else if (val.indexOf('pt') > -1) {
+          } else if (val.indexOf('pt')  >= 0) {
             pxVal = parseInt(val, 10) * 96 / 72;
-          } else if (val.indexOf('em') > -1) {
+          } else if (val.indexOf('em')  >= 0) {
             pxVal = parseInt(val, 10) * 16;
           } else {
 
@@ -165,15 +143,17 @@
               tempArr[i] = undefined;
           }
 
+  // console.log('font-size', util.computedStyle(allElements[i], 'line-height'))
+
           fontSizeArr.push(
-            util.nameValTopx(
+            util.unitsToREM(
               util.computedStyle(
                 allElements[i], 'font-size')
             )
           );
 
           lineHtArr.push(
-            util.nameValTopx(
+            util.unitsToREM(
               util.computedStyle(
                 allElements[i], 'line-height')
             )
