@@ -1,88 +1,66 @@
-var gulp          = require('gulp'),
-    jshint        = require('gulp-jshint'),
-    fileInsert    = require('gulp-file-insert'),
-    uglify        = require('gulp-uglify'),
-    rename        = require('gulp-rename'),
-    header        = require('gulp-header'),
-    pkg           = require('./package.json'),
+const gulp = require('gulp');
+const rename = require('gulp-rename');
+const uglify = require('gulp-uglify');
+const concat = require('gulp-concat');
+const plumber = require('gulp-plumber');
+const notify = require('gulp-notify');
+const header = require('gulp-header');
+const pkg = require('./package.json');
+const bump = require('gulp-bump');
+
+const banner = ['/**',
+        ' * <%= pkg.name %>',
+        ' * Version:  <%= pkg.version %>',
+        ' * License:  <%= pkg.license %>',
+        ' * Copyright <%= pkg.author %> 2015 - ' + new Date().getFullYear() +' All Rights Reserved.',
+        ' * github:  <%= pkg.repository.url %>',
+        ' *‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾',
+        ' */',
+        ''
+    ].join('\n');
 
 
-    js = './src/**/*.js',
-    sources = [
-    './src/**/*.js',
-    './src/**/*.html',
-    './src/**/*.css'],
+/**
+ * src files in order.
+ */
+const src = [
+    // Wrapper start.
+    './src/amd-wrapper-start.js',
+
+    // RequestAnimationFrame polyfill.
+    './libs/resizilla.js',
+
+    // Resizilla for window resize debouncing.
+    './src/mimetic.js',
+
+    // Wrapper end.
+    './src/amd-wrapper-end.js'
+];
 
 
-    banner = ['/**',
-  '/*',
-  ' *  <%= pkg.name %> - <%= pkg.description %>',
-  ' *    Version:  v<%= pkg.version %>',
-  ' *      License:  <%= pkg.license %>',
-  ' *        Author:  <%= pkg.author %>',
-  ' *          Contact:  julienetie@gmail.com',
-  ' *            github:  <%= pkg.repository.url %>',
-  ' *              twitter:  @julienetienne_',
-  ' *‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾',
-  ' *  Place/ inject Mimetic directly into the page before </ body>',
-  ' *  for seamless results .',
-  ' *',
-  ' */',
-  ''].join('\n'),
-
-
-    minBanner = ['/**',
-  ' * <%= pkg.name %> - <%= pkg.description %>',
-  ' * @version v<%= pkg.version %>',
-  ' * @license <%= pkg.license %>',
-  ' * Paste or insert Mimetic directly into the page before </ body> for seamless results.',
-  ' */',
-  ''].join('\n');
-
-
-// ./dist/mimetic.min.js
-gulp.task('make-min', function() {
-  gulp.src(js)
-  .pipe(uglify())
-  .pipe(header(minBanner, { pkg : pkg } ))
-  .pipe(rename({
-    extname: '.min.js'
-  }))
-
-  .pipe(gulp.dest('./dist'));
+gulp.task('build', function() {
+    return gulp.src(src)
+        .pipe(plumber({errorHandler: notify.onError("Error: <%= error.message %>")}))
+        .pipe(concat('mimetic.js'))
+        .pipe(header(banner, {
+                pkg: pkg
+            }))
+        .pipe(gulp.dest('./dist'))
+        .pipe(uglify())
+        .pipe(header(banner, {
+                pkg: pkg
+            }))
+        .pipe(rename('mimetic.min.js'))
+        .pipe(gulp.dest('./dist'));
 });
 
 
+gulp.task('default', ['build']);
 
 
-// ./dist/mimetic.js
-gulp.task('make', function() {
-  gulp.src(js)
-  .pipe(header(banner, { pkg : pkg } ))  
-  .pipe(gulp.dest('./dist'));
+/**
+ * Watch for changes.
+ */
+gulp.task('watch', function(){
+    gulp.watch(['./src/**.js','./libs/**.js'], ['build']);
 });
-
-
-gulp.task('insert', function() {
-  gulp.src('./src/insert-template/mimetic.html').pipe(fileInsert({
-    '/* normalize.min.css */': './vendor/normalize.min.css',
-    '/* style.css */': './src/style.css',
-    '/* mimetic.js */': './src/mimetic.js',
-    '/* html5shiv.min.js */': './vendor/html5shiv.min.js'
-  })).pipe(gulp.dest('./'));
-});
-
-
-gulp.task('lint', function() {
-  return gulp.src(js)
-    .pipe(jshint())
-    .pipe(jshint.reporter('jshint-stylish'));
-});
-
-
-gulp.task('watch', function() {
-  gulp.watch(sources,['insert','lint','make-min','make']);
-});
-
-
-gulp.task('default', ['watch','lint','insert','make-min','make']);

@@ -1,7 +1,7 @@
 {
   "name": "mimetic",
   "version": "0.4.0",
-  "description": "Metric Normalizer",
+  "description": "Scalable Desing Framework",
   "main": "gulpfile.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -13,13 +13,13 @@
   "author": "Julien Etienne",
   "license": "MIT",
   "devDependencies": {
-    "gulp": "*",
-    "gulp-file-insert": "*",
-    "gulp-header": "*",
-    "gulp-jshint": "^2.0.1",
-    "gulp-rename": "*",
-    "gulp-uglify": "*",
-    "jshint": "^2.9.2",
-    "jshint-stylish": "*"
+    "gulp": "^3.9.1",
+    "gulp-bump": "^2.2.0",
+    "gulp-concat": "^2.6.0",
+    "gulp-header": "^1.8.7",
+    "gulp-notify": "^2.2.0",
+    "gulp-plumber": "^1.1.0",
+    "gulp-rename": "^1.2.2",
+    "gulp-uglify": "^1.5.4"
   }
 }
