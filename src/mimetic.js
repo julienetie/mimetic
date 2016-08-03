@@ -1,6 +1,20 @@
 (function(window, document, undefined) {
     'use strict';
 
+
+
+// unit  name  equivalence
+// cm  centimeters 1cm = 96px/2.54
+// mm  millimeters 1mm = 1/10th of 1cm
+// q quarter-millimeters 1q = 1/40th of 1cm
+// in  inches  1in = 2.54cm = 96px
+// pc  picas 1pc = 1/6th of 1in
+// pt  points  1pt = 1/72th of 1in
+// px  pixels  1px = 1/96th of 1in
+
+
+
+
     var CSSUnits = [{
       unit: 'px',
       //  1 / 16
@@ -110,7 +124,7 @@
           .shift();
 
           remValue = metricInfo ? numberValue * metricInfo.REMFactor : aliasValueToREM(value);
-
+          console.log('unitsToREM', remValue)
           return remValue;
         }
 
@@ -118,11 +132,14 @@
           return window.getComputedStyle(element, null).getPropertyValue(property);
         }
 
+
+
+
         var util = {
             convertUnits: function(propDef, iter) {
-              var preSfx = propDef[iter].slice(-2),
-                cleanPropDef = parseInt(propDef[iter], 10),
-                suffix = {
+              var preSfx = propDef[iter].slice(-2);
+              var cleanPropDef = parseInt(propDef[iter], 10);
+              var suffix = {
                   'px': cleanPropDef,
                   'em': cleanPropDef * 16,
                   '%': 1024 / cleanPropDef,
@@ -134,9 +151,8 @@
                 }.cutSuffix(preSfx);
             },
 
-
-            sanitizeShorthand: function(propVal) {
-              var propValDef = propVal.split(' ');
+            sanitizeShorthand: function(value) {
+              var propValDef = value.split(' ');
               for (var i = 0; i < propValDef.length; i++) {
                 this.convertUnits(propValDef, i);
               }
@@ -206,25 +222,31 @@
           }()),
 
 
-          mimetic = {
-            scale: function() {
-              var winWidth = window.innerWidth;
-              if (winWidth > 1024) {
+     mimetic = {
+        scale: function() {
 
-                designWidthRatio = winWidth / options.designWidth * 0.1;
-                for (var i = 0; i < cleanArr.length; i++) {
+          var winWidth = window.innerWidth;
+          if (winWidth > 1024) {
 
-                  if (tempArr[i] !== undefined) {
-                    allElements[i].style.fontSize = Math.round(designWidthRatio * (fontSizeArr[i] / 10)) + 'rem';
-                    allElements[i].style.lineHeight = Math.round(designWidthRatio * (lineHtArr[i] / 10)) + 'rem';
-                    util.setBoundaryProp('margin', tmpMgVal, marginArr, i);
-                    util.setBoundaryProp('padding', tmpPdVal, paddingArr, i);
+            var _DesignWidthRatio = winWidth / options.designWidth;
+              console.log(_DesignWidthRatio)
+            for (var i = 0; i < cleanArr.length; i++) {
 
-                  }
-                }
+              if (tempArr[i]) {
+                console.log('_DesignWidthRatio * fontSizeArr[i]',_DesignWidthRatio * fontSizeArr[i])
+                allElements[i].style.fontSize = _DesignWidthRatio * fontSizeArr[i] + 'rem';
+                allElements[i].style.lineHeight =  _DesignWidthRatio  * lineHtArr[i] + 'rem';
+                
+                util.setBoundaryProp('margin', tmpMgVal, marginArr, i);
+                util.setBoundaryProp('padding', tmpPdVal, paddingArr, i);
+
+              } else {
+                // 
               }
             }
-          };
+          }
+        }
+      };
 
         mimetic.scale();
         resizilla(mimetic.scale, 180, false);
