@@ -87,8 +87,7 @@
     var
       i,
       designWidthRatio,
-      tempArr = [],
-      cleanArr = [],
+      tagNames = [],
       fontSizeArr = [],
       lineHtArr = [],
       marginArr = [],
@@ -98,6 +97,7 @@
 
 
     var allElements = document.getElementsByTagName('body')[0].getElementsByTagName('*');
+    var allElementsArr = [].slice.call(allElements);
 
 
     function aliasValueToREM(value) {
@@ -136,105 +136,101 @@
       return newShorthandArr;
     }
 
-    function setBoundaryProp(propType, tempPropVal, propArr, iterI, designWidthRatio) {
+    function setBoundaryProp(propType, tempPropVal, propArr, iterI, designWidthRatio, cleanElements) {
       tempPropVal = [];
       i = 0;
       while (i < propArr[iterI].length) {
-        // console.log(designWidthRatio)
+
         tempPropVal.push(parseFloat(designWidthRatio * propArr[iterI][i]).toFixed(3) + 'rem');
         if (i === propArr[iterI].length - 1) {
-          console.log(tempPropVal)
-          allElements[iterI].style[propType] = tempPropVal.join(' ');
+          cleanElements[iterI].style[propType] = tempPropVal.join(' ');
         }
         i++;
       }
     }
 
 
-    (function() {
 
+    function processElements() {
       var remove = options.excludeTags;
+      var cleanElements = allElementsArr.filter(function(element, i) {
+        return remove.every(function(excludeValue) {
+          return excludeValue !== element.nodeName.toLowerCase();
+        });
+      });
 
-      for (var i = 0; i < allElements.length; i++) {
-        tempArr.push(allElements[i].tagName);
-        for (var j = 0; j < remove.length; j++) {
-          if (tempArr[i] === remove[j].toUpperCase())
-            tempArr[i] = undefined;
-        }
-
+      cleanElements.forEach(function(element) {
         fontSizeArr.push(
           unitsToREM(
             computedStyle(
-              allElements[i], 'font-size')
+              element, 'font-size')
           )
         );
 
         lineHtArr.push(
           unitsToREM(
             computedStyle(
-              allElements[i], 'line-height')
+              element, 'line-height')
           )
         );
 
         marginArr.push(
           sanitizeShorthand(
             computedStyle(
-              allElements[i], 'margin')
+              element, 'margin')
           )
         );
 
         paddingArr.push(
           sanitizeShorthand(
             computedStyle(
-              allElements[i], 'padding')
+              element, 'padding')
           )
         );
+      });
 
-      }
-
-      cleanArr = tempArr;
-
-    }());
+      return cleanElements;
+    }
 
 
-    var mimetic = {
-      scale: function() {
-        var winWidth = window.innerWidth;
 
-        for (var i = 0; i < cleanArr.length; i++) {
-          if (winWidth > 1024) {
-            var designWidthRatio = winWidth / options.designWidth;
-            if (tempArr[i]) {
-              // FONT SIZE
-              allElements[i].style.fontSize = parseFloat(designWidthRatio * fontSizeArr[i]).toFixed(3) + 'rem';
-              // LINE HEIGHT
-              allElements[i].style.lineHeight = parseFloat(designWidthRatio * lineHtArr[i]).toFixed(3) + 'rem';
-              // MARGIN
-              setBoundaryProp('margin', tmpMgVal, marginArr, i, designWidthRatio);
-              // PADDING
-              setBoundaryProp('padding', tmpPdVal, paddingArr, i, designWidthRatio);
-            }
-          } else {
-            // When below 1025 the font-size property is removed from the style attribute
-            // preventing rendering issues for downsizing. 
-            var inlineStyle = allElements[i].getAttribute('style');
-            var inlineStyleAsArray;
-            if (inlineStyle) {
-              var test = inlineStyle
-                .split('; ')
-                .filter(function(style) {
-                  return style.indexOf('font-size') == -1;
-                }).join('; ');
-              allElements[i].setAttribute('style', test)
-            }
+
+
+    function mimeticScale() {
+      var cleanElements = processElements();
+      var winWidth = window.innerWidth;
+
+      for (var i = 0; i < cleanElements.length; i++) {
+        if (winWidth > 1024) {
+          var designWidthRatio = winWidth / options.designWidth;
+          // FONT SIZE
+          cleanElements[i].style.fontSize = parseFloat(designWidthRatio * fontSizeArr[i]).toFixed(3) + 'rem';
+          // LINE HEIGHT
+          cleanElements[i].style.lineHeight = parseFloat(designWidthRatio * lineHtArr[i]).toFixed(3) + 'rem';
+          // MARGIN
+          setBoundaryProp('margin', tmpMgVal, marginArr, i, designWidthRatio, cleanElements);
+          // PADDING
+          setBoundaryProp('padding', tmpPdVal, paddingArr, i, designWidthRatio, cleanElements);
+        } else {
+          // When below 1025 the font-size property is removed from the style attribute
+          // preventing rendering issues for downsizing. 
+          var inlineStyle = cleanElements[i].getAttribute('style');
+          var inlineStyleAsArray;
+          if (inlineStyle) {
+            var test = inlineStyle
+              .split('; ')
+              .filter(function(style) {
+                return style.indexOf('font-size') == -1;
+              }).join('; ');
+            cleanElements[i].setAttribute('style', test)
           }
         }
-
       }
-    };
+    }
 
-    mimetic.scale();
-    resizilla(mimetic.scale, 150, false);
+
+    mimeticScale();
+    resizilla(mimeticScale, 150, false);
   }
 
   window.addEventListener("DOMContentLoaded", function() {
