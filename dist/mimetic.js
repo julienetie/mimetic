@@ -461,45 +461,50 @@ else if (typeof window === 'object') {
 }((typeof window === "undefined" ? {} : window)));
 
 (function(window, document, undefined) {
-    'use strict';
+  'use strict';
 
-    // unit  name  equivalence
-    // cm  centimeters 1cm = 96px/2.54
-    // mm  millimeters 1mm = 1/10th of 1cm
-    // q quarter-millimeters 1q = 1/40th of 1cm
-    // in  inches  1in = 2.54cm = 96px
-    // pc  picas 1pc = 1/6th of 1in
-    // pt  points  1pt = 1/72th of 1in
-    // px  pixels  1px = 1/96th of 1in
+  // unit  name  equivalence
+  // cm  centimeters 1cm = 96px/2.54
+  // mm  millimeters 1mm = 1/10th of 1cm
+  // q quarter-millimeters 1q = 1/40th of 1cm
+  // in  inches  1in = 2.54cm = 96px
+  // pc  picas 1pc = 1/6th of 1in
+  // pt  points  1pt = 1/72th of 1in
+  // px  pixels  1px = 1/96th of 1in
 
-    var options = {};
+  var options = {};
 
-    // Design to this width
-    options.designWidth = 1024;
+  // Design to this width
+  options.designWidth = 1024;
 
-    // Add tags to exclude here
-    options.excludeTags = ['script', 'canvas'];
+  // Add tags to exclude here
+  options.excludeTags = ['script', 'canvas'];
 
-    // Interpolate tags to preserve animation state
-    options.interpolateTags = []
+  // Interpolate tags to preserve animation state
+  options.interpolateTags = []
 
-    // Scale font-size
-    options.mimeticFonts = true;
+  // Scale font-size
+  options.mimeticFonts = true;
 
-    // Scale line-height 
-    options.mimeticLineHt = true;
+  // Scale line-height 
+  options.mimeticLineHt = true;
 
-    // Scale margin 
-    options.mimeticMargin = true;
+  // Scale margin 
+  options.mimeticMargin = true;
 
-    // Scale padding  
-    options.mimeticPadding = true;
+  // Scale padding  
+  options.mimeticPadding = true;
 
-    // For designs that exceed the overflow of the initial contiaining block.
-    options.infinateCanvas = false;
+  // For designs that exceed the overflow of the initial contiaining block.
+  options.infinateCanvas = false;
 
-    // Performance {0} vs cosmetic accuracy {4}
-    options.fidelity = 3;
+  // Performance {0} vs cosmetic accuracy {4}
+  options.fidelity = 3;
+
+  // options.delay = ms
+
+  // options.incept = boolean
+
 
   var CSSUnits = [{
     unit: 'px',
@@ -516,6 +521,46 @@ else if (typeof window === 'object') {
   }, {
     unit: 'rem',
     // 1
+    REMFactor: 1
+  }, {
+    unit: 'cm',
+    // ???
+    REMFactor: 1
+  }, {
+    unit: 'q',
+    // ???
+    REMFactor: 1
+  }, {
+    unit: 'in',
+    // ???
+    REMFactor: 1
+  }, {
+    unit: 'pc',
+    // 96 / 72 / 12 / 16
+    REMFactor: 0.00694444444
+  }, {
+    unit: 'ex',
+    // ???
+    REMFactor: 1
+  }, {
+    unit: 'ch',
+    // ???
+    REMFactor: 1
+  }, {
+    unit: 'vw',
+    // Needs override.
+    REMFactor: 1
+  }, {
+    unit: 'vh',
+    // Needs override.
+    REMFactor: 1
+  }, {
+    unit: 'vmin',
+    // Needs override.
+    REMFactor: 1
+  }, {
+    unit: 'vmax',
+    // Needs override.
     REMFactor: 1
   }];
 
@@ -668,8 +713,6 @@ else if (typeof window === 'object') {
 
 
 
-
-
     function mimeticScale() {
       var cleanElements = processElements();
       var winWidth = window.innerWidth;
@@ -682,9 +725,9 @@ else if (typeof window === 'object') {
           // LINE HEIGHT
           cleanElements[i].style.lineHeight = parseFloat(designWidthRatio * lineHtArr[i]).toFixed(3) + 'rem';
           // MARGIN
-          cleanElements[i].style.margin = setBoundaryProp('margin', tmpMgVal, marginArr, i, designWidthRatio);
+          cleanElements[i].style.margin = setBoundaryProp(tmpMgVal, marginArr, i, designWidthRatio);
           // PADDING
-          cleanElements[i].style.padding = setBoundaryProp('padding', tmpPdVal, paddingArr, i, designWidthRatio);
+          cleanElements[i].style.padding = setBoundaryProp(tmpPdVal, paddingArr, i, designWidthRatio);
         } else {
           // When below 1025 the font-size property is removed from the style attribute
           // preventing rendering issues for downsizing. 
@@ -696,7 +739,7 @@ else if (typeof window === 'object') {
               .filter(function(style) {
                 // 1) exclude elements from being modified when within 1024, 
                 // 2) animate using classes only, 
-                // 3) ??? 
+                // 3) Ideally you should not be animating margins and padding, use transform and translate. 
                 return !['font-size', 'line-height', 'margin', 'padding'].some(function(property) {
                   return style.indexOf(property) >= 0;
                 });
@@ -709,7 +752,7 @@ else if (typeof window === 'object') {
 
 
     mimeticScale();
-    resizilla(mimeticScale, 150, false);
+    resizilla(mimeticScale, options.delay || 180, optioins.incept || false);
   }
 
   window.addEventListener("DOMContentLoaded", function() {

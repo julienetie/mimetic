@@ -1,3 +1,11 @@
+/**
+ * mimetic
+ * Version:  0.4.0
+ * License:  MIT
+ * Copyright Julien Etienne 2015 - 2016 All Rights Reserved.
+ * github:  https://github.com/julienetie/mimetic.git
+ *‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
+ */
 (function(window, document, undefined) {
   'use strict';
 
