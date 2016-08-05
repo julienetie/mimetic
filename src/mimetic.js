@@ -1,32 +1,43 @@
 (function(window, document, undefined) {
-  'use strict';
+    'use strict';
 
-  // unit  name  equivalence
-  // cm  centimeters 1cm = 96px/2.54
-  // mm  millimeters 1mm = 1/10th of 1cm
-  // q quarter-millimeters 1q = 1/40th of 1cm
-  // in  inches  1in = 2.54cm = 96px
-  // pc  picas 1pc = 1/6th of 1in
-  // pt  points  1pt = 1/72th of 1in
-  // px  pixels  1px = 1/96th of 1in
+    // unit  name  equivalence
+    // cm  centimeters 1cm = 96px/2.54
+    // mm  millimeters 1mm = 1/10th of 1cm
+    // q quarter-millimeters 1q = 1/40th of 1cm
+    // in  inches  1in = 2.54cm = 96px
+    // pc  picas 1pc = 1/6th of 1in
+    // pt  points  1pt = 1/72th of 1in
+    // px  pixels  1px = 1/96th of 1in
 
-  var options = {};
-  // Design to this width
-  options.designWidth = 1024;
-  // Add tags to exclude here
-  options.excludeTags = ['script', 'canvas'];
-  // Scale font-size
-  options.mimeticFonts = true;
-  // Scale line-height 
-  options.mimeticLineHt = true;
-  // Scale margin 
-  options.mimeticMargin = true;
-  // Scale padding  
-  options.mimeticPadding = true;
-  // For designs that exceed the overflow of the initial contiaining block.
-  options.infinateCanvas = false;
-  // Performance {0} vs cosmetic accuracy {4}
-  options.fidelity = 3;
+    var options = {};
+
+    // Design to this width
+    options.designWidth = 1024;
+
+    // Add tags to exclude here
+    options.excludeTags = ['script', 'canvas'];
+
+    // Interpolate tags to preserve animation state
+    options.interpolateTags = []
+
+    // Scale font-size
+    options.mimeticFonts = true;
+
+    // Scale line-height 
+    options.mimeticLineHt = true;
+
+    // Scale margin 
+    options.mimeticMargin = true;
+
+    // Scale padding  
+    options.mimeticPadding = true;
+
+    // For designs that exceed the overflow of the initial contiaining block.
+    options.infinateCanvas = false;
+
+    // Performance {0} vs cosmetic accuracy {4}
+    options.fidelity = 3;
 
   var CSSUnits = [{
     unit: 'px',
