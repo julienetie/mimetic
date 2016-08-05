@@ -136,17 +136,18 @@
       return newShorthandArr;
     }
 
-    function setBoundaryProp(propType, tempPropVal, propArr, iterI, designWidthRatio, cleanElements) {
+    function setBoundaryProp(propType, tempPropVal, propArr, iterI, designWidthRatio) {
       tempPropVal = [];
       i = 0;
       while (i < propArr[iterI].length) {
 
-        tempPropVal.push(parseFloat(designWidthRatio * propArr[iterI][i]).toFixed(3) + 'rem');
+        tempPropVal.push(parseFloat(designWidthRatio * propArr[iterI][i]).toFixed(2) + 'rem');
         if (i === propArr[iterI].length - 1) {
-          cleanElements[iterI].style[propType] = tempPropVal.join(' ');
+          return tempPropVal.join(' ');
         }
         i++;
       }
+
     }
 
 
@@ -201,16 +202,16 @@
       var winWidth = window.innerWidth;
 
       for (var i = 0; i < cleanElements.length; i++) {
-        if (winWidth > 1024) {
+        if (winWidth > options.designWidth) {
           var designWidthRatio = winWidth / options.designWidth;
           // FONT SIZE
-          cleanElements[i].style.fontSize = parseFloat(designWidthRatio * fontSizeArr[i]).toFixed(3) + 'rem';
+          cleanElements[i].style.fontSize = parseFloat(designWidthRatio * fontSizeArr[i]).toFixed(2) + 'rem';
           // LINE HEIGHT
           cleanElements[i].style.lineHeight = parseFloat(designWidthRatio * lineHtArr[i]).toFixed(3) + 'rem';
           // MARGIN
-          setBoundaryProp('margin', tmpMgVal, marginArr, i, designWidthRatio, cleanElements);
+          cleanElements[i].style.margin = setBoundaryProp('margin', tmpMgVal, marginArr, i, designWidthRatio);
           // PADDING
-          setBoundaryProp('padding', tmpPdVal, paddingArr, i, designWidthRatio, cleanElements);
+          cleanElements[i].style.padding = setBoundaryProp('padding', tmpPdVal, paddingArr, i, designWidthRatio);
         } else {
           // When below 1025 the font-size property is removed from the style attribute
           // preventing rendering issues for downsizing. 
@@ -224,7 +225,7 @@
                 // 2) animate using classes only, 
                 // 3) ??? 
                 return !['font-size', 'line-height', 'margin', 'padding'].some(function(property) {
-                 return style.indexOf(property) >= 0;
+                  return style.indexOf(property) >= 0;
                 });
               }).join('; ');
             cleanElements[i].setAttribute('style', test);
