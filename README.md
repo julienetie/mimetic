@@ -1,15 +1,31 @@
-#Mimetic
+#MIMETIC
 
-Mimetic considers a single width structure e.g,'1024' and scales the design to any screen size with minimal/ optional refinements necessary.
+(Alpha)
 
-Mimetic can work with any framework that can detatch from its grid system. Eg., Bootstrap, Foundation, etc.
-This current alpha release dosen't include Mimetic.stack, a feature to stack content for mobile devices.
+MIMETIC is a Fluid Font Formatting Engine (It scales text according the window size)
 
-##Install
+MIMETIC was build for a Scalable Design workflow:
 
-Embed Mimetic directly into the page via < script > tags for seamless results, this is the recommended way.
-Place the script just before the </ body > tag.
+- No dependencies
+- Supports IE9+ 
+- Supports 
+- exclude tags and selectors from traversing
 
-##Dependencies
 
-No dependencies, but to suport IE8 and below use <b>html5shiv</b> in the head.
+MIMETIC requires:
+
+- A full fluid design (percentages)
+- Recommended use of rem units for font-size (Any can be used)
+- You will still be required to customize media queries for mobile layouts 
+
+
+MIMETIC considers a single width structure e.g,'1024' and scales the design to any screen size with minimal/ optional refinements necessary.
+
+MIMETIC can be used with any frontend framework with the exception that any elements being directly animated (via JavaScript
+applying inline styles) must be either excluded or included in the interpolateTags option.
+
+##Implement
+
+Include MIMETIC within the header and it will fire once all DOM assets have loaded. The head is recommended to pre-load the script.
+Alternatively it may be feasible to include MIMETIC wihin the page.
+

@@ -1,7 +1,7 @@
 {
   "name": "mimetic",
   "version": "0.4.0",
-  "description": "Scalable Desing Framework",
+  "description": "Fluid Font Formatting Engine",
   "main": "gulpfile.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
