@@ -220,9 +220,14 @@
             var test = inlineStyle
               .split('; ')
               .filter(function(style) {
-                return style.indexOf('font-size') == -1;
+                // 1) exclude elements from being modified when within 1024, 
+                // 2) animate using classes only, 
+                // 3) ??? 
+                return !['font-size', 'line-height', 'margin', 'padding'].some(function(property) {
+                 return style.indexOf(property) >= 0;
+                });
               }).join('; ');
-            cleanElements[i].setAttribute('style', test)
+            cleanElements[i].setAttribute('style', test);
           }
         }
       }
