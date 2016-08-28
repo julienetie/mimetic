@@ -192,7 +192,7 @@
       return newShorthandArr;
     }
 
-    function setBoundaryProp(propType, tempPropVal, propArr, iterI, designWidthRatio) {
+    function setBoundaryProp(tempPropVal, propArr, iterI, designWidthRatio) {
       tempPropVal = [];
       i = 0;
       while (i < propArr[iterI].length) {
@@ -290,7 +290,7 @@
 
 
     mimeticScale();
-    resizilla(mimeticScale, options.delay || 180, optioins.incept || false);
+    resizilla(mimeticScale, options.delay || 180, options.incept || false);
   }
 
   window.addEventListener("DOMContentLoaded", function() {
