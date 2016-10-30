@@ -138,179 +138,179 @@ var CSSFixedUnits = [{
 }];
 
 
-function mimeticFn(options, CSSUnits, CSSFixedUnits) {
+// function mimeticFn(options, CSSUnits, CSSFixedUnits) {
 
-  var
-    i,
-    designWidthRatio,
-    tagNames = [],
-    fontSizeArr = [],
-    lineHtArr = [],
-    tmpMgVal = [],
-    tmpPdVal = [];
-
-
-  var allElements = document.getElementsByTagName('body')[0].getElementsByTagName('*');
-  var allElementsArr = [].slice.call(allElements);
+//   var
+//     i,
+//     designWidthRatio,
+//     tagNames = [],
+//     fontSizeArr = [],
+//     lineHtArr = [],
+//     tmpMgVal = [],
+//     tmpPdVal = [];
 
 
-  function aliasValueToREM(value) {
-    return CSSFixedUnits.filter(function(metricInfo) {
-      return value === metricInfo.unit;
-    }).shift().REMValue;
-  }
+//   var allElements = document.getElementsByTagName('body')[0].getElementsByTagName('*');
+//   var allElementsArr = [].slice.call(allElements);
 
 
-  function unitsToREM(value) {
-    var suffix = value.replace(/[^a-z]+/gi, '');
-    var numberValue = value.replace(/[^\d\.]*/g, '');
-    var remValue;
-
-    var metricInfo = CSSUnits.filter(function(metricInfo) {
-        return suffix === metricInfo.unit;
-      })
-      .shift();
-
-    remValue = metricInfo ? numberValue * metricInfo.REMFactor : aliasValueToREM(value);
-    return remValue;
-  }
+//   function aliasValueToREM(value) {
+//     return CSSFixedUnits.filter(function(metricInfo) {
+//       return value === metricInfo.unit;
+//     }).shift().REMValue;
+//   }
 
 
-  function computedStyle(element, property) {
-    return window.getComputedStyle(element, null).getPropertyValue(property);
-  }
+//   function unitsToREM(value) {
+//     var suffix = value.replace(/[^a-z]+/gi, '');
+//     var numberValue = value.replace(/[^\d\.]*/g, '');
+//     var remValue;
 
-  function sanitizeShorthand(value) {
+//     var metricInfo = CSSUnits.filter(function(metricInfo) {
+//         return suffix === metricInfo.unit;
+//       })
+//       .shift();
 
-    var propValDef = value.split(' ');
-
-    var newShorthandArr = propValDef.map(function(val) {
-
-      return unitsToREM(val);
-    });
-
-    return newShorthandArr;
-  }
-
-  function setBoundaryProp(tempPropVal, propArr, iterI, designWidthRatio) {
-    tempPropVal = [];
-    i = 0;
-
-    let cleanVal;
-    let partVal;
-    let propArrIteriLength;
-
-    while (i < propArr[iterI].length) {
-      cleanVal = designWidthRatio * propArr[iterI][i];
-      cleanVal = !cleanVal ? 0 : cleanVal.toFixed(2);
-      tempPropVal.push(cleanVal + 'rem');
+//     remValue = metricInfo ? numberValue * metricInfo.REMFactor : aliasValueToREM(value);
+//     return remValue;
+//   }
 
 
-      propArrIteriLength = propArr[iterI].length;
+//   function computedStyle(element, property) {
+//     return window.getComputedStyle(element, null).getPropertyValue(property);
+//   }
 
-      if (i === propArrIteriLength - 1) {
-        console.log(tempPropVal)
-        return tempPropVal.join(' ');
-      }
-      i++;
-    }
+//   function sanitizeShorthand(value) {
 
-  }
+//     var propValDef = value.split(' ');
 
+//     var newShorthandArr = propValDef.map(function(val) {
 
+//       return unitsToREM(val);
+//     });
 
-  function processElements() {
-    const marginArr = [];
-    const paddingArr = [];
-    /**
-     * Remove all elements to be ignored.
-     */
-    const remove = options.excludeTags;
-    const cleanElements = allElementsArr.filter(function(element, i) {
-      return remove.every(function(excludeValue) {
-        return excludeValue !== element.nodeName.toLowerCase();
-      });
-    });
+//     return newShorthandArr;
+//   }
 
-    const cleanElementsLength = cleanElements.length;
+//   function setBoundaryProp(tempPropVal, propArr, iterI, designWidthRatio) {
+//     tempPropVal = [];
+//     i = 0;
 
-    let sanMarg;
-    let sanPad;
+//     let cleanVal;
+//     let partVal;
+//     let propArrIteriLength;
 
-    for (let i = 0; i < cleanElementsLength; i++) {
-      sanMarg = sanitizeShorthand(
-        computedStyle(
-          cleanElements[i], 'margin')
-      )
-      marginArr.push(sanMarg);
-
-      sanPad = sanitizeShorthand(
-        computedStyle(
-          cleanElements[i], 'padding')
-      )
-      paddingArr.push(sanPad);
-    }
+//     while (i < propArr[iterI].length) {
+//       cleanVal = designWidthRatio * propArr[iterI][i];
+//       cleanVal = !cleanVal ? 0 : cleanVal.toFixed(2);
+//       tempPropVal.push(cleanVal + 'rem');
 
 
-    return { cleanElements, marginArr, paddingArr };
-  }
+//       propArrIteriLength = propArr[iterI].length;
 
-  const cleaned = processElements();
+//       if (i === propArrIteriLength - 1) {
+//         console.log(tempPropVal)
+//         return tempPropVal.join(' ');
+//       }
+//       i++;
+//     }
 
-  function mimeticScale() {
-
-
-    const cleanElementsLength = cleaned.cleanElements.length;
-    const winWidth = window.innerWidth;
-    const body = document.body;
-    const optionsDesignWidth = options.designWidth;
-
-    let designWidthRatio;
-    let cleanedEl;
-    let marginVal;
-    let paddingVal;
-
-    // console.log(tmpMgVal, marginArr)
+//   }
 
 
-    const windowExceedsDesignWidth = winWidth > optionsDesignWidth;
-    // Set design width ratio.
-    if (windowExceedsDesignWidth) {
-      designWidthRatio = winWidth / options.designWidth;
-    } else {
-      designWidthRatio = optionsDesignWidth;
-    }
+
+//   function processElements() {
+//     const marginArr = [];
+//     const paddingArr = [];
+//     /**
+//      * Remove all elements to be ignored.
+//      */
+//     const remove = options.excludeTags;
+//     const cleanElements = allElementsArr.filter(function(element, i) {
+//       return remove.every(function(excludeValue) {
+//         return excludeValue !== element.nodeName.toLowerCase();
+//       });
+//     });
+
+//     const cleanElementsLength = cleanElements.length;
+
+//     let sanMarg;
+//     let sanPad;
+
+//     for (let i = 0; i < cleanElementsLength; i++) {
+//       sanMarg = sanitizeShorthand(
+//         computedStyle(
+//           cleanElements[i], 'margin')
+//       )
+//       marginArr.push(sanMarg);
+
+//       sanPad = sanitizeShorthand(
+//         computedStyle(
+//           cleanElements[i], 'padding')
+//       )
+//       paddingArr.push(sanPad);
+//     }
 
 
-    if (windowExceedsDesignWidth) {
-      fastdom.mutate(() => {
-        body.style.fontSize = designWidthRatio + 'rem';
+//     return { cleanElements, marginArr, paddingArr };
+//   }
+
+//   const cleaned = processElements();
+
+//   function mimeticScale() {
 
 
-        for (var i = 0; i < cleanElementsLength; i++) {
-          // if (windowExceedsDesignWidth) {
-          cleanedEl = cleaned.cleanElements[i];
+//     const cleanElementsLength = cleaned.cleanElements.length;
+//     const winWidth = window.innerWidth;
+//     const body = document.body;
+//     const optionsDesignWidth = options.designWidth;
 
-          marginVal = setBoundaryProp(tmpMgVal, cleaned.marginArr, i, designWidthRatio);
-          paddingVal = setBoundaryProp(tmpMgVal, cleaned.paddingArr, i, designWidthRatio);
+//     let designWidthRatio;
+//     let cleanedEl;
+//     let marginVal;
+//     let paddingVal;
 
-          cleanedEl.style.margin = marginVal;
-          cleanedEl.style.padding = paddingVal;
-
-        }
-      });
-    }
-
-  }
+//     // console.log(tmpMgVal, marginArr)
 
 
-  mimeticScale();
-  resizilla(mimeticScale, options.delay || 180, options.incept || false);
-}
+//     const windowExceedsDesignWidth = winWidth > optionsDesignWidth;
+//     // Set design width ratio.
+//     if (windowExceedsDesignWidth) {
+//       designWidthRatio = winWidth / options.designWidth;
+//     } else {
+//       designWidthRatio = optionsDesignWidth;
+//     }
 
-window.addEventListener("DOMContentLoaded", function() {
-  mimeticFn(options, CSSUnits, CSSFixedUnits);
-});
+
+//     if (windowExceedsDesignWidth) {
+//       fastdom.mutate(() => {
+//         body.style.fontSize = designWidthRatio + 'rem';
+
+
+//         for (var i = 0; i < cleanElementsLength; i++) {
+//           // if (windowExceedsDesignWidth) {
+//           cleanedEl = cleaned.cleanElements[i];
+
+//           marginVal = setBoundaryProp(tmpMgVal, cleaned.marginArr, i, designWidthRatio);
+//           paddingVal = setBoundaryProp(tmpMgVal, cleaned.paddingArr, i, designWidthRatio);
+
+//           cleanedEl.style.margin = marginVal;
+//           cleanedEl.style.padding = paddingVal;
+
+//         }
+//       });
+//     }
+
+//   }
+
+
+//   mimeticScale();
+//   resizilla(mimeticScale, options.delay || 180, options.incept || false);
+// }
+
+// window.addEventListener("DOMContentLoaded", function() {
+//   mimeticFn(options, CSSUnits, CSSFixedUnits);
+// });
 // }());
 
 
@@ -337,3 +337,108 @@ window.addEventListener("DOMContentLoaded", function() {
 //   cleanElements[i].setAttribute('style', test);
 // }
 //}
+
+
+// 1. Measure the root fontSize of the body once
+// 1. Measure the initial margin and padding size of each element once.
+
+// 2. mutate the fontSize of the body
+// 2. mutate the margin and padding sizes of each element.
+
+// 3. if the viewport is less that the display width, set back to the inital sizes
+
+
+
+
+
+
+function run(){
+
+
+
+const initalStyles = {};
+let rootFontSize;
+let designWidthRatio;
+let windowWidth;
+
+/*
+  When using REM units, the HTML tag becomes
+  the root font-sie element.
+*/
+let html = document.firstElementChild;
+/*
+  The body element is only effective as
+  the root font size when the em unit is
+  used. Therefore can be used as a fallback
+  if changing the HTML element is found to 
+  not be feasable.
+*/
+let body = document.body;
+
+
+
+  const aliasValueToREM = (value) => {
+    return CSSFixedUnits.filter(function(metricInfo) {
+      return value === metricInfo.unit;
+    }).shift().REMValue;
+  }
+
+
+  const unitsToREM = (value) => {
+    let suffix = value.replace(/[^a-z]+/gi, '');
+    let numberValue = value.replace(/[^\d\.]*/g, '');
+    let remValue;
+
+    const metricInfo = CSSUnits.filter(function(metricInfo) {
+        return suffix === metricInfo.unit;
+      })
+      .shift();
+
+    remValue = metricInfo ? numberValue * metricInfo.REMFactor : aliasValueToREM(value);
+    return remValue;
+  }
+
+const initalRootFontSizePx = window.getComputedStyle(body,null).fontSize;
+
+  /**
+   * Eliminate measuring from the root font size if expected as 16px.
+   */
+  if(initalRootFontSizePx === '16px'){
+    initalStyles.rootFontSizeREM = 1;
+  }
+
+  const measureInitialValues = () => {
+     if(!initalStyles.rootFontSizeREM){
+       rootFontSize = window.getComputedStyle(body,null).fontSize;
+       initalStyles.rootFontSizeREM = unitsToREM(rootFontSize);
+     }
+
+     fastdom.mutate(mutateStyles);
+  }
+
+  const mutateStyles = () => {
+    const windowWidth = window.innerWidth;
+    const designWidthRatio = windowWidth / options.designWidth;
+    /**
+     * Set root font size.
+     */ 
+     console.log((initalStyles.rootFontSizeREM * designWidthRatio).toFixed(3) + 'rem')
+    body.style.fontSize = (initalStyles.rootFontSizeREM * designWidthRatio).toFixed(3) + 'rem';
+  }
+
+  const updateViewport = () => {
+      fastdom.measure(measureInitialValues);
+  }
+  
+
+  resizilla(updateViewport, options.delay || 17, options.incept || false);
+}
+
+
+
+
+// fastdom.measure(measureInitialValues)
+// .then(mutateStyles)
+window.addEventListener("DOMContentLoaded", function() {
+  run()
+});
