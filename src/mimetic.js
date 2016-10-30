@@ -1,5 +1,11 @@
-(function(window, document, undefined) {
-  'use strict';
+import fastdom from '../libs/fastdom';
+import resizilla from '../libs/resizilla';
+
+// export default (function(){
+
+
+
+console.log(fastdom)
 
   // unit  name  equivalence
   // cm  centimeters 1cm = 96px/2.54
@@ -38,10 +44,6 @@
 
   // Performance {0} vs cosmetic accuracy {4}
   options.fidelity = 3;
-
-  // options.delay = ms
-
-  // options.incept = boolean
 
 
   var CSSUnits = [{
@@ -217,19 +219,6 @@
       });
 
       cleanElements.forEach(function(element) {
-        fontSizeArr.push(
-          unitsToREM(
-            computedStyle(
-              element, 'font-size')
-          )
-        );
-
-        lineHtArr.push(
-          unitsToREM(
-            computedStyle(
-              element, 'line-height')
-          )
-        );
 
         marginArr.push(
           sanitizeShorthand(
@@ -254,38 +243,52 @@
     function mimeticScale() {
       var cleanElements = processElements();
       var winWidth = window.innerWidth;
+      var body = document.body;
+      var bodyStyle;
+      var bodyStyeFontWithPX;
+      var bodyFontSize;
+      var designWidthRatio;
+
+
+      if (winWidth > options.designWidth) {
+        designWidthRatio = winWidth / options.designWidth;
+
+        console.log('font-size body', designWidthRatio)
+          // FONT SIZE
+        body.style.fontSize = designWidthRatio + 'rem';
+      }
+window.requestAnimationFrame(function(){
+
 
       for (var i = 0; i < cleanElements.length; i++) {
         if (winWidth > options.designWidth) {
-          var designWidthRatio = winWidth / options.designWidth;
-          // FONT SIZE
-          cleanElements[i].style.fontSize = parseFloat(designWidthRatio * fontSizeArr[i]).toFixed(2) + 'rem';
-          // LINE HEIGHT
-          cleanElements[i].style.lineHeight = parseFloat(designWidthRatio * lineHtArr[i]).toFixed(3) + 'rem';
           // MARGIN
           cleanElements[i].style.margin = setBoundaryProp(tmpMgVal, marginArr, i, designWidthRatio);
           // PADDING
           cleanElements[i].style.padding = setBoundaryProp(tmpPdVal, paddingArr, i, designWidthRatio);
         } else {
-          // When below 1025 the font-size property is removed from the style attribute
-          // preventing rendering issues for downsizing. 
-          var inlineStyle = cleanElements[i].getAttribute('style');
-          var inlineStyleAsArray;
-          if (inlineStyle) {
-            var test = inlineStyle
-              .split('; ')
-              .filter(function(style) {
-                // 1) exclude elements from being modified when within 1024, 
-                // 2) animate using classes only, 
-                // 3) Ideally you should not be animating margins and padding, use transform and translate. 
-                return !['font-size', 'line-height', 'margin', 'padding'].some(function(property) {
-                  return style.indexOf(property) >= 0;
-                });
-              }).join('; ');
-            cleanElements[i].setAttribute('style', test);
-          }
+          // // When below 1025 the font-size property is removed from the style attribute
+          // // preventing rendering issues for downsizing. 
+          // var inlineStyle = cleanElements[i].getAttribute('style');
+          // var inlineStyleAsArray;
+          // if (inlineStyle) {
+          //   var test = inlineStyle
+          //     .split('; ')
+          //     .filter(function(style) {
+          //       // 1) exclude elements from being modified when within 1024, 
+          //       // 2) animate using classes only, 
+          //       // 3) Ideally you should not be animating margins and padding, use transform and translate. 
+          //       return !['margin', 'padding'].some(function(property) {
+          //         return style.indexOf(property) >= 0;
+          //       });
+          //     }).join('; ');
+          //   cleanElements[i].setAttribute('style', test);
+          // }
         }
       }
+
+})
+
     }
 
 
@@ -296,4 +299,4 @@
   window.addEventListener("DOMContentLoaded", function() {
     mimeticFn(options, CSSUnits, CSSFixedUnits);
   });
-}(window, document, undefined));
+// }());

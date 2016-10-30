@@ -17,15 +17,15 @@ margin: 0;
 /* Small screens */
 @media only screen { } /* Define mobile styles */
 
-@media only screen and (max-width: 40em) {
+@media only screen and (max-width: 40rem) {
 /*html{ font-size: 32px;  } */
   } /* max-width 640px, mobile-only styles, use when QAing mobile issues */
 
 
 /* Medium screens */
-@media only screen and (min-width: 40.063em) { } /* min-width 641px, medium screens */
+@media only screen and (min-width: 40.063rem) { } /* min-width 641px, medium screens */
 
-@media only screen and (min-device-width: 40.063em) {
+@media only screen and (min-device-width: 40.063rem) {
 /* body{min-width: 998px;} */
   } /* min-width 641px and max-width 1024px, use when QAing tablet-only issues */
 
@@ -48,13 +48,13 @@ header{
     color: #03003B;
   }
 header h1{
-  font-size: 7em;
-  line-height: 1em;
+  font-size: 7rem;
+  line-height: 1rem;
 
 }
 header h2{
-  font-size: 2em;
-  margin: 0 0 0.5em 0;
+  font-size: 2rem;
+  margin: 0 0 0.5rem 0;
 }
 
 header h1,header h2{
@@ -86,15 +86,15 @@ aside{
 
 
 p{
-margin: 1em;  /*  51.2px, 48px, 50px, 20px  */
-font-size: 1em;
-line-height: 1em;
-padding: 1em;
+margin: 1rem;  /*  51.2px, 48px, 50px, 20px  */
+font-size: 1rem;
+line-height: 1rem;
+padding: 1rem;
 }
 
 h2{
-margin: 1em 1em 0;
-line-height: 1em;
+margin: 1rem 1rem 0;
+line-height: 1rem;
 }
 
 /*scaled transition*/
