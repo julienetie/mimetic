@@ -1939,6 +1939,10 @@ rollup-watch:
   dependencies:
     semver "^5.1.0"
 
+run-once:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/run-once/-/run-once-1.0.0.tgz#ef8413c8ae8a9814d77e2bea840cbfaed74d7f8d"
+
 semver@^4.1.0:
   version "4.3.6"
   resolved "https://registry.yarnpkg.com/semver/-/semver-4.3.6.tgz#300bc6e0e86374f7ba61068b5b1ecd57fc6532da"
@@ -1950,6 +1954,10 @@ semver@^5.1.0, semver@^5.3.0, "semver@2 || 3 || 4 || 5":
 sequencify@~0.0.7:
   version "0.0.7"
   resolved "https://registry.yarnpkg.com/sequencify/-/sequencify-0.0.7.tgz#90cff19d02e07027fd767f5ead3e7b95d1e7380c"
+
+set-animation-frame:
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/set-animation-frame/-/set-animation-frame-0.1.1.tgz#92b2d30f63912ea5bbb68f93ec0da5d701942bf8"
 
 shellwords@^0.1.0:
   version "0.1.0"
@@ -2151,6 +2159,10 @@ vinyl@^0.5.0:
     clone "^1.0.0"
     clone-stats "^0.0.1"
     replace-ext "0.0.1"
+
+volve:
+  version "0.0.2"
+  resolved "https://registry.yarnpkg.com/volve/-/volve-0.0.2.tgz#56535226308697eb601e554d9cfa01d611c53d56"
 
 which@^1.0.5, which@^1.2.10:
   version "1.2.11"

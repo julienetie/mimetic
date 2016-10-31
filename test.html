@@ -46,8 +46,13 @@ html{
 font-family: arial, sans-serif; /* FF sans-serif too heavy */
 }
 
+body{
+  background: pink;
+
+}
+
 .container{
-  height: 20vw;
+  height: 6em;
   background: red;
   margin: 2rem 6rem 0 6rem;
 }
@@ -63,23 +68,40 @@ p{
   padding: 1rem;
 }
 
+#info{
+  min-width: 2rem;
+  min-height: 1rem;
+  background: lime;
+  position: absolute;
+  top:0;
+  left:0;
+}
 </style>
 
 <script src="dist/mimetic.js"></script>
+<script>
+mimetic({
+  mobileWidth: 0
+});
+</script>
 </head>
 <body>
-
-<div class="container">
+<div id="info"></div>
+<div>
+ <div class="container">
   Margin
   <div class="box">
       <p>Hello World!</p>
+      <input type="text" >
+      <input type="text" >
+      <input type="text" >
   </div>
   
 </div>
 
-<canvas></canvas>
-<canvas></canvas>
-<canvas></canvas>
+</div> 
+
+
 <script></script>
 <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/fastdom/1.0.5/fastdom-strict.min.js"></script> -->
 </body>

@@ -28,6 +28,9 @@
   },
   "dependencies": {
     "fastdom": "^1.0.5",
-    "request-frame": "^1.5.3"
+    "request-frame": "^1.5.3",
+    "run-once": "^1.0.0",
+    "set-animation-frame": "^0.1.1",
+    "volve": "^0.0.2"
   }
 }
