@@ -4,7 +4,9 @@
   "description": "Fluid Font Formatting Engine",
   "main": "gulpfile.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "watch": "rollup -c -w",
+    "build": "rollup -c",
+    "test": "mocha --compilers js:babel-register --recursive"
   },
   "repository": {
     "type": "git",
@@ -27,10 +29,12 @@
     "rollup-watch": "^2.5.0"
   },
   "dependencies": {
-    "fastdom": "^1.0.5",
-    "request-frame": "^1.5.3",
-    "run-once": "^1.0.0",
-    "set-animation-frame": "^0.1.1",
-    "volve": "^0.0.2"
+    "request-frame": "*",
+    "run-once": "*",
+    "babel-preset-es2015": "*",
+    "babel-register": "*",
+    "chai": "^3.5.0",
+    "jsdom": "*",
+    "mocha": "*"
   }
 }
