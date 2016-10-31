@@ -1,299 +1,270 @@
-(function(window, document, undefined) {
-  'use strict';
+/*
+  Browsers manually tested: 
 
-  // unit  name  equivalence
-  // cm  centimeters 1cm = 96px/2.54
-  // mm  millimeters 1mm = 1/10th of 1cm
-  // q quarter-millimeters 1q = 1/40th of 1cm
-  // in  inches  1in = 2.54cm = 96px
-  // pc  picas 1pc = 1/6th of 1in
-  // pt  points  1pt = 1/72th of 1in
-  // px  pixels  1px = 1/96th of 1in
-
-  var options = {};
-
-  // Design to this width
-  options.designWidth = 1024;
-
-  // Add tags to exclude here
-  options.excludeTags = ['script', 'canvas'];
-
-  // Interpolate tags to preserve animation state
-  options.interpolateTags = []
-
-  // Scale font-size
-  options.mimeticFonts = true;
-
-  // Scale line-height 
-  options.mimeticLineHt = true;
-
-  // Scale margin 
-  options.mimeticMargin = true;
-
-  // Scale padding  
-  options.mimeticPadding = true;
-
-  // For designs that exceed the overflow of the initial contiaining block.
-  options.infinateCanvas = false;
-
-  // Performance {0} vs cosmetic accuracy {4}
-  options.fidelity = 3;
-
-  // options.delay = ms
-
-  // options.incept = boolean
+  Secondary systems:
+  - IE9+
+  - SF 6.2+
+  Primary system:
+  - IE11+
+  - Edge+
+  - FF 14+ 
+  - CH 31+
+  - OP 18+
+*/
 
 
-  var CSSUnits = [{
-    unit: 'px',
-    //  1 / 16
-    REMFactor: 0.0625
-  }, {
-    unit: 'pt',
-    // 96 / 72 / 16
-    REMFactor: 0.08333333333
-  }, {
-    unit: 'em',
-    // 1
-    REMFactor: 1
-  }, {
-    unit: 'rem',
-    // 1
-    REMFactor: 1
-  }, {
-    unit: 'cm',
-    // ???
-    REMFactor: 1
-  }, {
-    unit: 'q',
-    // ???
-    REMFactor: 1
-  }, {
-    unit: 'in',
-    // ???
-    REMFactor: 1
-  }, {
-    unit: 'pc',
-    // 96 / 72 / 12 / 16
-    REMFactor: 0.00694444444
-  }, {
-    unit: 'ex',
-    // ???
-    REMFactor: 1
-  }, {
-    unit: 'ch',
-    // ???
-    REMFactor: 1
-  }, {
-    unit: 'vw',
-    // Needs override.
-    REMFactor: 1
-  }, {
-    unit: 'vh',
-    // Needs override.
-    REMFactor: 1
-  }, {
-    unit: 'vmin',
-    // Needs override.
-    REMFactor: 1
-  }, {
-    unit: 'vmax',
-    // Needs override.
-    REMFactor: 1
-  }];
+import resizilla from '../libs/resizilla';
+import requestFrame from 'request-frame';
+import isPlainObject from '../libs/is-plain-object';
+import objectAssign from '../libs/object-assign';
+import runOnce from 'run-once';
+import { debounce } from '../libs/volve';
 
+let autoInitialization = true;
+let newSettings;
 
-  var CSSFixedUnits = [{
-    unit: 'xx-small',
-    // 9 / 16
-    REMValue: 0.5625
-  }, {
-    unit: 'x-small',
-    // 10 / 16
-    REMValue: 0.625
-  }, {
-    unit: 'small',
-    // 13 / 16
-    REMValue: 0.8125
-  }, {
-    unit: 'normal',
-    // 16 / 16
-    REMValue: 1
-  }, {
-    unit: 'medium',
-    // 16 / 16
-    REMValue: 1
-  }, {
-    unit: 'large',
-    // 18 / 16
-    REMValue: 1.125
-  }, {
-    unit: 'x-large',
-    // 24 / 16
-    REMValue: 1.5
-  }, {
-    unit: 'xx-large',
-    // 32 / 16
-    REMValue: 2
-  }];
+/**
+ * Polyfills
+ */
+objectAssign();
 
-
-  function mimeticFn(options, CSSUnits, CSSFixedUnits) {
-
-    var
-      i,
-      designWidthRatio,
-      tagNames = [],
-      fontSizeArr = [],
-      lineHtArr = [],
-      marginArr = [],
-      paddingArr = [],
-      tmpMgVal = [],
-      tmpPdVal = [];
-
-
-    var allElements = document.getElementsByTagName('body')[0].getElementsByTagName('*');
-    var allElementsArr = [].slice.call(allElements);
-
-
-    function aliasValueToREM(value) {
-      return CSSFixedUnits.filter(function(metricInfo) {
-        return value === metricInfo.unit;
-      }).shift().REMValue;
-    }
-
-
-    function unitsToREM(value) {
-      var suffix = value.replace(/[^a-z]+/gi, '');
-      var numberValue = value.replace(/[^\d\.]*/g, '');
-      var remValue;
-
-      var metricInfo = CSSUnits.filter(function(metricInfo) {
-          return suffix === metricInfo.unit;
-        })
-        .shift();
-
-      remValue = metricInfo ? numberValue * metricInfo.REMFactor : aliasValueToREM(value);
-      return remValue;
-    }
-
-
-    function computedStyle(element, property) {
-      return window.getComputedStyle(element, null).getPropertyValue(property);
-    }
-
-    function sanitizeShorthand(value) {
-      var propValDef = value.split(' ');
-
-      var newShorthandArr = propValDef.map(function(val) {
-        return unitsToREM(val);
-      });
-
-      return newShorthandArr;
-    }
-
-    function setBoundaryProp(tempPropVal, propArr, iterI, designWidthRatio) {
-      tempPropVal = [];
-      i = 0;
-      while (i < propArr[iterI].length) {
-
-        tempPropVal.push(parseFloat(designWidthRatio * propArr[iterI][i]).toFixed(2) + 'rem');
-        if (i === propArr[iterI].length - 1) {
-          return tempPropVal.join(' ');
-        }
-        i++;
-      }
-
-    }
-
-
-
-    function processElements() {
-      var remove = options.excludeTags;
-      var cleanElements = allElementsArr.filter(function(element, i) {
-        return remove.every(function(excludeValue) {
-          return excludeValue !== element.nodeName.toLowerCase();
-        });
-      });
-
-      cleanElements.forEach(function(element) {
-        fontSizeArr.push(
-          unitsToREM(
-            computedStyle(
-              element, 'font-size')
-          )
-        );
-
-        lineHtArr.push(
-          unitsToREM(
-            computedStyle(
-              element, 'line-height')
-          )
-        );
-
-        marginArr.push(
-          sanitizeShorthand(
-            computedStyle(
-              element, 'margin')
-          )
-        );
-
-        paddingArr.push(
-          sanitizeShorthand(
-            computedStyle(
-              element, 'padding')
-          )
-        );
-      });
-
-      return cleanElements;
-    }
-
-
-
-    function mimeticScale() {
-      var cleanElements = processElements();
-      var winWidth = window.innerWidth;
-
-      for (var i = 0; i < cleanElements.length; i++) {
-        if (winWidth > options.designWidth) {
-          var designWidthRatio = winWidth / options.designWidth;
-          // FONT SIZE
-          cleanElements[i].style.fontSize = parseFloat(designWidthRatio * fontSizeArr[i]).toFixed(2) + 'rem';
-          // LINE HEIGHT
-          cleanElements[i].style.lineHeight = parseFloat(designWidthRatio * lineHtArr[i]).toFixed(3) + 'rem';
-          // MARGIN
-          cleanElements[i].style.margin = setBoundaryProp(tmpMgVal, marginArr, i, designWidthRatio);
-          // PADDING
-          cleanElements[i].style.padding = setBoundaryProp(tmpPdVal, paddingArr, i, designWidthRatio);
-        } else {
-          // When below 1025 the font-size property is removed from the style attribute
-          // preventing rendering issues for downsizing. 
-          var inlineStyle = cleanElements[i].getAttribute('style');
-          var inlineStyleAsArray;
-          if (inlineStyle) {
-            var test = inlineStyle
-              .split('; ')
-              .filter(function(style) {
-                // 1) exclude elements from being modified when within 1024, 
-                // 2) animate using classes only, 
-                // 3) Ideally you should not be animating margins and padding, use transform and translate. 
-                return !['font-size', 'line-height', 'margin', 'padding'].some(function(property) {
-                  return style.indexOf(property) >= 0;
-                });
-              }).join('; ');
-            cleanElements[i].setAttribute('style', test);
-          }
-        }
-      }
-    }
-
-
+// Yes webkit but not modern chrome.  Has devicePixelRatio        
+let devicePixelRatioType = window.webkitURL && !window.chrome ? 'safari-like' : 'supported';
+devicePixelRatioType = window.devicePixelRatio ? devicePixelRatioType : 'not-supported';
+/**
+ * Auto initate if main function is not called.
+ */
+window.addEventListener("DOMContentLoaded", () => {
+  if (autoInitialization) {
     mimeticScale();
-    resizilla(mimeticScale, options.delay || 180, options.incept || false);
+  } else {
+    mimeticScale(newSettings);
+  }
+});
+
+
+/**
+ * Mimetic runs before DOMContentLoaded if called
+ * and passes options to override the defautls.
+ * @param {Object} - Options object.
+ */
+export default function mimetic(optionOverrides) {
+  if (isPlainObject(optionOverrides)) {
+    if (optionOverrides.disable) {
+      resizilla.destroy('all');
+      return;
+    }
   }
 
-  window.addEventListener("DOMContentLoaded", function() {
-    mimeticFn(options, CSSUnits, CSSFixedUnits);
-  });
-}(window, document, undefined));
+  newSettings = optionOverrides;
+  autoInitialization = false;
+}
+
+
+const mimeticScale = (options) => {
+  const defaults = {};
+  const initalStyles = {};
+  const request = requestFrame('request');
+  const cancel = requestFrame('cancel');
+  const html = document.firstElementChild || document.getElementsByTagName('html').item(0);
+  const intialDevicePixelRatio = window.devicePixelRatio || 1;
+  let canReszie = false;
+
+  initalStyles.requestFrameId;
+
+  defaults.designWidth = 1024;
+  defaults.mobileWidth = 640;
+  defaults.delay = 17;
+  defaults.transformType = 'incremental'; // incremental | resizeStop | suspended    incremental = default
+  defaults.rootElement = 'html'; // 'html' | 'body'                         html = default
+  defaults.bezierCurve = null; // TBA
+  defaults.autostart = true; // true 
+  defaults.disable = false; // false 
+
+
+  /**
+   * Creates setting by overriding defaults with options.
+   */
+  const settings = Object.assign(defaults, options);
+
+
+  /**
+   * Quick one time references.
+   */
+  const designWidth = settings.designWidth;
+  const mobileWidth = settings.mobileWidth;
+  const delay = settings.delay;
+
+  /* 
+    Transform Type
+
+    TBA.
+  */
+  const transformType = settings.transformType;
+
+  /*
+    Root Element
+
+    Only when using REM units, the HTML tag becomes
+    the root font-sie element. The body element is 
+    only effective as the root font size when the 
+    em unit is used. Therefore can be used as a 
+    fallback if changing the HTML element is found 
+    to not be feasable.
+  */
+  const rootElement = settings.rootElement !== 'body' ? html : document.body;
+
+  /* 
+    Bezier Curve
+
+    TBA.
+  */
+  const bezierCurve = settings.bezierCurve;
+  const autostart = settings.autostart;
+  const disable = settings.disable;
+
+
+  function getFontSize(element) {
+    if (element.nodeType === element.ELEMENT_NODE) {
+      return window.getComputedStyle(document.body, null).fontSize
+    }
+  }
+
+
+
+  const aliasValueToREM = (value) => {
+    return CSSFixedUnits.filter(function(metricInfo) {
+      return value === metricInfo.unit;
+    }).shift().REMValue;
+  }
+
+
+  const unitsToREM = (value) => {
+    const REMFactor = 0.0625;
+    return value.replace(/[^\d\.]*/g, '') * REMFactor;
+  }
+
+  const initalRootFontSizePx = getFontSize(rootElement);
+
+  var initialOuterWidth;
+  var initialOuterHeight;
+  /**
+   * Eliminate measuring from the root font size if expected as 16px.
+   */
+  const measureInitialValues = () => {
+    initialOuterWidth = window.outerWidth;
+    initialOuterHeight = window.outerHeight;
+    if (initalRootFontSizePx === '16px') {
+      initalStyles.rootFontSizeREM = 1;
+    } else {
+      initalStyles.rootFontSizeREM = unitsToREM(getFontSize(rootElement));
+    }
+  }
+
+  var info = document.getElementById('info');
+  /**
+   * Mutate the root REM value.
+   */
+  let once = true;
+  const mutateREMStyles = () => {
+    const windowWidth = window.innerWidth;
+    const windowOuterWidth = window.outerWidth;
+    const windowOuterHeight = window.outerHeight;
+    const windowResize = windowOuterWidth !== initialOuterWidth && windowOuterHeight !== initialOuterHeight;
+    //canReszie , windowResize
+    if (true || runOnce('mutateREMStyles')) {
+
+      const designWidthRatio = windowWidth / designWidth;
+
+      /**
+       * Cancel previous requestAnimationFrame.
+       */
+      cancel(initalStyles.requestFrameId);
+
+      /**
+       * Mutate on next available frame.
+       */
+      initalStyles.requestFrameId = request(() => {
+        if (windowWidth > mobileWidth) {
+
+          switch (devicePixelRatioType) {
+            case 'supported':
+              console.log('supported')
+              rootElement.style.fontSize = (initalStyles.rootFontSizeREM * designWidthRatio * window.devicePixelRatio).toFixed(6) + 'rem';
+              break;
+            case 'safari-like':
+              console.log('safari-like')
+              rootElement.style.fontSize = (initalStyles.rootFontSizeREM * designWidthRatio * (window.outerWidth / window.innerWidth) / intialDevicePixelRatio).toFixed(6) + 'rem';
+              break;
+            case 'not-supported':
+            default:
+              if(canReszie){
+                console.log('not-supported')
+                rootElement.style.fontSize = (initalStyles.rootFontSizeREM * designWidthRatio).toFixed(6) + 'rem'; 
+              }
+          }
+
+          once = true
+        } else if (once) {
+          rootElement.removeAttribute("style");
+          once = false;
+        }
+      });
+      initialOuterWidth = windowOuterWidth;
+      initialOuterHeight = windowOuterWidth;
+    }
+  }
+
+  if (autostart) {
+    /** 
+     * Assign rootFontSizeREM.
+     */
+    measureInitialValues();
+
+
+    /** 
+     * Trigger render of new REM values.
+     */
+    mutateREMStyles();
+
+    if (devicePixelRatioType === 'not-supported') {
+      /**
+       * Render on resize.
+       */
+      html.addEventListener('mouseleave', () => {
+        console.log('mouseleave')
+        canReszie = true;
+      })
+
+
+      // window.addEventListener('blur', () => {
+      //   canReszie = true;
+      // })
+
+
+      html.addEventListener('mouseenter', () => {
+        console.log('mouseenter')
+        // mutateREMStyles();
+        canReszie = false;
+      })
+
+
+      // window.addEventListener('focus', () => {
+      //   // mutateREMStyles();
+      //   canReszie = false;
+      // })
+
+    }
+
+
+
+    resizilla(mutateREMStyles, delay, false);
+  }
+}
+
+
+/* TODO
+
+  - some sort of local storage to save the size after transition end. 
+  - stupid amount of options.
+*/
