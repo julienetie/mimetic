@@ -1,11 +1,15 @@
 /*
   Browsers manually tested: 
+
+  Secondary systems:
+  - IE9+
+  - SF 6.2+
+  Primary system:
   - IE11+
   - Edge+
-  - FF 18+ 
-  - CH 33+
+  - FF 14+ 
+  - CH 31+
   - OP 18+
-  - SF 6.2+
 */
 
 
@@ -24,8 +28,9 @@ let newSettings;
  */
 objectAssign();
 
-
-let DPR = !!window.webkitURL && !window.chrome ? false : true;
+// Yes webkit but not modern chrome.  Has devicePixelRatio        
+let devicePixelRatioType = window.webkitURL && !window.chrome ? 'safari-like' : 'supported';
+devicePixelRatioType = window.devicePixelRatio ? devicePixelRatioType : 'not-supported';
 /**
  * Auto initate if main function is not called.
  */
@@ -147,8 +152,8 @@ const mimeticScale = (options) => {
    * Eliminate measuring from the root font size if expected as 16px.
    */
   const measureInitialValues = () => {
-      initialOuterWidth = window.outerWidth;
-      initialOuterHeight = window.outerHeight;
+    initialOuterWidth = window.outerWidth;
+    initialOuterHeight = window.outerHeight;
     if (initalRootFontSizePx === '16px') {
       initalStyles.rootFontSizeREM = 1;
     } else {
@@ -181,21 +186,32 @@ const mimeticScale = (options) => {
        */
       initalStyles.requestFrameId = request(() => {
         if (windowWidth > mobileWidth) {
-            if(!DPR){
-              rootElement.style.fontSize = (initalStyles.rootFontSizeREM * designWidthRatio * (window.outerWidth / window.innerWidth) / intialDevicePixelRatio).toFixed(6)  + 'rem';
-            }else{
-              rootElement.style.fontSize = (initalStyles.rootFontSizeREM * designWidthRatio * DPR / intialDevicePixelRatio ).toFixed(6)  + 'rem';
-            }
-          //       info.innerHTML = `root:  ${initalStyles.rootFontSizeREM} dwr:  ${designWidthRatio} dpr:  ${} ${DPR}`;
-          // rootElement.style.fontSize = (initalStyles.rootFontSizeREM * designWidthRatio * (DPR || window.outerWidth / window.innerWidth) ).toFixed(6)  + 'rem';
+
+          switch (devicePixelRatioType) {
+            case 'supported':
+              console.log('supported')
+              rootElement.style.fontSize = (initalStyles.rootFontSizeREM * designWidthRatio * window.devicePixelRatio).toFixed(6) + 'rem';
+              break;
+            case 'safari-like':
+              console.log('safari-like')
+              rootElement.style.fontSize = (initalStyles.rootFontSizeREM * designWidthRatio * (window.outerWidth / window.innerWidth) / intialDevicePixelRatio).toFixed(6) + 'rem';
+              break;
+            case 'not-supported':
+            default:
+              if(canReszie){
+                console.log('not-supported')
+                rootElement.style.fontSize = (initalStyles.rootFontSizeREM * designWidthRatio).toFixed(6) + 'rem'; 
+              }
+          }
+
           once = true
         } else if (once) {
           rootElement.removeAttribute("style");
           once = false;
         }
       });
-     initialOuterWidth = windowOuterWidth;
-     initialOuterHeight = windowOuterWidth;
+      initialOuterWidth = windowOuterWidth;
+      initialOuterHeight = windowOuterWidth;
     }
   }
 
@@ -211,30 +227,35 @@ const mimeticScale = (options) => {
      */
     mutateREMStyles();
 
-
-    /**
-     * Render on resize.
-     */
-    // html.addEventListener('mouseleave', () => {
-    //   canReszie = true;
-    // })
-
-
-    // window.addEventListener('blur', () => {
-    //     canReszie = true; 
-    // })
+    if (devicePixelRatioType === 'not-supported') {
+      /**
+       * Render on resize.
+       */
+      html.addEventListener('mouseleave', () => {
+        console.log('mouseleave')
+        canReszie = true;
+      })
 
 
-    // html.addEventListener('mouseenter', () => {
-    //   // mutateREMStyles();
-    //   canReszie = false;
-    // })
+      // window.addEventListener('blur', () => {
+      //   canReszie = true;
+      // })
 
 
-    // window.addEventListener('focus', () => {
-    //     // mutateREMStyles();
-    //     canReszie = false;
-    // })
+      html.addEventListener('mouseenter', () => {
+        console.log('mouseenter')
+        // mutateREMStyles();
+        canReszie = false;
+      })
+
+
+      // window.addEventListener('focus', () => {
+      //   // mutateREMStyles();
+      //   canReszie = false;
+      // })
+
+    }
+
 
 
     resizilla(mutateREMStyles, delay, false);
@@ -246,4 +267,4 @@ const mimeticScale = (options) => {
 
   - some sort of local storage to save the size after transition end. 
   - stupid amount of options.
-*/ 
+*/
