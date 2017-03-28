@@ -1,9 +1,8 @@
 import requestFrame from 'request-frame';
 import resizilla from '../libs/resizilla';
-import isPlainObject from '../libs/is-plain-object';
 import objectAssign from '../libs/object-assign';
+// @TODO remove run once and curry functions.
 import runOnce from 'run-once';
-import { debounce } from '../libs/volve';
 
 /*
   Browser support: 
@@ -65,8 +64,10 @@ Revive Mimetic after kill.
     mimetic.revivie();
 */
 
-
-
+/** 
+ * Object Assign polyfill.
+ */
+objectAssign();
 
 const Mimetic = (configurationObj) => {
     /** 
@@ -302,9 +303,6 @@ const Mimetic = (configurationObj) => {
         }));
 
 
-        /** 
-         * Horrible mutation.
-         */
         varInitialOuterWidth = windowOuterWidth;
         varInitialOuterHeight = windowOuterWidth;
     }
