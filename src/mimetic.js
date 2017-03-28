@@ -18,281 +18,6 @@ import { debounce } from '../libs/volve';
  */
 
 
-let autoInitialization = true;
-let newSettings;
-
-/**
- * Polyfills
- */
-objectAssign();
-
-// Yes webkit but not modern chrome.  Has devicePixelRatio        
-let devicePixelRatioType = window.webkitURL && !window.chrome ? 'safari-like' : 'supported';
-devicePixelRatioType = window.devicePixelRatio ? devicePixelRatioType : 'not-supported';
-/**
- * Auto initate if main function is not called.
- */
-// window.addEventListener("DOMContentLoaded", () => {
-//     if (autoInitialization) {
-//         mimeticScale();
-//     } else {
-//         mimeticScale(newSettings);
-//     }d
-// });
-
-
-/**
- * Mimetic runs before DOMContentLoaded if called
- * and passes options to override the defautls.
- * @param {Object} - Options object.
- */
-function mimetic(optionOverrides) {
-    if (isPlainObject(optionOverrides)) {
-        if (optionOverrides.disable) {
-            resizilla.destroy('all');
-            return;
-        }
-    }
-
-    newSettings = optionOverrides;
-    autoInitialization = false;
-}
-
-
-const mimeticScale = (options) => {
-    const defaults = {};
-    const initalStyles = {};
-    const request = requestFrame('request');
-    const cancel = requestFrame('cancel');
-    const html = document.firstElementChild || document.getElementsByTagName('html').item(0);
-    const intialDevicePixelRatio = window.devicePixelRatio || 1;
-    let canReszie = false;
-
-    initalStyles.requestFrameId;
-
-    defaults.designWidth = 1024;
-    defaults.mobileWidth = 640;
-    defaults.delay = 16;
-    defaults.transformType = 'incremental'; // incremental | resizeStop | suspended    incremental = default
-    defaults.rootElement = 'html'; // 'html' | 'body'                         html = default
-    defaults.bezierCurve = null; // TBA
-    defaults.autostart = true; // true 
-    defaults.disable = false; // false 
-
-
-    /**
-     * Creates setting by overriding defaults with options.
-     */
-    const settings = Object.assign(defaults, options);
-
-
-    /**
-     * Quick one time references.
-     */
-    const designWidth = settings.designWidth;
-    const mobileWidth = settings.mobileWidth;
-    const delay = settings.delay;
-
-    /* 
-      Transform Type
-
-      TBA.
-    */
-    const transformType = settings.transformType;
-
-    /*
-      Root Element
-
-      Only when using REM units, the HTML tag becomes
-      the root font-sie element. The body element is 
-      only effective as the root font size when the 
-      em unit is used. Therefore can be used as a 
-      fallback if changing the HTML element is found 
-      to not be feasable.
-    */
-    const rootElement = settings.rootElement !== 'body' ? html : document.body;
-
-    /* 
-      Bezier Curve
-
-      TBA.
-    */
-    const bezierCurve = settings.bezierCurve;
-    const autostart = settings.autostart;
-    const disable = settings.disable;
-
-
-    function getFontSize(element) {
-        if (element.nodeType === element.ELEMENT_NODE) {
-            return window.getComputedStyle(document.body, null).fontSize
-        }
-    }
-
-
-
-    const aliasValueToREM = (value) => {
-        return CSSFixedUnits.filter(function(metricInfo) {
-            return value === metricInfo.unit;
-        }).shift().REMValue;
-    }
-
-
-    const unitsToREM = (value) => {
-        const REMFactor = 0.0625;
-        return value.replace(/[^\d\.]*/g, '') * REMFactor;
-    }
-
-    const initalRootFontSizePx = getFontSize(rootElement);
-
-    var initialOuterWidth;
-    var initialOuterHeight;
-    /**
-     * Eliminate measuring from the root font size if expected as 16px.
-     */
-    const measureInitialValues = () => {
-        initialOuterWidth = window.outerWidth;
-        initialOuterHeight = window.outerHeight;
-        if (initalRootFontSizePx === '16px') {
-            initalStyles.rootFontSizeREM = 1;
-        } else {
-            initalStyles.rootFontSizeREM = unitsToREM(getFontSize(rootElement));
-        }
-    }
-
-    var info = document.getElementById('info');
-    /**
-     * Mutate the root REM value.
-     */
-    let once = true;
-    let lastClientWidth;
-    let clientWidth;
-    let newdevicePixelRatio;
-    let lastDevicePixelRatio;
-    let newDevicePixelRatio;
-    const mutateREMStyles = () => {
-        console.info('mutateREMStyles');
-        const windowWidth = window.innerWidth;
-        const windowOuterWidth = window.outerWidth;
-        const windowOuterHeight = window.outerHeight;
-        const windowResize = windowOuterWidth !== initialOuterWidth && windowOuterHeight !== initialOuterHeight;
-        clientWidth = parseInt(document.documentElement.clientWidth * devicePixelRatio);
-        const defaultDevicePixelRatio = parseInt(clientWidth / screen.width) || devicePixelRatio;
-
-        newdevicePixelRatio = devicePixelRatio.toFixed(3);
-
-        if (lastClientWidth === undefined) {
-            lastClientWidth = clientWidth;
-        }
-        //canReszie , windowResize
-        if (true || runOnce('mutateREMStyles')) {
-
-            const designWidthRatio = windowWidth / designWidth;
-
-
-            const isDevicePixelRatioDefault = defaultDevicePixelRatio === devicePixelRatio;
-            /**
-             * Cancel previous requestAnimationFrame.
-             */
-            cancel(initalStyles.requestFrameId);
-
-            /**
-             * Mutate on next available frame.
-             */
-            initalStyles.requestFrameId = request(() => {
-                const dpr = windowWidth === windowOuterWidth ? 1 : window.devicePixelRatio;
-
-                // console.log(newdevicePixelRatio, lastDevicePixelRatio);
-
-                if (newdevicePixelRatio === lastDevicePixelRatio || isDevicePixelRatioDefault || runOnce('init')) {
-                    const isAboveDesignWidth = windowWidth > designWidth;
-
-                    if (windowWidth > mobileWidth) {
-                        // console.info('Scale fonts, large screen')
-                        switch (devicePixelRatioType) {
-                            case 'supported':
-                                // console.log('supported')
-                                rootElement.style.fontSize = isAboveDesignWidth ? (initalStyles.rootFontSizeREM * designWidthRatio * dpr).toFixed(6) + 'rem' : initalStyles.rootFontSizeREM + 'rem';
-                                break;
-                            case 'safari-like':
-                                // console.log('safari-like')
-                                rootElement.style.fontSize = isAboveDesignWidth ? (initalStyles.rootFontSizeREM * designWidthRatio * (window.outerWidth / window.innerWidth) / intialDevicePixelRatio).toFixed(6) + 'rem' : initalStyles.rootFontSizeREM + 'rem';
-                                break;
-                            case 'not-supported':
-                            default:
-                                if (canReszie) {
-                                    // console.log('not-supported')
-                                    rootElement.style.fontSize = isAboveDesignWidth ? (initalStyles.rootFontSizeREM * designWidthRatio).toFixed(6) + 'rem' : initalStyles.rootFontSizeREM + 'rem';
-                                }
-                        }
-
-                        once = true;
-                        // lastClientWidth = clientWidth;
-                    } else if (once) {
-                        console.info('No scale, mobile width')
-                            // rootElement.removeAttribute("style");
-                        once = false;
-                    }
-
-                }
-                lastDevicePixelRatio = newdevicePixelRatio;
-            });
-
-            initialOuterWidth = windowOuterWidth;
-            initialOuterHeight = windowOuterWidth;
-        }
-
-    }
-
-
-
-    if (autostart) {
-        /** 
-         * Assign rootFontSizeREM.
-         */
-        measureInitialValues();
-
-
-        /** 
-         * Trigger render of new REM values.
-         */
-        mutateREMStyles();
-
-        if (devicePixelRatioType === 'not-supported') {
-            /**
-             * Render on resize.
-             */
-            html.addEventListener('mouseleave', () => {
-                console.log('mouseleave')
-                canReszie = true;
-            })
-
-
-            // window.addEventListener('blur', () => {
-            //   canReszie = true;
-            // })
-
-
-            html.addEventListener('mouseenter', () => {
-                console.log('mouseenter')
-                    // mutateREMStyles();
-                canReszie = false;
-            })
-
-
-            // window.addEventListener('focus', () => {
-            //   // mutateREMStyles();
-            //   canReszie = false;
-            // })
-
-        }
-
-
-
-        resizilla(mutateREMStyles, delay, false);
-    }
-}
-
-
 
 /*
 
@@ -354,16 +79,16 @@ const Mimetic = (configurationObj) => {
      * Default config properties if not defined.
      */
     const defaults = {
-        loadEvent: 'DOMContentLoaded', // Load type @@@@@
+        loadEvent: 'DOMContentLoaded', // Load type
         mobileWidth: 640, // Width before disabling for mobile phone devices.
         scaleDelay: 33, // Miliseconds between calls on resize.
-        preserveDevicePixelRatio: false, // Preserve the device pixel ratio on zoom.
+        preserveDevicePixelRatio: false, // Preserve the device pixel ratio on zoom. @TODO
         rootSelector: 'html', // Use the HTML element as the root element. 
-        onScale: (viewPortWidth, clientWidth) => {}, // On Scale 
-        onZoom: (devicePixelRatio) => {}, // On Zoom
-        onResize: (viewPortWidth, clientWidth, devicePixelRatio) => {}, // On Resize
-        initalOuterWidth: window.outerWidth,
-        initalOuterHeight: window.outerHeight
+        onScale: (viewPortWidth, clientWidth) => {}, // On Scale @TODO
+        onZoom: (devicePixelRatio) => {}, // On Zoom @TODO
+        onResize: (viewPortWidth, clientWidth, devicePixelRatio) => {}, // On Resize, @TODO
+        cutOffWidth: 0, // The minimum width to disable resizing.
+        relativeDesignWidth: 1024 // The width relative to the font size.
     }
 
 
@@ -380,19 +105,31 @@ const Mimetic = (configurationObj) => {
 
 
     /**
-     * Only fire once tthe desired content has loaded.
+     * Only fire wasLastBeyondMobileWidth tthe desired content has loaded.
      * Default = DOMContentLoaded.
      */
     const loadEventOption = config.loadEvent === 'load' ? 'load' : 'DOMContentLoaded';
+
+
+    /**
+     * 
+     */
     window.addEventListener(loadEventOption, () => initializeMimetic(config));
 
 
+    /** 
+     * Simple compose.
+     */
     const compose = (a, b) => {
         return function(c) {
             return a(b(c));
         };
     };
 
+
+    /**
+     * Sets and gets the root element.
+     */
     const getRootElement = (element) => {
         const elements = {
             html: (parent) => parent.documentElement,
@@ -409,48 +146,220 @@ const Mimetic = (configurationObj) => {
         return elements.hasOwnProperty(element) ? elements[element](document) : document.querySelector(element);
     }
 
+    /** 
+     * Gets the documents root font size.
+     */
     const getFontSize = (doc) => window.getComputedStyle(doc.documentElement, null).getPropertyValue('font-size');
 
+
+    /** 
+     * converts pixels to REM values.
+     */
     const pxToRem = (fontSizePx) => parseInt(fontSizePx) / 16;
+
+
+
+    /** 
+     * Calculate and apply the new font size to the root element.
+     */
+    let wasLastBeyondMobileWidth = true;
+    let lastDevicePixelRatio;
+    const resizeFonts = (preCalculatedValues) => {
+        const {
+            timestamp,
+            windowWidth,
+            windowOuterWidth,
+            devicePixelRatio,
+            isDevicePixelRatioDefault,
+            relativeDesignWidth,
+            cutOff,
+            rootElement,
+            rootElementStyle,
+            designWidthRatio,
+            rootFontSize
+        } = preCalculatedValues;
+
+        const dpr = windowWidth === windowOuterWidth ? 1 : devicePixelRatio;
+        const currentDevicePixelRatio = devicePixelRatio.toFixed(3);
+
+        if (currentDevicePixelRatio === lastDevicePixelRatio || isDevicePixelRatioDefault || runOnce('init')) {
+            const isAboveDesignWidth = windowWidth > relativeDesignWidth;
+
+            if (windowWidth > cutOff) {
+                /** 
+                 * Set the rootElement's font size.
+                 */
+                rootElementStyle.fontSize = (rootFontSize * designWidthRatio * dpr).toFixed(6) + 'rem';
+
+
+                /** 
+                 * Indicate that the viewport has exceeded the mobileWidth.
+                 */
+                wasLastBeyondMobileWidth = true;
+            } else if (wasLastBeyondMobileWidth) {
+                /** 
+                 * Prevent odd behaviour when refreshed.
+                 */
+                rootElement.removeAttribute("style");
+
+                /** 
+                 * Reset as within mobileWidth.
+                 */
+                wasLastBeyondMobileWidth = false;
+            }
+        }
+
+        /** 
+         * Set the last ratio from the current.
+         */
+        lastDevicePixelRatio = currentDevicePixelRatio;
+    };
+
 
 
     /** 
      * Set Root Font Size.
      */
-    const setRootFontSize = () =>{}
+    // Values to curry 
+    // let wasLastBeyondMobileWidth = true;
+    // let currentDevicePixelRatio;
+    // let lastDevicePixelRatio;
+    let newDevicePixelRatio;
+    let requestId;
+    var varInitialOuterWidth;
+    var varInitialOuterHeight;
+
+    const setRootFontSize = (settings) => {
+        const {
+            window,
+            rootElement,
+            rootElementStyle,
+            rootFontSize,
+            initialOuterHeight,
+            initialOuterWidth,
+            relativeDesignWidth,
+            mobileWidth,
+            cutOffWidth
+        } = settings;
+
+        console.log(relativeDesignWidth, mobileWidth)
+
+        /**
+         * Cancel previous requestAnimationFrame.
+         */
+        cancelAnimationFrame(requestId);
+
+
+        /** 
+         * Set variable inital values if not yet set.
+         */
+        if (varInitialOuterWidth === undefined) {
+            varInitialOuterWidth = initialOuterWidth;
+            varInitialOuterHeight = initialOuterHeight;
+        }
+
+
+        /** 
+         * Get Real time values.
+         */
+        const windowWidth = window.innerWidth;
+        const windowOuterWidth = window.outerWidth;
+        const windowOuterHeight = window.outerHeight;
+        const windowResize = windowOuterWidth !== varInitialOuterWidth && windowOuterHeight !== varInitialOuterHeight;
+        const clientWidth = parseInt(document.documentElement.clientWidth * devicePixelRatio);
+        const defaultDevicePixelRatio = parseInt(clientWidth / screen.width) || devicePixelRatio;
+
+
+        /**
+         * The window width compared to the design width.
+         */
+        const designWidthRatio = windowWidth / relativeDesignWidth;
+
+
+        /**
+         * Check to see if the window is at the default zoom level.
+         */
+        const isDevicePixelRatioDefault = defaultDevicePixelRatio === devicePixelRatio;
+
+        const cutOff = cutOffWidth > mobileWidth ? cutOffWidth : mobileWidth;
+
+
+        /**
+         * Mutate on next available frame.
+         */
+        requestId = requestAnimationFrame((timestamp) => resizeFonts({
+            timestamp,
+            windowWidth,
+            windowOuterWidth,
+            devicePixelRatio,
+            isDevicePixelRatioDefault,
+            relativeDesignWidth,
+            cutOff,
+            rootElement,
+            rootElementStyle,
+            designWidthRatio,
+            rootFontSize
+        }));
+
+
+        /** 
+         * Horrible mutation.
+         */
+        varInitialOuterWidth = windowOuterWidth;
+        varInitialOuterHeight = windowOuterWidth;
+    }
 
 
     /**
      * Initialize Mimetic.  
      */
     function initializeMimetic(config) {
-        const { loadEvent, mobileWidth, rootSelector, initialOuterWidth, initialOuterHeight } = config;
+        const { loadEvent, mobileWidth, rootSelector, scaleDelay } = config;
 
-        const rootElement = getRootElement(rootSelector);
 
         /** 
-         * Get initial values.
+         * Use the rootSelector as the root element.
          */
-        // measureInitialValues(unitsToREM, );
+        const rootElement = getRootElement(rootSelector);
+
+
+        /** 
+         * Obtains Root font size as REM value from a given PX value string.
+         */
         const getRootREMValue = compose(pxToRem, getFontSize);
 
-        const rootREMValue = getRootREMValue(document);
 
-       
+        /** 
+         * Get root font size.
+         */
+        const rootFontSize = getRootREMValue(document);
+
+
+        // @TODO remove config, only use what is needed.
+        /** 
+         * Provide parameters to setRootFontSize.
+         */
+        const settings = Object.assign({
+            initialOuterHeight: window.outerHeight,
+            initialOuterWidth: window.outerWidth,
+            rootFontSize,
+            rootElement,
+            rootElementStyle: rootElement.style,
+            window
+        }, config);
+
 
         /** 
          * Set Root font size.
          */
-        setRootFontSize(rootREMValue);
+        setRootFontSize(settings);
 
 
         /**
          * On resize set Root font size and action callbacks.
          */
-        // resizilla(mutateREMStyles, delay, false);
+        resizilla(() => setRootFontSize(settings), scaleDelay, false);
     }
-
-
 }
 
 export default Mimetic;
