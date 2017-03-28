@@ -358,10 +358,12 @@ const Mimetic = (configurationObj) => {
         mobileWidth: 640, // Width before disabling for mobile phone devices.
         scaleDelay: 33, // Miliseconds between calls on resize.
         preserveDevicePixelRatio: false, // Preserve the device pixel ratio on zoom.
-        rootElement: 'html', // Use the HTML element as the root element.
+        rootSelector: 'html', // Use the HTML element as the root element. 
         onScale: (viewPortWidth, clientWidth) => {}, // On Scale 
         onZoom: (devicePixelRatio) => {}, // On Zoom
-        onResize: (viewPortWidth, clientWidth, devicePixelRatio) => {} // On Resize
+        onResize: (viewPortWidth, clientWidth, devicePixelRatio) => {}, // On Resize
+        initalOuterWidth: window.outerWidth,
+        initalOuterHeight: window.outerHeight
     }
 
 
@@ -385,9 +387,11 @@ const Mimetic = (configurationObj) => {
     window.addEventListener(loadEventOption, () => initializeMimetic(config));
 
 
-    const unitsToPX = (value) => {
-        //
-    }
+    const compose = (a, b) => {
+        return function(c) {
+            return a(b(c));
+        };
+    };
 
     const getRootElement = (element) => {
         const elements = {
@@ -405,13 +409,45 @@ const Mimetic = (configurationObj) => {
         return elements.hasOwnProperty(element) ? elements[element](document) : document.querySelector(element);
     }
 
+    const getFontSize = (doc) => window.getComputedStyle(doc.documentElement, null).getPropertyValue('font-size');
+
+    const pxToRem = (fontSizePx) => parseInt(fontSizePx) / 16;
+
+
+    /** 
+     * Set Root Font Size.
+     */
+    const setRootFontSize = () =>{}
+
+
     /**
      * Initialize Mimetic.  
      */
     function initializeMimetic(config) {
-        const { loadEvent, mobileWidth } = config;
-        // console.log(loadEvent, mobileWidth);
-        console.log(getRootElement('body'));
+        const { loadEvent, mobileWidth, rootSelector, initialOuterWidth, initialOuterHeight } = config;
+
+        const rootElement = getRootElement(rootSelector);
+
+        /** 
+         * Get initial values.
+         */
+        // measureInitialValues(unitsToREM, );
+        const getRootREMValue = compose(pxToRem, getFontSize);
+
+        const rootREMValue = getRootREMValue(document);
+
+       
+
+        /** 
+         * Set Root font size.
+         */
+        setRootFontSize(rootREMValue);
+
+
+        /**
+         * On resize set Root font size and action callbacks.
+         */
+        // resizilla(mutateREMStyles, delay, false);
     }
 
 
