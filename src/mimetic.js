@@ -75,6 +75,133 @@ objectAssign();
 const request = requestFrame('request');
 const cancel = requestFrame('cancel');
 
+
+/** 
+ * CSS Units with pixel factor.
+ */
+var CSSUnits = [{
+    unit: 'px',
+    //  1 / 16
+    PXFactor: 1
+}, {
+    unit: 'pt',
+    // 96 / 72 / 16
+    PXFactor: 1.33333333328
+}, {
+    unit: 'em',
+    // 1
+    PXFactor: 16
+}, {
+    unit: 'rem',
+    // 1
+    PXFactor: 16
+}, {
+    unit: 'cm',
+    // ???
+    PXFactor: 16
+}, {
+    unit: 'q',
+    // ???
+    PXFactor: 16
+}, {
+    unit: 'in',
+    // ???
+    PXFactor: 16
+}, {
+    unit: 'pc',
+    // 96 / 72 / 12 / 16
+    PXFactor: 0.11111111104
+}, {
+    unit: 'ex',
+    // ???
+    PXFactor: 16
+}, {
+    unit: 'ch',
+    // ???
+    PXFactor: 16
+}, {
+    unit: 'vw',
+    // Needs override.
+    PXFactor: 16
+}, {
+    unit: 'vh',
+    // Needs override.
+    PXFactor: 16
+}, {
+    unit: 'vmin',
+    // Needs override.
+    PXFactor: 16
+}, {
+    unit: 'vmax',
+    // Needs override.
+    PXFactor: 16
+}];
+
+
+/** 
+ * CSS Fixed units with pixel values.
+ */
+var CSSFixedUnits = [{
+    unit: 'xx-small',
+    // 9 / 16
+    PXValue: 9
+}, {
+    unit: 'x-small',
+    // 10 / 16
+    PXValue: 10
+}, {
+    unit: 'small',
+    // 13 / 16
+    PXValue: 13
+}, {
+    unit: 'normal',
+    // 16 / 16
+    PXValue: 16
+}, {
+    unit: 'medium',
+    // 16 / 16
+    PXValue: 16
+}, {
+    unit: 'large',
+    // 18 / 16
+    PXValue: 18
+}, {
+    unit: 'x-large',
+    // 24 / 16
+    PXValue: 24
+}, {
+    unit: 'xx-large',
+    // 32 / 16
+    PXValue: 32
+}];
+
+
+const aliasValueToPX = (value) => {
+    return CSSFixedUnits.filter(function(metricInfo) {
+        return value === metricInfo.unit;
+    }).shift().PXValue;
+}
+
+
+const unitsToPX = (value) => {
+    if(typeof value === 'number'){
+        return value;
+    }
+    const suffix = value.replace(/[^a-z]+/gi, '');
+    const numberValue = value.replace(/[^\d\.]*/g, '');
+
+    const metricInfo = CSSUnits.filter(function(metricInfo) {
+            return suffix === metricInfo.unit;
+        })
+        .shift();
+
+    const PXValue = metricInfo ? numberValue * metricInfo.PXFactor : aliasValueToPX(value);
+    return parseInt(PXValue);
+}
+
+
+
+
 const Mimetic = (configurationObj) => {
     /** 
      * Assing configuration as an object.
@@ -202,14 +329,10 @@ const Mimetic = (configurationObj) => {
         /** 
          * Evaluated devicePixelRatio
          */
-        
-         const  ddd = (1 / defaultDevicePixelRatio) * devicePixelRatioConst;
+
+        const ddd = (1 / defaultDevicePixelRatio) * devicePixelRatioConst;
         const evalDevicePixelRatio = preserveDevicePixelRatio ? devicePixelRatio : ddd;
-
-
-        console.log('evalDevicePixelRatio',evalDevicePixelRatio)
         const currentDevicePixelRatio = devicePixelRatioConst.toFixed(3);
-
         const resizeWithoutZoom = currentDevicePixelRatio === lastDevicePixelRatio;
 
         if (resizeWithoutZoom || isDevicePixelRatioDefault || runOnce('init')) {
@@ -303,6 +426,8 @@ const Mimetic = (configurationObj) => {
                 onScale,
                 onZoom,
                 onResize,
+                mobileWidthPX,
+                cutOffWidthPX
             } = settings;
 
 
@@ -347,7 +472,7 @@ const Mimetic = (configurationObj) => {
             /** 
              * The minimum veiwport size to not react to.
              */
-            const cutOff = cutOffWidth > mobileWidth ? cutOffWidth : mobileWidth;
+            const cutOff = cutOffWidthPX > mobileWidthPX ? cutOffWidthPX : mobileWidthPX;
 
 
             /**
@@ -387,7 +512,7 @@ const Mimetic = (configurationObj) => {
      * Initialize Mimetic.  
      */
     function initializeMimetic(config) {
-        const { loadEvent, mobileWidth, rootSelector, scaleDelay } = config;
+        const { loadEvent, mobileWidth, rootSelector, scaleDelay, cutOffWidth } = config;
 
 
         /** 
@@ -408,6 +533,20 @@ const Mimetic = (configurationObj) => {
         const rootFontSize = getRootREMValue(document);
 
 
+
+        /** 
+         * Mobile width in pixels.
+         */
+        const mobileWidthPX = unitsToPX(mobileWidth);
+
+
+        /** 
+         * Cut odd width in pixels.
+         */
+        const cutOffWidthPX = unitsToPX(cutOffWidth);
+
+
+        console.log('mobileWidthPX',mobileWidthPX, 'cutOffWidthPX', cutOffWidthPX);
         // @TODO remove config, only use what is needed.
         /** 
          * Provide parameters to setRootFontSize.
@@ -418,7 +557,9 @@ const Mimetic = (configurationObj) => {
             rootFontSize,
             rootElement,
             rootElementStyle: rootElement.style,
-            window
+            window,
+            mobileWidthPX,
+            cutOffWidthPX
         }, config);
 
 

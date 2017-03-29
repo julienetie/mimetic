@@ -83,7 +83,7 @@ export default function resizilla(optionsHandler, delay, incept) {
 
     function debounce(handler, delay, incept) {
         var timeout;
-                console.log(delay)
+                // console.log(delay)
         return function() {
             var lastCall = function() {
                 timeout = 0;
