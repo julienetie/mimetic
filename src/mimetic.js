@@ -69,6 +69,12 @@ Revive Mimetic after kill.
  */
 objectAssign();
 
+/** 
+ * requestAnimationFrame polyfill
+ */
+const request = requestFrame('request');
+const cancel = requestFrame('cancel');
+
 const Mimetic = (configurationObj) => {
     /** 
      * Assing configuration as an object.
@@ -82,14 +88,15 @@ const Mimetic = (configurationObj) => {
     const defaults = {
         loadEvent: 'DOMContentLoaded', // Load type
         mobileWidth: 640, // Width before disabling for mobile phone devices.
-        scaleDelay: 33, // Miliseconds between calls on resize.
-        preserveDevicePixelRatio: false, // Preserve the device pixel ratio on zoom. @TODO
+        scaleDelay: 16, // Miliseconds between calls on resize.
+        preserveDevicePixelRatio: false, // Preserve the device pixel ratio on zoom.
         rootSelector: 'html', // Use the HTML element as the root element. 
-        onScale: (viewPortWidth, clientWidth) => {}, // On Scale @TODO
-        onZoom: (devicePixelRatio) => {}, // On Zoom @TODO
-        onResize: (viewPortWidth, clientWidth, devicePixelRatio) => {}, // On Resize, @TODO
+        onScale: undefined,
+        onZoom: undefined,
+        onResize: undefined,
         cutOffWidth: 0, // The minimum width to disable resizing.
-        relativeDesignWidth: 1024 // The width relative to the font size.
+        relativeDesignWidth: 1024, // The width relative to the font size.
+        enableScale: true
     }
 
 
@@ -159,39 +166,57 @@ const Mimetic = (configurationObj) => {
     const pxToRem = (fontSizePx) => parseInt(fontSizePx) / 16;
 
 
+    const isCallBackDefined = (callback) => typeof callback === 'function';
+
 
     /** 
      * Calculate and apply the new font size to the root element.
      */
     let wasLastBeyondMobileWidth = true;
     let lastDevicePixelRatio;
+    let hasScaleCallback = false;
+    let hasZoomCallback = false;
+    let hasResizeCallback = false;
     const resizeFonts = (preCalculatedValues) => {
         const {
             timestamp,
             windowWidth,
             windowOuterWidth,
-            devicePixelRatio,
             isDevicePixelRatioDefault,
             relativeDesignWidth,
             cutOff,
             rootElement,
             rootElementStyle,
             designWidthRatio,
-            rootFontSize
+            devicePixelRatioConst,
+            rootFontSize,
+            enableScale,
+            preserveDevicePixelRatio,
+            onScale,
+            onZoom,
+            onResize,
+            clientWidth
         } = preCalculatedValues;
 
-        const dpr = windowWidth === windowOuterWidth ? 1 : devicePixelRatio;
-        const currentDevicePixelRatio = devicePixelRatio.toFixed(3);
+        /** 
+         * Evaluated devicePixelRatio
+         */
+        const evalDevicePixelRatio = windowWidth === windowOuterWidth || !preserveDevicePixelRatio ? 1 : devicePixelRatioConst;
 
-        if (currentDevicePixelRatio === lastDevicePixelRatio || isDevicePixelRatioDefault || runOnce('init')) {
+        const currentDevicePixelRatio = devicePixelRatioConst.toFixed(3);
+
+        const resizeWithoutZoom = currentDevicePixelRatio === lastDevicePixelRatio;
+
+        if (resizeWithoutZoom || isDevicePixelRatioDefault || runOnce('init')) {
             const isAboveDesignWidth = windowWidth > relativeDesignWidth;
 
             if (windowWidth > cutOff) {
                 /** 
                  * Set the rootElement's font size.
                  */
-                rootElementStyle.fontSize = (rootFontSize * designWidthRatio * dpr).toFixed(6) + 'rem';
-
+                if (enableScale) {
+                    rootElementStyle.fontSize = (rootFontSize * designWidthRatio * evalDevicePixelRatio).toFixed(6) + 'rem';
+                }
 
                 /** 
                  * Indicate that the viewport has exceeded the mobileWidth.
@@ -200,15 +225,44 @@ const Mimetic = (configurationObj) => {
             } else if (wasLastBeyondMobileWidth) {
                 /** 
                  * Prevent odd behaviour when refreshed.
+                 * By removing the style attribute once when 
+                 * within the mobileWidth.
                  */
-                rootElement.removeAttribute("style");
-
+                if (wasLastBeyondMobileWidth) {
+                    rootElement.removeAttribute("style");
+                }
                 /** 
                  * Reset as within mobileWidth.
                  */
                 wasLastBeyondMobileWidth = false;
             }
         }
+
+
+        /** 
+         * Callbacks.
+         */
+        if (!runOnce('callbacks')) {
+
+            if (resizeWithoutZoom && hasScaleCallback) {
+                onScale(clientWidth, windowWidth, devicePixelRatioConst);
+            } else if (hasZoomCallback) {
+                onZoom(clientWidth, windowWidth, devicePixelRatioConst);
+            }
+
+            if (hasResizeCallback) {
+                onResize(clientWidth, windowWidth, devicePixelRatioConst);
+            }
+
+        } else {
+            /** 
+             * Validates callbacks once.
+             */
+            hasScaleCallback = isCallBackDefined(onScale);
+            hasZoomCallback = isCallBackDefined(onZoom);
+            hasResizeCallback = isCallBackDefined(onResize);
+        }
+
 
         /** 
          * Set the last ratio from the current.
@@ -221,90 +275,106 @@ const Mimetic = (configurationObj) => {
     /** 
      * Set Root Font Size.
      */
-    // Values to curry 
-    // let wasLastBeyondMobileWidth = true;
-    // let currentDevicePixelRatio;
-    // let lastDevicePixelRatio;
-    let newDevicePixelRatio;
-    let requestId;
-    var varInitialOuterWidth;
-    var varInitialOuterHeight;
-
-    const setRootFontSize = (settings) => {
-        const {
-            window,
-            rootElement,
-            rootElementStyle,
-            rootFontSize,
-            initialOuterHeight,
-            initialOuterWidth,
-            relativeDesignWidth,
-            mobileWidth,
-            cutOffWidth
-        } = settings;
-
-        console.log(relativeDesignWidth, mobileWidth)
-
-        /**
-         * Cancel previous requestAnimationFrame.
-         */
-        cancelAnimationFrame(requestId);
+    const setRootFontSizeCurried = () => {
+        var requestId;
+        var outerWidth;
+        var outerHeight;
+        return (settings) => {
+            /** 
+             * Destructured settings.
+             */
+            const {
+                window,
+                rootElement,
+                rootElementStyle,
+                rootFontSize,
+                initialOuterHeight,
+                initialOuterWidth,
+                relativeDesignWidth,
+                mobileWidth,
+                cutOffWidth,
+                enableScale,
+                preserveDevicePixelRatio,
+                onScale,
+                onZoom,
+                onResize
+            } = settings;
 
 
-        /** 
-         * Set variable inital values if not yet set.
-         */
-        if (varInitialOuterWidth === undefined) {
-            varInitialOuterWidth = initialOuterWidth;
-            varInitialOuterHeight = initialOuterHeight;
+            /** 
+             * Get Real time values.
+             */
+            const windowWidth = window.innerWidth;
+            const windowOuterWidth = window.outerWidth;
+            const windowOuterHeight = window.outerHeight;
+            const devicePixelRatioConst = window.devicePixelRatio;
+            const windowResize = windowOuterWidth !== outerWidth && windowOuterHeight !== outerHeight;
+            const clientWidth = parseInt(document.documentElement.clientWidth * devicePixelRatioConst);
+            const defaultDevicePixelRatio = 1 //parseInt(clientWidth / screen.width) || devicePixelRatioConst;
+
+
+            /**
+             * Cancel previous requestAnimationFrame.
+             */
+            cancel(requestId);
+
+
+            /** 
+             * Set variable inital values if not yet set.
+             */
+            if (outerWidth === undefined) {
+                outerWidth = initialOuterWidth;
+                outerHeight = initialOuterHeight;
+            }
+
+
+            /**
+             * The window width compared to the design width.
+             */
+            const designWidthRatio = windowWidth / relativeDesignWidth;
+
+
+            /**
+             * Check to see if the window is at the default zoom level.
+             */
+            const isDevicePixelRatioDefault = defaultDevicePixelRatio === devicePixelRatioConst;
+
+
+            /** 
+             * The minimum veiwport size to not react to.
+             */
+            const cutOff = cutOffWidth > mobileWidth ? cutOffWidth : mobileWidth;
+
+
+            /**
+             * Mutate on next available frame.
+             */
+            requestId = request((timestamp) => resizeFonts({
+                timestamp,
+                windowWidth,
+                windowOuterWidth,
+                isDevicePixelRatioDefault,
+                relativeDesignWidth,
+                cutOff,
+                rootElement,
+                rootElementStyle,
+                designWidthRatio,
+                devicePixelRatioConst,
+                rootFontSize,
+                enableScale,
+                preserveDevicePixelRatio,
+                onScale,
+                onZoom,
+                onResize,
+                clientWidth
+            }));
+
+            /**
+             * Updated Outer browser dimensions.
+             */
+            outerWidth = windowOuterWidth;
+            outerHeight = windowOuterWidth;
         }
-
-
-        /** 
-         * Get Real time values.
-         */
-        const windowWidth = window.innerWidth;
-        const windowOuterWidth = window.outerWidth;
-        const windowOuterHeight = window.outerHeight;
-        const windowResize = windowOuterWidth !== varInitialOuterWidth && windowOuterHeight !== varInitialOuterHeight;
-        const clientWidth = parseInt(document.documentElement.clientWidth * devicePixelRatio);
-        const defaultDevicePixelRatio = parseInt(clientWidth / screen.width) || devicePixelRatio;
-
-
-        /**
-         * The window width compared to the design width.
-         */
-        const designWidthRatio = windowWidth / relativeDesignWidth;
-
-
-        /**
-         * Check to see if the window is at the default zoom level.
-         */
-        const isDevicePixelRatioDefault = defaultDevicePixelRatio === devicePixelRatio;
-
-        const cutOff = cutOffWidth > mobileWidth ? cutOffWidth : mobileWidth;
-
-
-        /**
-         * Mutate on next available frame.
-         */
-        requestId = requestAnimationFrame((timestamp) => resizeFonts({
-            timestamp,
-            windowWidth,
-            windowOuterWidth,
-            devicePixelRatio,
-            isDevicePixelRatioDefault,
-            relativeDesignWidth,
-            cutOff,
-            rootElement,
-            rootElementStyle,
-            designWidthRatio,
-            rootFontSize
-        }));
-
-
-        varInitialOuterWidth = windowOuterWidth;
-        varInitialOuterHeight = windowOuterWidth;
     }
 
 
@@ -345,6 +415,12 @@ const Mimetic = (configurationObj) => {
             rootElementStyle: rootElement.style,
             window
         }, config);
+
+
+        /** 
+         * Sets variables for setRootFontSize.
+         */
+        const setRootFontSize = setRootFontSizeCurried();
 
 
         /** 
