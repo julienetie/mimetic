@@ -195,14 +195,19 @@ const Mimetic = (configurationObj) => {
             onScale,
             onZoom,
             onResize,
-            clientWidth
+            clientWidth,
+            defaultDevicePixelRatio
         } = preCalculatedValues;
 
         /** 
          * Evaluated devicePixelRatio
          */
-        const evalDevicePixelRatio = windowWidth === windowOuterWidth || !preserveDevicePixelRatio ? 1 : devicePixelRatioConst;
+        
+         const  ddd = (1 / defaultDevicePixelRatio) * devicePixelRatioConst;
+        const evalDevicePixelRatio = preserveDevicePixelRatio ? devicePixelRatio : ddd;
 
+
+        console.log('evalDevicePixelRatio',evalDevicePixelRatio)
         const currentDevicePixelRatio = devicePixelRatioConst.toFixed(3);
 
         const resizeWithoutZoom = currentDevicePixelRatio === lastDevicePixelRatio;
@@ -297,7 +302,7 @@ const Mimetic = (configurationObj) => {
                 preserveDevicePixelRatio,
                 onScale,
                 onZoom,
-                onResize
+                onResize,
             } = settings;
 
 
@@ -310,8 +315,7 @@ const Mimetic = (configurationObj) => {
             const devicePixelRatioConst = window.devicePixelRatio;
             const windowResize = windowOuterWidth !== outerWidth && windowOuterHeight !== outerHeight;
             const clientWidth = parseInt(document.documentElement.clientWidth * devicePixelRatioConst);
-            const defaultDevicePixelRatio = 1 //parseInt(clientWidth / screen.width) || devicePixelRatioConst;
-
+            const defaultDevicePixelRatio = Math.round(document.documentElement.clientWidth * devicePixelRatioConst / window.outerWidth);
 
             /**
              * Cancel previous requestAnimationFrame.
@@ -366,7 +370,8 @@ const Mimetic = (configurationObj) => {
                 onScale,
                 onZoom,
                 onResize,
-                clientWidth
+                clientWidth,
+                defaultDevicePixelRatio
             }));
 
             /**

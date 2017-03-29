@@ -130,7 +130,8 @@ dd{
 <script>
   Mimetic({
     loadEvent: 'load',
-    mobileWidth: 640
+    mobileWidth: 640,
+    onScale: function(a,b,c){console.log('hello world', a,c,b)}
   });
 </script>
 </head>
