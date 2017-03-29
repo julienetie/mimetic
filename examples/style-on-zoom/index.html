@@ -1,0 +1,236 @@
+<!doctype html>
+<html class="no-js" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MIMETIC Example - Style On Zoom</title>
+    <!-- 1. Ensure all the dimensions you need to scale (e.g. font-size) 
+    are using relative units, (preferably REM units) -->
+    <link rel="stylesheet" href="foundation.min.css">
+    <style>
+    .callout,
+    body {
+        background: url(repeat.png);
+    }
+    
+    h1,
+    h2,
+    h3,
+    span,
+    .stat,
+    a,
+    p {
+        transition: background 0.3s ease, color 0.3s ease,  border 0.3s ease, padding 0.3s ease;
+    }
+    
+    h1.accessible-zoom,
+    h2.accessible-zoom,
+    h3.accessible-zoom,
+    span.accessible-zoom,
+    .stat.accessible-zoom,
+    a.accessible-zoom,
+    p.accessible-zoom {
+        /*background: rgba(255,255,255,0.8);*/
+        color: black;
+    }
+    /*
+      And better on hover. 
+     */
+    h1.accessible-zoom:hover,
+    h2.accessible-zoom:hover,
+    h3.accessible-zoom:hover,
+    span.accessible-zoom:hover,
+    .stat.accessible-zoom:hover,
+    a.accessible-zoom:hover,
+    p.accessible-zoom:hover {
+        background: rgba(255,255,255,1) !important;
+        border: 0.1rem dashed blue;
+        box-sizing: border-box;
+        color: black;
+        padding:1rem;
+    }
+    </style>
+    <!-- 2. Include Mimetic preferably in the head of the document -->
+    <script src="../../dist/mimetic.js"></script>
+    <!-- 3. Call Mimetic, optionally configurate by passing an object -->
+    <script>
+    const improveReadabilityOnZoom = (elements, type, opacity) => {
+        elements.forEach((element) => {
+            element.classList[type]('accessible-zoom');
+            if (type === 'add') {
+                element.style.backgroundColor = `rgba(255,255,255,${opacity})`;
+            }
+            if(type === 'remove'){
+              element.style.backgroundColor = `rgba(255,255,255,0)`;
+            }
+        });
+    }
+
+
+    const styleBackgroundOnZoom = ({
+        ddd
+    }) => {
+        const textSelectors = ['h1', 'p', 'a', 'h2', 'h3', 'span', '.stat'];
+
+        const textElements = textSelectors.map((selector) => {
+            if (selector[0] === '.') {
+                return Array.from(document.getElementsByClassName(selector));
+            } else {
+                return Array.from(document.getElementsByTagName(selector));
+            }
+        });
+
+
+        var textElementsFlat = textElements.reduce(function(prev, curr) {
+            return prev.concat(curr);
+        });
+
+        const opacity = 0.5 + (Math.abs(ddd / 10));
+
+        if (ddd !== 1) {
+            improveReadabilityOnZoom(textElementsFlat, 'add', opacity);
+        } else {
+            improveReadabilityOnZoom(textElementsFlat, 'remove');
+        }
+    }
+
+    Mimetic({
+        onZoom: styleBackgroundOnZoom
+    });
+    </script>
+    <!-- 4. Resize and zoom the browser to your hearts content -->
+    <!-- You can use Mimetic for "Scalable Web Design" or to simply detect 
+    the browser zoom level See docs. -->
+</head>
+
+<body>
+    <!-- Start Top Bar -->
+    <div class="top-bar">
+        <div class="top-bar-left">
+            <ul class="menu">
+                <li class="menu-text">MIMETIC</li>
+                <li><a href="#">One</a></li>
+                <li><a href="#">Two</a></li>
+            </ul>
+        </div>
+        <div class="top-bar-right">
+            <ul class="menu">
+                <li><a href="#">Three</a></li>
+                <li><a href="#">Four</a></li>
+                <li><a href="#">Five</a></li>
+                <li><a href="#">Six</a></li>
+            </ul>
+        </div>
+    </div>
+    <!-- End Top Bar -->
+    <div class="callout large">
+        <div class="row column text-center">
+            <h1>Zoom in and out via the browser zoom</h1>
+            <p class="lead">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam in dui mauris.</p>
+            <a href="#" class="button large hollow">Learn More</a>
+            <a href="#" class="button large hollow">Learn Less</a>
+        </div>
+    </div>
+    <div class="row">
+        <div class="medium-6 columns medium-push-6">
+            <img class="thumbnail" src="http://placehold.it/750x350">
+        </div>
+        <div class="medium-6 columns medium-pull-6">
+            <h2>Our Agency, our selves.</h2>
+            <p>Vivamus luctus urna sed urna ultricies ac tempor dui sagittis. In condimentum facilisis porta. Sed nec diam eu diam mattis viverra. Nulla fringilla, orci ac euismod semper, magna diam porttitor mauris, quis sollicitudin sapien justo in libero. Vestibulum mollis mauris enim. Morbi euismod magna ac lorem rutrum elementum. Donec viverra auctor.</p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="medium-4 columns">
+            <h3>Photoshop</h3>
+            <p>Vivamus luctus urna sed urna ultricies ac tempor dui sagittis. In condimentum facilisis porta. Sed nec diam eu diam mattis viverra. Nulla fringilla, orci ac euismod semper, magna.</p>
+        </div>
+        <div class="medium-4 columns">
+            <h3>Javascript</h3>
+            <p>Vivamus luctus urna sed urna ultricies ac tempor dui sagittis. In condimentum facilisis porta. Sed nec diam eu diam mattis viverra. Nulla fringilla, orci ac euismod semper, magna.</p>
+        </div>
+        <div class="medium-4 columns">
+            <h3>Marketing</h3>
+            <p>Vivamus luctus urna sed urna ultricies ac tempor dui sagittis. In condimentum facilisis porta. Sed nec diam eu diam mattis viverra. Nulla fringilla, orci ac euismod semper, magna.</p>
+        </div>
+    </div>
+    <hr>
+    <div class="row column">
+        <ul class="vertical medium-horizontal menu expanded text-center">
+            <li>
+                <a href="#">
+                    <div class="stat">28</div><span>Websites</span></a>
+            </li>
+            <li>
+                <a href="#">
+                    <div class="stat">43</div><span>Apps</span></a>
+            </li>
+            <li>
+                <a href="#">
+                    <div class="stat">95</div><span>Ads</span></a>
+            </li>
+            <li>
+                <a href="#">
+                    <div class="stat">59</div><span>Cakes</span></a>
+            </li>
+            <li>
+                <a href="#">
+                    <div class="stat">18</div><span>Logos</span></a>
+            </li>
+        </ul>
+    </div>
+    <hr>
+    <div class="row column">
+        <h3>Our Recent Work</h3>
+    </div>
+    <div class="row medium-up-3 large-up-4">
+        <div class="column">
+            <img class="thumbnail" src="http://placehold.it/550x550">
+        </div>
+        <div class="column">
+            <img class="thumbnail" src="http://placehold.it/550x550">
+        </div>
+        <div class="column">
+            <img class="thumbnail" src="http://placehold.it/550x550">
+        </div>
+        <div class="column">
+            <img class="thumbnail" src="http://placehold.it/550x550">
+        </div>
+        <div class="column">
+            <img class="thumbnail" src="http://placehold.it/550x550">
+        </div>
+        <div class="column">
+            <img class="thumbnail" src="http://placehold.it/550x550">
+        </div>
+        <div class="column">
+            <img class="thumbnail" src="http://placehold.it/550x550">
+        </div>
+        <div class="column">
+            <img class="thumbnail" src="http://placehold.it/550x550">
+        </div>
+        <div class="column">
+            <img class="thumbnail" src="http://placehold.it/550x550">
+        </div>
+        <div class="column">
+            <img class="thumbnail" src="http://placehold.it/550x550">
+        </div>
+        <div class="column">
+            <img class="thumbnail" src="http://placehold.it/550x550">
+        </div>
+        <div class="column">
+            <img class="thumbnail" src="http://placehold.it/550x550">
+        </div>
+    </div>
+    <hr>
+    <div class="row column">
+        <ul class="menu">
+            <li><a href="#">One</a></li>
+            <li><a href="#">Two</a></li>
+            <li><a href="#">Three</a></li>
+            <li><a href="#">Four</a></li>
+        </ul>
+    </div>
+</body>
+
+</html>

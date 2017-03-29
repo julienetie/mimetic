@@ -1,192 +1,413 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0">
     <title>MM</title>
-<style>
-/*! normalize.css v3.0.2 | MIT License | github.com/necolas/normalize.css */
-html{font-family:sans-serif;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%}body{margin:0}article,aside,details,figcaption,figure,footer,header,hgroup,main,menu,nav,section,summary{display:block}audio,canvas,progress,video{display:inline-block;vertical-align:baseline}audio:not([controls]){display:none;height:0}[hidden],template{display:none}a{background-color:transparent}a:active,a:hover{outline:0}abbr[title]{border-bottom:1px dotted}b,strong{font-weight:700}dfn{font-style:italic}h1{font-size:2em;margin:.67em 0}mark{background:#ff0;color:#000}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sup{top:-.5em}sub{bottom:-.25em}img{border:0}svg:not(:root){overflow:hidden}figure{margin:1em 40px}hr{box-sizing:content-box;height:0}pre{overflow:auto}code,kbd,pre,samp{font-family:monospace,monospace;font-size:1em}button,input,optgroup,select,textarea{color:inherit;font:inherit;margin:0}button{overflow:visible}button,select{text-transform:none}button,html input[type=button],input[type=reset],input[type=submit]{-webkit-appearance:button;cursor:pointer}button[disabled],html input[disabled]{cursor:default}button::-moz-focus-inner,input::-moz-focus-inner{border:0;padding:0}input{line-height:normal}input[type=checkbox],input[type=radio]{box-sizing:border-box;padding:0}input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{height:auto}input[type=search]{-webkit-appearance:textfield;box-sizing:content-box}input[type=search]::-webkit-search-cancel-button,input[type=search]::-webkit-search-decoration{-webkit-appearance:none}fieldset{border:1px solid silver;margin:0 2px;padding:.35em .625em .75em}legend{border:0;padding:0}textarea{overflow:auto}optgroup{font-weight:700}table{border-collapse:collapse;border-spacing:0}td,th{padding:0}
-
-
-
-
-h1{
-padding: 0;
-margin: 0;
-}
-
-*/
-
-/* test if have media queries */
-@media all and (min-width:1px) {
-    body{background:pink;}
-}
-
-
-
-/* Small screens */
-@media only screen { } /* Define mobile styles */
-
-@media only screen and (max-width: 40em) {
-/*html{ font-size: 32px;  } */
-  } /* max-width 640px, mobile-only styles, use when QAing mobile issues */
-
-
-/* Medium screens */
-@media only screen and (min-width: 40.063em) { } /* min-width 641px, medium screens */
-
-@media only screen and (min-device-width: 40.063em) {
-/* body{min-width: 998px;} */
-  } /* min-width 641px and max-width 1024px, use when QAing tablet-only issues */
-
-
-
-html{
-font-family: arial, sans-serif; /* FF sans-serif too heavy */
-}
-
-h1{
-padding: 0;
-margin: 0;
-}
-
-header{
-    width:100%;
-    background: green;
-    top:0;
-    border-bottom: 1px dashed blue;
-    color: #03003B;
-  }
-header h1{
-  font-size: 7rem;
-  line-height: 1rem;
-
-}
-header h2{
-  font-size: 2rem;
-  margin: 0 0 0.5rem 0;
-}
-
-header h1,header h2{
-text-align: center;
-
-}
-
-aside,section{
-position: relative;
-float:left;
-}
-
-#middle-sec{
-  width: 50%;
-
-}
-aside{
-  width: 25%;
-  background: pink;
-}
-#content-body{
-  background: #fff;
-  width: 100%;
-
-}
-#middle-sec{
-
-}
-
-
-p{
-margin: 1em;  /*  51.2px, 48px, 50px, 20px  */
-font-size: 1em;
-line-height: 1em;
-padding: 1em;
-background: lime;
-}
-
-h2{
-margin: 1em 1em 0;
-line-height: 1em;
-background: yellow;
-}
-
-/*scaled transition*/
-p{
-  /*
+    <style>
+    /*! normalize.css v3.0.2 | MIT License | github.com/necolas/normalize.css */
+    
+    html {
+        font-family: sans-serif;
+        -ms-text-size-adjust: 100%;
+        -webkit-text-size-adjust: 100%
+    }
+    
+    body {
+        margin: 0
+    }
+    
+    article,
+    aside,
+    details,
+    figcaption,
+    figure,
+    footer,
+    header,
+    hgroup,
+    main,
+    menu,
+    nav,
+    section,
+    summary {
+        display: block
+    }
+    
+    audio,
+    canvas,
+    progress,
+    video {
+        display: inline-block;
+        vertical-align: baseline
+    }
+    
+    audio:not([controls]) {
+        display: none;
+        height: 0
+    }
+    
+    [hidden],
+    template {
+        display: none
+    }
+    
+    a {
+        background-color: transparent
+    }
+    
+    a:active,
+    a:hover {
+        outline: 0
+    }
+    
+    abbr[title] {
+        border-bottom: 1px dotted
+    }
+    
+    b,
+    strong {
+        font-weight: 700
+    }
+    
+    dfn {
+        font-style: italic
+    }
+    
+    h1 {
+        font-size: 2em;
+        margin: .67em 0
+    }
+    
+    mark {
+        background: #ff0;
+        color: #000
+    }
+    
+    small {
+        font-size: 80%
+    }
+    
+    sub,
+    sup {
+        font-size: 75%;
+        line-height: 0;
+        position: relative;
+        vertical-align: baseline
+    }
+    
+    sup {
+        top: -.5em
+    }
+    
+    sub {
+        bottom: -.25em
+    }
+    
+    img {
+        border: 0
+    }
+    
+    svg:not(:root) {
+        overflow: hidden
+    }
+    
+    figure {
+        margin: 1em 40px
+    }
+    
+    hr {
+        box-sizing: content-box;
+        height: 0
+    }
+    
+    pre {
+        overflow: auto
+    }
+    
+    code,
+    kbd,
+    pre,
+    samp {
+        font-family: monospace, monospace;
+        font-size: 1em
+    }
+    
+    button,
+    input,
+    optgroup,
+    select,
+    textarea {
+        color: inherit;
+        font: inherit;
+        margin: 0
+    }
+    
+    button {
+        overflow: visible
+    }
+    
+    button,
+    select {
+        text-transform: none
+    }
+    
+    button,
+    html input[type=button],
+    input[type=reset],
+    input[type=submit] {
+        -webkit-appearance: button;
+        cursor: pointer
+    }
+    
+    button[disabled],
+    html input[disabled] {
+        cursor: default
+    }
+    
+    button::-moz-focus-inner,
+    input::-moz-focus-inner {
+        border: 0;
+        padding: 0
+    }
+    
+    input {
+        line-height: normal
+    }
+    
+    input[type=checkbox],
+    input[type=radio] {
+        box-sizing: border-box;
+        padding: 0
+    }
+    
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button {
+        height: auto
+    }
+    
+    input[type=search] {
+        -webkit-appearance: textfield;
+        box-sizing: content-box
+    }
+    
+    input[type=search]::-webkit-search-cancel-button,
+    input[type=search]::-webkit-search-decoration {
+        -webkit-appearance: none
+    }
+    
+    fieldset {
+        border: 1px solid silver;
+        margin: 0 2px;
+        padding: .35em .625em .75em
+    }
+    
+    legend {
+        border: 0;
+        padding: 0
+    }
+    
+    textarea {
+        overflow: auto
+    }
+    
+    optgroup {
+        font-weight: 700
+    }
+    
+    table {
+        border-collapse: collapse;
+        border-spacing: 0
+    }
+    
+    td,
+    th {
+        padding: 0
+    }
+    
+    h1 {
+        padding: 0;
+        margin: 0;
+    }
+    
+    */
+    /* test if have media queries */
+    
+    @media all and (min-width:1px) {
+        body {
+            background: pink;
+        }
+    }
+    /* Small screens */
+    
+    @media only screen {}
+    /* Define mobile styles */
+    
+    @media only screen and (max-width: 40em) {
+        /*html{ font-size: 32px;  } */
+    }
+    /* max-width 640px, mobile-only styles, use when QAing mobile issues */
+    /* Medium screens */
+    
+    @media only screen and (min-width: 40.063em) {}
+    /* min-width 641px, medium screens */
+    
+    @media only screen and (min-device-width: 40.063em) {
+        /* body{min-width: 998px;} */
+    }
+    /* min-width 641px and max-width 1024px, use when QAing tablet-only issues */
+    
+    html {
+        font-family: arial, sans-serif;
+        /* FF sans-serif too heavy */
+    }
+    
+    h1 {
+        padding: 0;
+        margin: 0;
+    }
+    
+    header {
+        width: 100%;
+        background: green;
+        top: 0;
+        border-bottom: 1px dashed blue;
+        color: #03003B;
+    }
+    
+    header h1 {
+        font-size: 7rem;
+        line-height: 1rem;
+    }
+    
+    header h2 {
+        font-size: 2rem;
+        margin: 0 0 0.5rem 0;
+    }
+    
+    header h1,
+    header h2 {
+        text-align: center;
+    }
+    
+    aside,
+    section {
+        position: relative;
+        float: left;
+    }
+    
+    #middle-sec {
+        width: 50%;
+    }
+    
+    aside {
+        width: 25%;
+        background: pink;
+    }
+    
+    #content-body {
+        background: #fff;
+        width: 100%;
+    }
+    
+    #middle-sec {}
+    
+    p {
+        margin: 1em;
+        /*  51.2px, 48px, 50px, 20px  */
+        font-size: 1em;
+        line-height: 1em;
+        padding: 1em;
+        background: lime;
+    }
+    
+    h2 {
+        margin: 1em 1em 0;
+        line-height: 1em;
+        background: yellow;
+    }
+    /*scaled transition*/
+    
+    p {
+        /*
   -webkit-transition: all 0.2s linear;
 -moz-transition: all 0.2s linear;
 -o-transition: all 0.2s linear;
 transition: all 0.2s linear;
 */
-}
-
-dd{
-  padding: 1em;
-  margin: 0em;
-}
-</style>
-
-<script src="dist/mimetic.js"></script>
-<script>
-  Mimetic({
-    loadEvent: 'load',
-    mobileWidth: '12pt',
-    onScale: function(a,b,c){console.log('hello world', a,c,b)}
-  });
-</script>
+    }
+    
+    dd {
+        padding: 1em;
+        margin: 0em;
+    }
+    </style>
+    <script src="dist/mimetic.js"></script>
+    <script>
+    const mimetic = Mimetic({
+        loadEvent: 'load',
+        mobileWidth: '12pt',
+        onScale: function(a, b, c) {
+            console.log('hello world', a, c, b)
+        }
+    });
+window.mimetic = mimetic;
+    // setTimeout(() => {
+    //     console.info('bang')
+    //     console.log(mimetic.kill())
+    // }, 3000)
+    </script>
 </head>
+
 <body>
-<header>
-<h1>Mimetic</h1>
-<h2>Geometric Normalizer</h2>
-</header>
-
-<section id='content-body'>
-<aside>
-<article>
-<p>
-Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through
-</p>
-</article>
-<article>
-<p class='ham'>
-the cites of the word in classical literature, discovered the undoubtable source. Lorem Ipsum comes from sections 1.10.32 and 1.10.33 of "de Finibus Bonorum et Malorum" (The Extremes of Good and Evil) by Cicero, written in 45 BC. This book is a treatise on the theory of ethics, very popular during the Renaissance. The first line of Lorem Ipsum, "Lorem ipsum dolor sit amet..", comes from a line in section 1.10.32.
-</p>
-</article>
-</aside>
-<section id="middle-sec">
-<h2>What Is This?</h2>
-<p>
-Mimetic is a "Display Normalizer". Mimetic uses a 'Design once scale for all' philosophy that alows you to maximize visual development for all platforms.
-</p>
-</section>
-<section id="middle-sec">
-<p>
-Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through the cites of the word in classical literature, discovered the undoubtable source. Lorem Ipsum comes from sections 1.10.32 and 1.10.33 of "de Finibus Bonorum et Malorum" (The Extremes of Good and Evil) by Cicero, written in 45 BC. This book is a treatise on the theory of ethics, very popular during the Renaissance. The first line of Lorem Ipsum, "Lorem ipsum dolor sit amet..", comes from a line in section 1.10.32.
-</p>
-</section>
-<aside style="position: absolute;right:0;top:0; ">
-<h2>Mimetic In A Nutshell</h2>
-<dl>
-<dt class='potatoe'>Mimetic.scale</dt>
-<dd>The layout is constructied to a fixed width or height, the layout, fonts and
-images are scaled to fit any device. Your website is of full width/ height on eveery device.</dd>
-<dt>Mimetic.baseLayer (.base)</dt>
-<dd>This is the most simplified layer of the website without content. This layer only contains layout tags and maybe color fills, it is not appriximate.
-</dd>
-<dt>Mimetic.interfaceLayer (.ui)</dt>
-<dd>The interface layer defines UI elements primarilay using SVG.</dd>
-<dt>Mimetic.contentLayer (.con)</dt>
-<dd>This layer is strictly for content, the "layout" shoud only consist of the main content</dd>
-</dl>
-
-</aside>
-</section>
-
-<canvas></canvas>
-<canvas></canvas>
-<canvas></canvas>
-<script></script>
-<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/fastdom/1.0.5/fastdom-strict.min.js"></script> -->
+    <header>
+        <h1>Mimetic</h1>
+        <h2>Geometric Normalizer</h2>
+    </header>
+    <section id='content-body'>
+        <aside>
+            <article>
+                <p>
+                    Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through
+                </p>
+            </article>
+            <article>
+                <p class='ham'>
+                    the cites of the word in classical literature, discovered the undoubtable source. Lorem Ipsum comes from sections 1.10.32 and 1.10.33 of "de Finibus Bonorum et Malorum" (The Extremes of Good and Evil) by Cicero, written in 45 BC. This book is a treatise on the theory of ethics, very popular during the Renaissance. The first line of Lorem Ipsum, "Lorem ipsum dolor sit amet..", comes from a line in section 1.10.32.
+                </p>
+            </article>
+        </aside>
+        <section id="middle-sec">
+            <h2>What Is This?</h2>
+            <p>
+                Mimetic is a "Display Normalizer". Mimetic uses a 'Design once scale for all' philosophy that alows you to maximize visual development for all platforms.
+            </p>
+        </section>
+        <section id="middle-sec">
+            <p>
+                Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through the cites of the word in classical literature, discovered the undoubtable source. Lorem Ipsum comes from sections 1.10.32 and 1.10.33 of "de Finibus Bonorum et Malorum" (The Extremes of Good and Evil) by Cicero, written in 45 BC. This book is a treatise on the theory of ethics, very popular during the Renaissance. The first line of Lorem Ipsum, "Lorem ipsum dolor sit amet..", comes from a line in section 1.10.32.
+            </p>
+        </section>
+        <aside style="position: absolute;right:0;top:0; ">
+            <h2>Mimetic In A Nutshell</h2>
+            <dl>
+                <dt class='potatoe'>Mimetic.scale</dt>
+                <dd>The layout is constructied to a fixed width or height, the layout, fonts and images are scaled to fit any device. Your website is of full width/ height on eveery device.</dd>
+                <dt>Mimetic.baseLayer (.base)</dt>
+                <dd>This is the most simplified layer of the website without content. This layer only contains layout tags and maybe color fills, it is not appriximate.
+                </dd>
+                <dt>Mimetic.interfaceLayer (.ui)</dt>
+                <dd>The interface layer defines UI elements primarilay using SVG.</dd>
+                <dt>Mimetic.contentLayer (.con)</dt>
+                <dd>This layer is strictly for content, the "layout" shoud only consist of the main content</dd>
+            </dl>
+        </aside>
+    </section>
+    <canvas></canvas>
+    <canvas></canvas>
+    <canvas></canvas>
+    <script></script>
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/fastdom/1.0.5/fastdom-strict.min.js"></script> -->
 </body>
+
 </html>
