@@ -4,65 +4,20 @@ import objectAssign from '../libs/object-assign';
 // @TODO remove run once and curry functions.
 import runOnce from 'run-once';
 
-/*
-  Browser support: 
-  Safari IOS 7+ 
-  IE Mobile 11
 
-  Internet Explorer 9+
-  Edge
-  Chrome
-  Opera
-  Firefox
- */
-
-
-
-/*
-
-MIMETIC AS A VIEWPORT ENGINE
-
-Step 1: 
-    
-    Preferably place the script inline within the <head> of your HTML.
-    Or load the srouce within the head. As Mimetic is a stylistic feature 
-    and prime dependency it should be loaded before the main content. 
-    Despite placing, Mimetic will execute after DOMContentLoaded "by default". 
-
-Step 2: Initalize.
-  
-    Mimetic();
-
-Optional:
-  
-    Pass in options to customise Mimetic's behavior:
-
-    Mimetic({
-      mobileWidth: '40em',
-      preserveDevicePixelRatio: false
-    });
-
-
-MIMETIC AS A ZOOM DETECTION LIBRARY
-
-    Mimetic({
-      scale: false,
-      onZoom: (zoomLevel)=> console.log(zoomLevel)
-    });
-
-
-
-
-Kill Mimetic 
-
-    const mimetic = Mimetic();
-
-    mimetic.kill();
-
-Revive Mimetic after kill.
-
-    mimetic.revivie();
-*/
+    // ES5 15.2.3.9
+    // http://es5.github.com/#x15.2.3.9
+    if (!Object.freeze) {
+        Object.freeze = function freeze(object) {
+            if (Object(object) !== object) {
+                throw new TypeError('Object.freeze can only be called on Objects.');
+            }
+            // this is misleading and breaks feature-detection, but
+            // allows "securable" code to "gracefully" degrade to working
+            // but insecure code.
+            return object;
+        };
+    }
 
 /** 
  * Object Assign polyfill.
@@ -199,7 +154,11 @@ const unitsToPX = (value) => {
     return parseInt(PXValue);
 }
 
+// A browser that supports atleast some webkit legacy
+// const supportsLegacyWebkit = (obj) => Object.keys(obj).some((k) => ~k.indexOf("webkit"));
 
+// Legacy support (Safari 9 and below) will not change.
+const supportsLegacySafari = () => Object.prototype.toString.call(window.HTMLElement).indexOf('Constructor') > 0;
 
 
 const MimeticCurried = () => {
@@ -318,7 +277,7 @@ const MimeticCurried = () => {
                 rootElement,
                 rootElementStyle,
                 designWidthRatio,
-                devicePixelRatioConst,
+                devicePixelRatioRound,
                 rootFontSize,
                 enableScale,
                 preserveDevicePixelRatio,
@@ -333,10 +292,9 @@ const MimeticCurried = () => {
              * Evaluated devicePixelRatio
              */
 
-            const ddd = (1 / defaultDevicePixelRatio) * devicePixelRatioConst;
-            const evalDevicePixelRatio = preserveDevicePixelRatio ? devicePixelRatio : ddd;
-            const currentDevicePixelRatio = devicePixelRatioConst.toFixed(3);
-            const resizeWithoutZoom = currentDevicePixelRatio === lastDevicePixelRatio;
+            const ddd = (1 / defaultDevicePixelRatio) * devicePixelRatioRound;
+            const evalDevicePixelRatio = preserveDevicePixelRatio ? devicePixelRatioRound : ddd;
+            const resizeWithoutZoom = devicePixelRatioRound === lastDevicePixelRatio;
 
             if (resizeWithoutZoom || isDevicePixelRatioDefault || runOnce('init')) {
                 const isAboveDesignWidth = windowWidth > relativeDesignWidth;
@@ -382,15 +340,15 @@ const MimeticCurried = () => {
                 hasResizeCallback = isCallBackDefined(onResize);
             }
             if (resizeWithoutZoom && hasScaleCallback) {
-                onScale(clientWidth, windowWidth, evalDevicePixelRatio, devicePixelRatioConst);
+                onScale(clientWidth, windowWidth, evalDevicePixelRatio, devicePixelRatioRound);
             }
 
             if (!resizeWithoutZoom && hasZoomCallback) {
-                onZoom({ clientWidth, windowWidth, evalDevicePixelRatio, devicePixelRatioConst, ddd });
+                onZoom({ clientWidth, windowWidth, evalDevicePixelRatio, devicePixelRatioRound, ddd });
             }
 
             if (hasResizeCallback) {
-                onResize(clientWidth, windowWidth, evalDevicePixelRatio, devicePixelRatioConst);
+                onResize(clientWidth, windowWidth, evalDevicePixelRatio, devicePixelRatioRound);
             }
 
 
@@ -398,7 +356,7 @@ const MimeticCurried = () => {
             /** 
              * Set the last ratio from the current.
              */
-            lastDevicePixelRatio = currentDevicePixelRatio;
+            lastDevicePixelRatio = devicePixelRatioRound;
         };
 
 
@@ -437,14 +395,20 @@ const MimeticCurried = () => {
                 /** 
                  * Get Real time values.
                  */
+                const isSafari = /constructor/i.test(window.HTMLElement) || (function (p) { return p.toString() === "[object SafariRemoteNotification]"; })(!window['safari'] || safari.pushNotification);
                 const windowWidth = window.innerWidth;
                 const windowOuterWidth = window.outerWidth;
                 const windowOuterHeight = window.outerHeight;
-                const devicePixelRatioConst = window.devicePixelRatio;
-                const windowResize = windowOuterWidth !== outerWidth && windowOuterHeight !== outerHeight;
-                const clientWidth = parseInt(document.documentElement.clientWidth * devicePixelRatioConst);
-                const defaultDevicePixelRatio = Math.round(document.documentElement.clientWidth * devicePixelRatioConst / window.outerWidth);
+                const cliWidth = document.documentElement.clientWidth;
+                const safarIDPR = Number(windowOuterWidth / cliWidth);
+                const iEDPR = Number(screen.deviceXDPI / screen.logicalXDPI);
 
+                const devicePixelRatioRound = Math.abs(iEDPR ? iEDPR : isSafari ? safarIDPR : devicePixelRatio);
+                const windowResize = windowOuterWidth !== outerWidth && windowOuterHeight !== outerHeight;
+                const clientWidth = parseInt(cliWidth * devicePixelRatioRound);
+                const defaultDevicePixelRatio = Math.round(cliWidth * devicePixelRatioRound / windowOuterWidth);
+
+                console.log(devicePixelRatioRound, isSafari)
                 /**
                  * Cancel previous requestAnimationFrame.
                  */
@@ -469,7 +433,7 @@ const MimeticCurried = () => {
                 /**
                  * Check to see if the window is at the default zoom level.
                  */
-                const isDevicePixelRatioDefault = defaultDevicePixelRatio === devicePixelRatioConst;
+                const isDevicePixelRatioDefault = defaultDevicePixelRatio === devicePixelRatioRound;
 
 
                 /** 
@@ -491,7 +455,7 @@ const MimeticCurried = () => {
                     rootElement,
                     rootElementStyle,
                     designWidthRatio,
-                    devicePixelRatioConst,
+                    devicePixelRatioRound,
                     rootFontSize,
                     enableScale,
                     preserveDevicePixelRatio,
@@ -549,7 +513,7 @@ const MimeticCurried = () => {
             const cutOffWidthPX = unitsToPX(cutOffWidth);
 
 
-            console.log('mobileWidthPX', mobileWidthPX, 'cutOffWidthPX', cutOffWidthPX);
+            
             // @TODO remove config, only use what is needed.
             /** 
              * Provide parameters to setRootFontSize.

@@ -21,7 +21,7 @@
     .stat,
     a,
     p {
-        transition: background 0.3s ease, color 0.3s ease,  border 0.3s ease, padding 0.3s ease;
+        transition: background 0.3s ease, color 0.3s ease, border 0.3s ease, padding 0.3s ease;
     }
     
     h1.accessible-zoom,
@@ -37,6 +37,7 @@
     /*
       And better on hover. 
      */
+    
     h1.accessible-zoom:hover,
     h2.accessible-zoom:hover,
     h3.accessible-zoom:hover,
@@ -44,40 +45,59 @@
     .stat.accessible-zoom:hover,
     a.accessible-zoom:hover,
     p.accessible-zoom:hover {
-        background: rgba(255,255,255,1) !important;
+        background: rgba(255, 255, 255, 1) !important;
         border: 0.1rem dashed blue;
         box-sizing: border-box;
         color: black;
-        padding:1rem;
+        padding: 1rem;
     }
     </style>
     <!-- 2. Include Mimetic preferably in the head of the document -->
     <script src="../../dist/mimetic.js"></script>
     <!-- 3. Call Mimetic, optionally configurate by passing an object -->
     <script>
-    const improveReadabilityOnZoom = (elements, type, opacity) => {
-        elements.forEach((element) => {
-            element.classList[type]('accessible-zoom');
+    function addClass(element, newClassName) {
+        if (element.classList) {
+            element.classList.add(newClassName);
+        } else {
+            element.className += ' ' + newClassName;
+        }
+    }
+
+    function removeClass(element, newClassName) {
+        if (element.classList) {
+            element.classList.remove(newClassName);
+        } else {
+            element.className = element.className.replace(new RegExp('(^|\\b)' + newClassName.split(' ').join('|') + '(\\b|$)', 'gi'), ' ');
+        }
+    }
+
+    function improveReadabilityOnZoom(elements, type, opacity) {
+        elements.forEach(function(element) {
+
+            
             if (type === 'add') {
-                element.style.backgroundColor = `rgba(255,255,255,${opacity})`;
+                addClass(element, 'accessible-zoom');
+                element.style.backgroundColor = 'rgba(255,255,255,' + opacity + ')';
             }
-            if(type === 'remove'){
-              element.style.backgroundColor = `rgba(255,255,255,0)`;
+            if (type === 'remove') {
+                removeClass(element, 'accessible-zoom');
+                element.style.backgroundColor = 'rgba(255,255,255,0)';
             }
         });
     }
 
 
-    const styleBackgroundOnZoom = ({
-        ddd
-    }) => {
-        const textSelectors = ['h1', 'p', 'a', 'h2', 'h3', 'span', '.stat'];
+    function styleBackgroundOnZoom(details) {
+        var dpr = details.devicePixelRatioRound;
 
-        const textElements = textSelectors.map((selector) => {
+        var textSelectors = ['h1', 'p', 'a', 'h2', 'h3', 'span', '.stat'];
+
+        var textElements = textSelectors.map(function(selector) {
             if (selector[0] === '.') {
-                return Array.from(document.getElementsByClassName(selector));
+                return [].slice.call(document.getElementsByClassName(selector));
             } else {
-                return Array.from(document.getElementsByTagName(selector));
+                return [].slice.call(document.getElementsByTagName(selector));
             }
         });
 
@@ -86,14 +106,17 @@
             return prev.concat(curr);
         });
 
-        const opacity = 0.5 + (Math.abs(ddd / 10));
 
-        if (ddd !== 1) {
+        var opacity = (0.5 + (Math.abs(dpr / 10))).toFixed(2);
+
+        console.log('dpr ',dpr)
+        if (dpr < 0.95 || dpr > 1.05) { // For IE
             improveReadabilityOnZoom(textElementsFlat, 'add', opacity);
         } else {
             improveReadabilityOnZoom(textElementsFlat, 'remove');
         }
     }
+
 
     Mimetic({
         onZoom: styleBackgroundOnZoom
