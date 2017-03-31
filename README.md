@@ -2,6 +2,8 @@
 
 ## Scalable Fonts & Zoom Detection
 
+`Alpha release`
+
 ### What is this?
 <img src="https://media.giphy.com/media/13NkUb5hwB1afK/giphy.gif">
 
