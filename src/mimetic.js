@@ -331,7 +331,7 @@ const MimeticCurried = () => {
             /** 
              * Callbacks.
              */
-            if (runOnce('callbacks')) {
+            if (runOnce('callbacks') && windowWidth > cutOff) {
                 /** 
                  * Validates callbacks once.
                  */
