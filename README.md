@@ -1,3 +1,10 @@
+<img src="http://oi67.tinypic.com/1z4a421.jpg">
+
+
+### Browser Support
+MIMETIC consistently supports **IE9+**, **Safari 6.2+**, Chrome, Firefox, Edge, Opera, etc.
+MIMETIC does not use any form of browser detection and does not modify element styles.
+
 # MIMETIC
 
 ## Scalable Fonts & Zoom Detection
@@ -11,9 +18,6 @@
 
 
 MIMETIC is a JavaScript _viewport engine_, that quantifies relative units to the viewport and _devicePixelRatio_ conditionally. Which means **text can scale to the viewport's dimensions without breaking the browser’s ability to zoom**.
-
-### Browser Support 
-MIMETIC supports IE9+
 
 ### Why?
 
