@@ -1,9 +1,3 @@
-(function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
-	typeof define === 'function' && define.amd ? define(factory) :
-	(global.mimetic = factory());
-}(this, (function () { 'use strict';
-
 /**
  * request-frame-modern - Optimal requestAnimationFrame & cancelAnimationFrame polyfill for modern development
  * @version v2.0.3
@@ -17,7 +11,7 @@ var previousTime = 0;
  * Native clearTimeout function for IE-9 cancelAnimationFrame
  * @return {Function}
  */
-var clearTimeoutWithId = function clearTimeoutWithId(id) {
+const clearTimeoutWithId = id => {
     window.clearTimeout(id);
     id = null;
 };
@@ -28,21 +22,21 @@ var clearTimeoutWithId = function clearTimeoutWithId(id) {
  * @return {Function} setTimeout Function.
  */
 function setTimeoutWithTimestamp(callback) {
-    var immediateTime = Date.now();
-    var lapsedTime = Math.max(previousTime + 16, immediateTime);
+    const immediateTime = Date.now();
+    let lapsedTime = Math.max(previousTime + 16, immediateTime);
     return setTimeout(function () {
         callback(previousTime = lapsedTime);
     }, lapsedTime - immediateTime);
 }
 
 // Request and cancel functions for IE9+ & modern mobile browsers. 
-var requestFrameFn = window.requestAnimationFrame || setTimeoutWithTimestamp;
-var cancelFrameFn = window.cancelAnimationFrame || clearTimeoutWithId;
+const requestFrameFn = window.requestAnimationFrame || setTimeoutWithTimestamp;
+const cancelFrameFn = window.cancelAnimationFrame || clearTimeoutWithId;
 
 /**
  * Set the requestAnimationFrame & cancelAnimationFrame window functions.
  */
-var setNativeFn = function setNativeFn(requestFn, cancelFn, winObj) {
+const setNativeFn = (requestFn, cancelFn, winObj) => {
     winObj.requestAnimationFrame = requestFn;
     winObj.cancelAnimationFrame = cancelFn;
 };
@@ -52,10 +46,10 @@ var setNativeFn = function setNativeFn(requestFn, cancelFn, winObj) {
  * @param  {String} type - request | cancel | native | ''.
  * @return {Function} Timing function.
  */
-var requestFrameModern$1 = function requestFrameModern(type) {
-    var errorMessage = 'RequestFrame parameter is not a type.';
-    var native = 'native';
-    var timingType = {};
+const requestFrameModern$1 = type => {
+    const errorMessage = 'RequestFrame parameter is not a type.';
+    const native = 'native';
+    const timingType = {};
 
     timingType.request = requestFrameFn;
     timingType.cancel = cancelFrameFn;
@@ -70,89 +64,6 @@ var requestFrameModern$1 = function requestFrameModern(type) {
     }
 
     return timingType[type];
-};
-
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
-  return typeof obj;
-} : function (obj) {
-  return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
-};
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-var defineProperty = function (obj, key, value) {
-  if (key in obj) {
-    Object.defineProperty(obj, key, {
-      value: value,
-      enumerable: true,
-      configurable: true,
-      writable: true
-    });
-  } else {
-    obj[key] = value;
-  }
-
-  return obj;
-};
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-var toConsumableArray = function (arr) {
-  if (Array.isArray(arr)) {
-    for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) arr2[i] = arr[i];
-
-    return arr2;
-  } else {
-    return Array.from(arr);
-  }
 };
 
 /*           _.-~-.
@@ -215,11 +126,11 @@ function debounce(callback, delay, lead) {
     var setDelay;
     var timeoutId;
 
-    var call = function call(parameters) {
+    const call = parameters => {
         callback(parameters);
     };
 
-    return function (parameters) {
+    return parameters => {
         if (lead) {
             currentTime = Date.now();
             if (currentTime > debounceRange) {
@@ -238,7 +149,7 @@ function debounce(callback, delay, lead) {
     };
 }
 
-var objectAssignPolyfill = function objectAssignPolyfill() {
+const objectAssignPolyfill = () => {
     if (typeof Object.assign != 'function') {
         (function () {
             Object.assign = function (target) {
@@ -270,35 +181,34 @@ var objectAssignPolyfill = function objectAssignPolyfill() {
 objectAssignPolyfill();
 
 // Obtains the window or global according to the environment.
-var windowGlobal = typeof window !== 'undefined' ? window : (typeof self === 'undefined' ? 'undefined' : _typeof(self)) === 'object' && self.self === self && self || (typeof global === 'undefined' ? 'undefined' : _typeof(global)) === 'object' && global.global === global && global;
+const windowGlobal = typeof window !== 'undefined' ? window : typeof self === 'object' && self.self === self && self || typeof global === 'object' && global.global === global && global;
 
 // A list of option names to make naming and renaming simple.
-var optionNames = 'handler,delay,incept,useCapture,orientationchange'.split(',');
+const optionNames = 'handler,delay,incept,useCapture,orientationchange'.split(',');
 
 // Default options that correspond with the optionNames.
-var defaults$$1 = [function () {}, 16, false, false, true];
+const defaults = [() => {}, 16, false, false, true];
 
 /** 
  * Each option name is paired with the option value
  * @return {Object}
  */
-var convertPairsToLiterals = function convertPairsToLiterals(value, i) {
-    return defineProperty({}, optionNames[i], value);
-};
+const convertPairsToLiterals = (value, i) => ({
+    [optionNames[i]]: value });
 
 /** 
  * Adds the window event with the provided options.
  * Returns the same handler for removeEventListeners.
  * @return {Function}
  */
-var addWindowEvent = function addWindowEvent(handler, delay, incept, windowObject, useCapture) {
-    var debounced = debounce(handler, delay, incept);
+const addWindowEvent = (handler, delay, incept, windowObject, useCapture) => {
+    const debounced = debounce(handler, delay, incept);
     windowObject.addEventListener('resize', debounced, useCapture);
     return debounced;
 };
 
-var destroyPartial = function destroyPartial(directHandler, useCapture, windowObject) {
-    var destroyAPI = function destroyAPI(type) {
+const destroyPartial = (directHandler, useCapture, windowObject) => {
+    const destroyAPI = type => {
         if (!type || type === 'all') {
             // Remove both event listeners.
             windowObject.removeEventListener('resize', directHandler, useCapture);
@@ -316,7 +226,7 @@ var destroyPartial = function destroyPartial(directHandler, useCapture, windowOb
  * @param {Array} defaults - Array of consecutive defaults.
  * @param {object} windowObject -  The window | global object.
  */
-var resizillaPartial = function resizillaPartial(defaults$$1, windowObject) {
+const resizillaPartial = (defaults, windowObject) => {
 
     /** 
      * The API
@@ -326,30 +236,28 @@ var resizillaPartial = function resizillaPartial(defaults$$1, windowObject) {
      * @param {Boolean} useCapture - Bubbling/ capture options for events
      * @param {Boolean} orientationChange - respond on orientation change
      */
-    return function resizillaFinal() {
-        for (var _len = arguments.length, APIParameters = Array(_len), _key = 0; _key < _len; _key++) {
-            APIParameters[_key] = arguments[_key];
-        }
+    return function resizillaFinal(...APIParameters) {
 
         // The unchosen excess defaults.
-        var excessDefaults = defaults$$1.slice(APIParameters.length, defaults$$1.length);
+        const excessDefaults = defaults.slice(APIParameters.length, defaults.length);
 
         // Concatenate the API options with the excess defaults.
-        var optionValues = [].concat(APIParameters, toConsumableArray(excessDefaults));
+        const optionValues = [...APIParameters, ...excessDefaults];
 
         // Final options as an object.
-        var mergedOptions = Object.assign.apply(Object, toConsumableArray(optionValues.map(convertPairsToLiterals)));
+        const mergedOptions = Object.assign(...optionValues.map(convertPairsToLiterals));
 
         // Destructured options.
-        var handler = mergedOptions.handler,
-            delay = mergedOptions.delay,
-            incept = mergedOptions.incept,
-            useCapture = mergedOptions.useCapture,
-            orientationChange = mergedOptions.orientationChange;
+        const {
+            handler,
+            delay,
+            incept,
+            useCapture,
+            orientationChange
+        } = mergedOptions;
 
         // A direct reference to the added handler.
-
-        var directHandler = addWindowEvent(handler, delay, incept, windowObject, useCapture);
+        const directHandler = addWindowEvent(handler, delay, incept, windowObject, useCapture);
 
         // Adds orientationchange event if required.
         if (orientationChange) {
@@ -364,9 +272,9 @@ var resizillaPartial = function resizillaPartial(defaults$$1, windowObject) {
 };
 
 // Creates the Resizilla function.
-var resizilla = resizillaPartial(defaults$$1, windowGlobal);
+const resizilla = resizillaPartial(defaults, windowGlobal);
 
-var objectAssignPolyfill$1 = function objectAssignPolyfill() {
+const objectAssignPolyfill$1 = () => {
     if (typeof Object.assign != 'function') {
         (function () {
             Object.assign = function (target) {
@@ -394,7 +302,7 @@ var objectAssignPolyfill$1 = function objectAssignPolyfill() {
     }
 };
 
-var objectFreezePolyfill = function objectFreezePolyfill() {
+const objectFreezePolyfill = () => {
     /** 
      * Object.freeze polyfill
      * ES5 15.2.3.9
@@ -416,7 +324,7 @@ var objectFreezePolyfill = function objectFreezePolyfill() {
 /** 
  * CSS Fixed units with pixel values.
  */
-var CSSFixedUnits = [{
+const CSSFixedUnits = [{
     unit: 'xx-small',
     // 9 / 16
     PXValue: 9
@@ -453,7 +361,7 @@ var CSSFixedUnits = [{
 /** 
  * CSS Units with pixel factor.
  */
-var CSSUnits = [{
+const CSSUnits = [{
     unit: 'px',
     //  1 / 16
     PXFactor: 1
@@ -512,41 +420,29 @@ var CSSUnits = [{
 }];
 
 // Checks if string or number is a number.
-var isNumber = function isNumber(value) {
-    return Number(value) === value;
-};
+const isNumber = value => Number(value) === value;
 
 // A very simple compose function.
-var basicCompose = function basicCompose(a, b) {
+const basicCompose = (a, b) => {
     return function (c) {
         return a(b(c));
     };
 };
 
 // converts pixels to REM values.
-var pxToRem = function pxToRem(fontSizePx) {
-    return parseInt(fontSizePx) / 16;
-};
+const pxToRem = fontSizePx => parseInt(fontSizePx) / 16;
 
 // Checks callback type.
-var isCallBackDefined = function isCallBackDefined(callback) {
-    return typeof callback === 'function';
-};
+const isCallBackDefined = callback => typeof callback === 'function';
 
 // Gets the element's root font size.
-var getFontSize = function getFontSize(element) {
-    return window.getComputedStyle(element.documentElement, null).getPropertyValue('font-size');
-};
+const getFontSize = element => window.getComputedStyle(element.documentElement, null).getPropertyValue('font-size');
 
 // Gets the root element.
-var getRootElement = function getRootElement(element) {
-    var elements = {
-        html: function html(parent) {
-            return parent.documentElement;
-        },
-        body: function body(parent) {
-            return parent.body;
-        }
+const getRootElement = element => {
+    const elements = {
+        html: parent => parent.documentElement,
+        body: parent => parent.body
     };
 
     if (element instanceof Element) {
@@ -559,26 +455,26 @@ var getRootElement = function getRootElement(element) {
     return elements.hasOwnProperty(element) ? elements[element](document) : document.querySelector(element);
 };
 
-var aliasValueToPX = function aliasValueToPX(value) {
+const aliasValueToPX = value => {
     return CSSFixedUnits.filter(function (metricInfo) {
         return value === metricInfo.unit;
     }).shift().PXValue;
 };
 
-var CSSUnitsToPixels = function CSSUnitsToPixels(value) {
+const CSSUnitsToPixels = value => {
 
     if (isNumber(value)) {
         return value;
     }
 
-    var suffix = value.replace(/[^a-z]+/gi, '');
-    var numberValue = value.replace(/[^\d\.]*/g, '');
+    const suffix = value.replace(/[^a-z]+/gi, '');
+    const numberValue = value.replace(/[^\d\.]*/g, '');
 
-    var metricInfo = CSSUnits.filter(function (metricInfo) {
+    const metricInfo = CSSUnits.filter(function (metricInfo) {
         return suffix === metricInfo.unit;
     }).shift();
 
-    var PXValue = metricInfo ? numberValue * metricInfo.PXFactor : aliasValueToPX(value);
+    const PXValue = metricInfo ? numberValue * metricInfo.PXFactor : aliasValueToPX(value);
 
     return parseInt(PXValue);
 };
@@ -601,38 +497,33 @@ function initializeMimeticPartial(getRootElement, getRootREMValue, CSSUnitsToPix
      */
     function initalizeMimeticFinal(config) {
         // Destructured API parameters.
-        var loadEvent = config.loadEvent,
-            mobileWidth = config.mobileWidth,
-            rootSelector = config.rootSelector,
-            scaleDelay = config.scaleDelay,
-            cutOffWidth = config.cutOffWidth;
+        const { loadEvent, mobileWidth, rootSelector, scaleDelay, cutOffWidth } = config;
 
         // Store the scaleDelay for kill and revive.
-
         resize.scaleDelay = scaleDelay;
 
         // The root font element.
-        var rootElement = getRootElement(rootSelector);
+        const rootElement = getRootElement(rootSelector);
 
         // The intial root font size.
-        var rootFontSize = getRootREMValue(document);
+        const rootFontSize = getRootREMValue(document);
 
         // mobileWidth in pixels.
-        var mobileWidthPX = CSSUnitsToPixels(mobileWidth);
+        const mobileWidthPX = CSSUnitsToPixels(mobileWidth);
 
         // Cut off width in pixels.
-        var cutOffWidthPX = CSSUnitsToPixels(cutOffWidth);
+        const cutOffWidthPX = CSSUnitsToPixels(cutOffWidth);
 
         // Provide parameters to setRootFontSize. @TODO remove config, only use what is needed.
-        var settings = Object.assign({
+        const settings = Object.assign({
             initialOuterHeight: window.outerHeight,
             initialOuterWidth: window.outerWidth,
-            rootFontSize: rootFontSize,
-            rootElement: rootElement,
+            rootFontSize,
+            rootElement,
             rootElementStyle: rootElement.style,
-            window: window,
-            mobileWidthPX: mobileWidthPX,
-            cutOffWidthPX: cutOffWidthPX
+            window,
+            mobileWidthPX,
+            cutOffWidthPX
         }, config);
 
         // Store the settings for kill and revive. 
@@ -642,7 +533,7 @@ function initializeMimeticPartial(getRootElement, getRootREMValue, CSSUnitsToPix
         setRootFontSize(settings);
 
         // On window resize set the root font size according to MIMETIC.
-        resize.resizilla = resizilla(function () {
+        resize.resizilla = resizilla(() => {
             setRootFontSize(settings);
         }, scaleDelay, false);
     }
@@ -658,7 +549,7 @@ function initializeMimeticPartial(getRootElement, getRootREMValue, CSSUnitsToPix
      * Re-instate resizilla.
      */
     initalizeMimeticFinal.prototype.revive = function () {
-        resize.resizilla = resizilla(function () {
+        resize.resizilla = resizilla(() => {
             setRootFontSize(resize.settings);
         }, resize.scaleDelay, false);
     };
@@ -670,48 +561,49 @@ function initializeMimeticPartial(getRootElement, getRootREMValue, CSSUnitsToPix
 /** 
  * Set Root Font Size.
  */
-var setRootFontSizePartial = function setRootFontSizePartial(resizeRootFontSize, cancel, request) {
+const setRootFontSizePartial = (resizeRootFontSize, cancel, request) => {
   var requestId;
   var outerWidth;
   var outerHeight;
-  return function (settings) {
+  return settings => {
     /** 
      * Destructured settings.
      */
-    var window = settings.window,
-        rootElement = settings.rootElement,
-        rootElementStyle = settings.rootElementStyle,
-        rootFontSize = settings.rootFontSize,
-        initialOuterHeight = settings.initialOuterHeight,
-        initialOuterWidth = settings.initialOuterWidth,
-        relativeDesignWidth = settings.relativeDesignWidth,
-        mobileWidth = settings.mobileWidth,
-        cutOffWidth = settings.cutOffWidth,
-        enableScale = settings.enableScale,
-        preserveDevicePixelRatio = settings.preserveDevicePixelRatio,
-        onScale = settings.onScale,
-        onZoom = settings.onZoom,
-        onResize = settings.onResize,
-        mobileWidthPX = settings.mobileWidthPX,
-        cutOffWidthPX = settings.cutOffWidthPX;
+    const {
+      window,
+      rootElement,
+      rootElementStyle,
+      rootFontSize,
+      initialOuterHeight,
+      initialOuterWidth,
+      relativeDesignWidth,
+      mobileWidth,
+      cutOffWidth,
+      enableScale,
+      preserveDevicePixelRatio,
+      onScale,
+      onZoom,
+      onResize,
+      mobileWidthPX,
+      cutOffWidthPX
+    } = settings;
 
     /** 
      * Get Real time values.
      */
-
-    var windowWidth = window.innerWidth;
-    var windowOuterWidth = window.outerWidth;
-    var windowOuterHeight = window.outerHeight;
-    var cliWidth = document.documentElement.clientWidth;
-    var outerPerClient = windowOuterWidth / cliWidth;
-    var opcR = outerPerClient < 1.05 && outerPerClient > 0.95 ? 1 : outerPerClient;
-    var safarIDPR = Number(opcR.toFixed(5));
-    var safarIDPRRounded = Number(safarIDPR.toFixed(1));
-    var iEDPR = Number(screen.deviceXDPI / screen.logicalXDPI);
-    var devicePixelRatioRound = Math.abs(iEDPR ? iEDPR : devicePixelRatio === 1 ? safarIDPR : devicePixelRatio);
-    var windowResize = windowOuterWidth !== outerWidth && windowOuterHeight !== outerHeight;
-    var clientWidth = parseInt(cliWidth * devicePixelRatioRound);
-    var defaultDevicePixelRatio = Math.round(cliWidth * devicePixelRatioRound / windowOuterWidth);
+    const windowWidth = window.innerWidth;
+    const windowOuterWidth = window.outerWidth;
+    const windowOuterHeight = window.outerHeight;
+    const cliWidth = document.documentElement.clientWidth;
+    const outerPerClient = windowOuterWidth / cliWidth;
+    const opcR = outerPerClient < 1.05 && outerPerClient > 0.95 ? 1 : outerPerClient;
+    const safarIDPR = Number(opcR.toFixed(5));
+    const safarIDPRRounded = Number(safarIDPR.toFixed(1));
+    const iEDPR = Number(screen.deviceXDPI / screen.logicalXDPI);
+    const devicePixelRatioRound = Math.abs(iEDPR ? iEDPR : devicePixelRatio === 1 ? safarIDPR : devicePixelRatio);
+    const windowResize = windowOuterWidth !== outerWidth && windowOuterHeight !== outerHeight;
+    const clientWidth = parseInt(cliWidth * devicePixelRatioRound);
+    const defaultDevicePixelRatio = Math.round(cliWidth * devicePixelRatioRound / windowOuterWidth);
 
     // Cancel previous requestAnimationFrame Id
     cancel(requestId);
@@ -727,40 +619,40 @@ var setRootFontSizePartial = function setRootFontSizePartial(resizeRootFontSize,
     /**
      * The window width compared to the design width.
      */
-    var designWidthRatio = windowWidth / relativeDesignWidth;
+    const designWidthRatio = windowWidth / relativeDesignWidth;
 
     /**
      * Check to see if the window is at the default zoom level.
      */
-    var isDevicePixelRatioDefault = defaultDevicePixelRatio === devicePixelRatioRound;
+    const isDevicePixelRatioDefault = defaultDevicePixelRatio === devicePixelRatioRound;
 
     /** 
      * The minimum veiwport size to not react to.
      */
-    var cutOff = cutOffWidthPX > mobileWidthPX ? cutOffWidthPX : mobileWidthPX;
+    const cutOff = cutOffWidthPX > mobileWidthPX ? cutOffWidthPX : mobileWidthPX;
 
     /**
      * Mutate on next available frame.
      */
     resizeRootFontSize({
       // timestamp,
-      windowWidth: windowWidth,
-      windowOuterWidth: windowOuterWidth,
-      isDevicePixelRatioDefault: isDevicePixelRatioDefault,
-      relativeDesignWidth: relativeDesignWidth,
-      cutOff: cutOff,
-      rootElement: rootElement,
-      rootElementStyle: rootElementStyle,
-      designWidthRatio: designWidthRatio,
-      devicePixelRatioRound: devicePixelRatioRound,
-      rootFontSize: rootFontSize,
-      enableScale: enableScale,
-      preserveDevicePixelRatio: preserveDevicePixelRatio,
-      onScale: onScale,
-      onZoom: onZoom,
-      onResize: onResize,
-      clientWidth: clientWidth,
-      defaultDevicePixelRatio: defaultDevicePixelRatio
+      windowWidth,
+      windowOuterWidth,
+      isDevicePixelRatioDefault,
+      relativeDesignWidth,
+      cutOff,
+      rootElement,
+      rootElementStyle,
+      designWidthRatio,
+      devicePixelRatioRound,
+      rootFontSize,
+      enableScale,
+      preserveDevicePixelRatio,
+      onScale,
+      onZoom,
+      onResize,
+      clientWidth,
+      defaultDevicePixelRatio
     });
 
     /**
@@ -792,40 +684,42 @@ function once(reference) {
 /** 
  * Calculate and apply the new font size to the root element.
  */
-var wasLastBeyondMobileWidth = true;
-var lastDevicePixelRatio = void 0;
-var hasScaleCallback = false;
-var hasZoomCallback = false;
-var hasResizeCallback = false;
-var resizeRootFontSize = function resizeRootFontSize(preCalculatedValues) {
-    var windowWidth = preCalculatedValues.windowWidth,
-        windowOuterWidth = preCalculatedValues.windowOuterWidth,
-        isDevicePixelRatioDefault = preCalculatedValues.isDevicePixelRatioDefault,
-        relativeDesignWidth = preCalculatedValues.relativeDesignWidth,
-        cutOff = preCalculatedValues.cutOff,
-        rootElement = preCalculatedValues.rootElement,
-        rootElementStyle = preCalculatedValues.rootElementStyle,
-        designWidthRatio = preCalculatedValues.designWidthRatio,
-        devicePixelRatioRound = preCalculatedValues.devicePixelRatioRound,
-        rootFontSize = preCalculatedValues.rootFontSize,
-        enableScale = preCalculatedValues.enableScale,
-        preserveDevicePixelRatio = preCalculatedValues.preserveDevicePixelRatio,
-        onScale = preCalculatedValues.onScale,
-        onZoom = preCalculatedValues.onZoom,
-        onResize = preCalculatedValues.onResize,
-        clientWidth = preCalculatedValues.clientWidth,
-        defaultDevicePixelRatio = preCalculatedValues.defaultDevicePixelRatio;
+let wasLastBeyondMobileWidth = true;
+let lastDevicePixelRatio;
+let hasScaleCallback = false;
+let hasZoomCallback = false;
+let hasResizeCallback = false;
+const resizeRootFontSize = preCalculatedValues => {
+    const {
+        windowWidth,
+        windowOuterWidth,
+        isDevicePixelRatioDefault,
+        relativeDesignWidth,
+        cutOff,
+        rootElement,
+        rootElementStyle,
+        designWidthRatio,
+        devicePixelRatioRound,
+        rootFontSize,
+        enableScale,
+        preserveDevicePixelRatio,
+        onScale,
+        onZoom,
+        onResize,
+        clientWidth,
+        defaultDevicePixelRatio
+    } = preCalculatedValues;
 
     /** 
      * Evaluated devicePixelRatio
      */
 
-    var ddd = 1 / defaultDevicePixelRatio * devicePixelRatioRound;
-    var evalDevicePixelRatio = preserveDevicePixelRatio ? devicePixelRatioRound : ddd;
-    var resizeWithoutZoom = devicePixelRatioRound === lastDevicePixelRatio;
+    const ddd = 1 / defaultDevicePixelRatio * devicePixelRatioRound;
+    const evalDevicePixelRatio = preserveDevicePixelRatio ? devicePixelRatioRound : ddd;
+    const resizeWithoutZoom = devicePixelRatioRound === lastDevicePixelRatio;
 
     if (resizeWithoutZoom || isDevicePixelRatioDefault || once('init')) {
-        var isAboveDesignWidth = windowWidth > relativeDesignWidth;
+        const isAboveDesignWidth = windowWidth > relativeDesignWidth;
 
         if (windowWidth > cutOff) {
             /** 
@@ -872,7 +766,7 @@ var resizeRootFontSize = function resizeRootFontSize(preCalculatedValues) {
     }
 
     if (!resizeWithoutZoom && hasZoomCallback) {
-        onZoom({ clientWidth: clientWidth, windowWidth: windowWidth, evalDevicePixelRatio: evalDevicePixelRatio, devicePixelRatioRound: devicePixelRatioRound, ddd: ddd });
+        onZoom({ clientWidth, windowWidth, evalDevicePixelRatio, devicePixelRatioRound, ddd });
     }
 
     if (hasResizeCallback) {
@@ -889,31 +783,29 @@ var resizeRootFontSize = function resizeRootFontSize(preCalculatedValues) {
  * Sets up mimetic via partial application.
  * @param {Function} initializeMimetic - Initalizes MIMETIC function.
  */
-var mimeticPartial = function mimeticPartial(initializeMimetic, defaults) {
-    return function (configurationObj) {
+const mimeticPartial = (initializeMimetic, defaults) => {
+    return configurationObj => {
         // Assing configuration as an object.
-        var configuration = configurationObj ? configurationObj : {};
+        const configuration = configurationObj ? configurationObj : {};
 
         // Merge configuration into defaults.
-        var overriddenDefaults = Object.assign(defaults, configuration);
+        const overriddenDefaults = Object.assign(defaults, configuration);
 
         // Prevent config mutations.
-        var config = Object.freeze(overriddenDefaults);
+        const config = Object.freeze(overriddenDefaults);
 
         // Default load to DOMContentLoaded if not opted.
-        var loadEventOption = config.loadEvent === 'load' ? 'load' : 'DOMContentLoaded';
+        const loadEventOption = config.loadEvent === 'load' ? 'load' : 'DOMContentLoaded';
 
         // Initalize mimetic on load.
-        window.addEventListener(loadEventOption, function () {
-            return initializeMimetic(config);
-        });
+        window.addEventListener(loadEventOption, () => initializeMimetic(config));
 
         // Return kill and revive methods.
         return {
-            kill: function kill() {
+            kill() {
                 initializeMimetic.prototype.kill();
             },
-            revive: function revive() {
+            revive() {
                 initializeMimetic.prototype.revive();
             }
         };
@@ -923,7 +815,7 @@ var mimeticPartial = function mimeticPartial(initializeMimetic, defaults) {
 /** 
  * Default config properties if not defined.
  */
-var defaults$2 = {
+const defaults$1 = {
     loadEvent: 'DOMContentLoaded', // Load type
     mobileWidth: 640, // Width before disabling for mobile phone devices.
     scaleDelay: 16, // Miliseconds between calls on resize.
@@ -944,10 +836,10 @@ objectAssignPolyfill$1();
 objectFreezePolyfill();
 
 // Non-mutating requestAnimationFrame polyfill.
-var request = requestFrameModern$1('request');
+const request = requestFrameModern$1('request');
 
 // Non-mutating requestAnimationFrame polyfill.
-var cancel = requestFrameModern$1('cancel');
+const cancel = requestFrameModern$1('cancel');
 
 /*
  initializeMimetic initalizes resizilla 
@@ -959,10 +851,10 @@ var cancel = requestFrameModern$1('cancel');
 
  This function is initally called on resize.
 */
-var setRootFontSize = setRootFontSizePartial(resizeRootFontSize, cancel, request);
+const setRootFontSize = setRootFontSizePartial(resizeRootFontSize, cancel, request);
 
 // Gets the root element value in REM units.
-var getRootREMValue = basicCompose(pxToRem, getFontSize);
+const getRootREMValue = basicCompose(pxToRem, getFontSize);
 
 /* 
  Called initally and on prototype.revivie() to 
@@ -972,11 +864,9 @@ var getRootREMValue = basicCompose(pxToRem, getFontSize);
  resizilla's event listeners and a revive method to 
  restart Mimetic's initalization.
 */
-var initializeMimetic = initializeMimeticPartial(getRootElement, getRootREMValue, CSSUnitsToPixels, setRootFontSize, resizilla);
+const initializeMimetic = initializeMimeticPartial(getRootElement, getRootREMValue, CSSUnitsToPixels, setRootFontSize, resizilla);
 
 // The MIMETIC API. 
-var mimetic = mimeticPartial(initializeMimetic, defaults$2);
+const mimetic = mimeticPartial(initializeMimetic, defaults$1);
 
-return mimetic;
-
-})));
+export default mimetic;

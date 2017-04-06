@@ -4,8 +4,8 @@
     "description": "Scalable Fonts & Zoom Detection",
     "main": "dist/mimetic.js",
     "scripts": {
-        "watch": "rollup -c -w",
-        "build": "rollup -c",
+        "watch": "concurrently \"rollup -c ./rollup/rollup.config.umd.js -w\" \"rollup -c ./rollup/rollup.config.es.js -w\"",
+        "build": "rollup -c ./rollup/rollup.config.umd.js && rollup -c ./rollup/rollup.config.es.js",
         "test": "mocha --compilers js:babel-register --recursive"
     },
     "repository": {
@@ -16,6 +16,7 @@
     "license": "MIT",
     "devDependencies": {
         "babel-preset-es2015-rollup": "^1.2.0",
+        "concurrently": "^3.4.0",
         "gulp": "^3.9.1",
         "gulp-bump": "^2.2.0",
         "gulp-concat": "^2.6.0",
@@ -29,12 +30,14 @@
         "rollup-watch": "^2.5.0"
     },
     "dependencies": {
-        "request-frame": "*",
-        "run-once": "*",
         "babel-preset-es2015": "*",
         "babel-register": "*",
         "chai": "^3.5.0",
         "jsdom": "*",
-        "mocha": "*"
+        "mocha": "*",
+        "request-frame-modern": "^2.0.3",
+        "resizilla": "^0.9.2",
+        "round-to": "^2.0.0",
+        "run-once": "*"
     }
 }
