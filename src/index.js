@@ -1,4 +1,3 @@
-import requestFrame from 'request-frame-modern';
 import resizilla from 'resizilla';
 import objectAssignPolyfill from '../libs/object-assign-polyfill';
 import objectFreezePolyfill from '../libs/object-freeze-polyfill';
@@ -25,14 +24,6 @@ objectAssignPolyfill();
 objectFreezePolyfill();
 
 
-// Non-mutating requestAnimationFrame polyfill.
-const request = requestFrame('request');
-
-
-// Non-mutating requestAnimationFrame polyfill.
-const cancel = requestFrame('cancel');
-
-
 /*
  initializeMimetic initalizes resizilla 
  (A window resize plugin) to call setRootFontSize 
@@ -43,11 +34,7 @@ const cancel = requestFrame('cancel');
 
  This function is initally called on resize.
 */
-const setRootFontSize = setRootFontSizePartial(
-    resizeRootFontSize,
-    cancel,
-    request
-);
+const setRootFontSize = setRootFontSizePartial(resizeRootFontSize);
 
 
 // Gets the root element value in REM units.

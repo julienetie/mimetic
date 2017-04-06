@@ -1,7 +1,7 @@
 /** 
  * Set Root Font Size.
  */
-const setRootFontSizePartial = (resizeRootFontSize, cancel, request) => {
+const setRootFontSizePartial = (resizeRootFontSize) => {
     var requestId;
     var outerWidth;
     var outerHeight;
@@ -45,10 +45,6 @@ const setRootFontSizePartial = (resizeRootFontSize, cancel, request) => {
         const windowResize = windowOuterWidth !== outerWidth && windowOuterHeight !== outerHeight;
         const clientWidth = parseInt(cliWidth * devicePixelRatioRound);
         const defaultDevicePixelRatio = Math.round(cliWidth * devicePixelRatioRound / windowOuterWidth);
-
-
-        // Cancel previous requestAnimationFrame Id
-        cancel(requestId);
 
 
         /** 

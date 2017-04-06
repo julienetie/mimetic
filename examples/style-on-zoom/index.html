@@ -75,7 +75,6 @@
     function improveReadabilityOnZoom(elements, type, opacity) {
         elements.forEach(function(element) {
 
-            
             if (type === 'add') {
                 addClass(element, 'accessible-zoom');
                 element.style.backgroundColor = 'rgba(255,255,255,' + opacity + ')';
@@ -109,7 +108,6 @@
 
         var opacity = (0.5 + (Math.abs(dpr / 10))).toFixed(2);
 
-        console.log('dpr ',dpr)
         if (dpr < 0.95 || dpr > 1.05) { // For IE
             improveReadabilityOnZoom(textElementsFlat, 'add', opacity);
         } else {

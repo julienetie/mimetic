@@ -4,74 +4,6 @@
 	(global.mimetic = factory());
 }(this, (function () { 'use strict';
 
-/**
- * request-frame-modern - Optimal requestAnimationFrame & cancelAnimationFrame polyfill for modern development
- * @version v2.0.3
- * @license MIT
- * Copyright Julien Etienne 2015 All Rights Reserved.
- */
-// Initial time of the timing lapse.
-var previousTime = 0;
-
-/**
- * Native clearTimeout function for IE-9 cancelAnimationFrame
- * @return {Function}
- */
-var clearTimeoutWithId = function clearTimeoutWithId(id) {
-    window.clearTimeout(id);
-    id = null;
-};
-
-/**
- * IE-9 Polyfill for requestAnimationFrame
- * @callback {Number} Timestamp.
- * @return {Function} setTimeout Function.
- */
-function setTimeoutWithTimestamp(callback) {
-    var immediateTime = Date.now();
-    var lapsedTime = Math.max(previousTime + 16, immediateTime);
-    return setTimeout(function () {
-        callback(previousTime = lapsedTime);
-    }, lapsedTime - immediateTime);
-}
-
-// Request and cancel functions for IE9+ & modern mobile browsers. 
-var requestFrameFn = window.requestAnimationFrame || setTimeoutWithTimestamp;
-var cancelFrameFn = window.cancelAnimationFrame || clearTimeoutWithId;
-
-/**
- * Set the requestAnimationFrame & cancelAnimationFrame window functions.
- */
-var setNativeFn = function setNativeFn(requestFn, cancelFn, winObj) {
-    winObj.requestAnimationFrame = requestFn;
-    winObj.cancelAnimationFrame = cancelFn;
-};
-
-/**
- * Default function to set the timing.
- * @param  {String} type - request | cancel | native | ''.
- * @return {Function} Timing function.
- */
-var requestFrameModern$1 = function requestFrameModern(type) {
-    var errorMessage = 'RequestFrame parameter is not a type.';
-    var native = 'native';
-    var timingType = {};
-
-    timingType.request = requestFrameFn;
-    timingType.cancel = cancelFrameFn;
-    timingType[''] = timingType.request;
-
-    if (type === native) {
-        return setNativeFn(requestFrameFn, cancelFrameFn, window);
-    }
-
-    if (!timingType.hasOwnProperty(type)) {
-        throw new Error(errorMessage);
-    }
-
-    return timingType[type];
-};
-
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
   return typeof obj;
 } : function (obj) {
@@ -670,7 +602,7 @@ function initializeMimeticPartial(getRootElement, getRootREMValue, CSSUnitsToPix
 /** 
  * Set Root Font Size.
  */
-var setRootFontSizePartial = function setRootFontSizePartial(resizeRootFontSize, cancel, request) {
+var setRootFontSizePartial = function setRootFontSizePartial(resizeRootFontSize) {
   var requestId;
   var outerWidth;
   var outerHeight;
@@ -712,9 +644,6 @@ var setRootFontSizePartial = function setRootFontSizePartial(resizeRootFontSize,
     var windowResize = windowOuterWidth !== outerWidth && windowOuterHeight !== outerHeight;
     var clientWidth = parseInt(cliWidth * devicePixelRatioRound);
     var defaultDevicePixelRatio = Math.round(cliWidth * devicePixelRatioRound / windowOuterWidth);
-
-    // Cancel previous requestAnimationFrame Id
-    cancel(requestId);
 
     /** 
      * Set variable inital values if not yet set.
@@ -943,12 +872,6 @@ objectAssignPolyfill$1();
 //Object Freeze polyfill.
 objectFreezePolyfill();
 
-// Non-mutating requestAnimationFrame polyfill.
-var request = requestFrameModern$1('request');
-
-// Non-mutating requestAnimationFrame polyfill.
-var cancel = requestFrameModern$1('cancel');
-
 /*
  initializeMimetic initalizes resizilla 
  (A window resize plugin) to call setRootFontSize 
@@ -959,7 +882,7 @@ var cancel = requestFrameModern$1('cancel');
 
  This function is initally called on resize.
 */
-var setRootFontSize = setRootFontSizePartial(resizeRootFontSize, cancel, request);
+var setRootFontSize = setRootFontSizePartial(resizeRootFontSize);
 
 // Gets the root element value in REM units.
 var getRootREMValue = basicCompose(pxToRem, getFontSize);
