@@ -1,8 +1,9 @@
 {
     "name": "mimetic",
-    "version": "0.5.6",
+    "version": "0.5.7",
     "description": "Scalable Fonts & Zoom Detection",
     "main": "dist/mimetic.js",
+    "jsnext:main": "dist/mimetic.es.js",
     "scripts": {
         "watch": "concurrently \"rollup -c ./rollup/rollup.config.umd.js -w\" \"rollup -c ./rollup/rollup.config.es.js -w\"",
         "build": "rollup -c ./rollup/rollup.config.umd.js && rollup -c ./rollup/rollup.config.es.js",
