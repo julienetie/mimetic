@@ -1,6 +1,7 @@
-import runOnce from 'run-once';
+
 import {isCallBackDefined} from './utilities';
 
+var once = true;
 /** 
  * Calculate and apply the new font size to the root element.
  */
@@ -38,7 +39,10 @@ const resizeRootFontSize = (preCalculatedValues) => {
     const evalDevicePixelRatio = preserveDevicePixelRatio ? devicePixelRatioRound : ddd;
     const resizeWithoutZoom = devicePixelRatioRound === lastDevicePixelRatio;
 
-    if (resizeWithoutZoom || isDevicePixelRatioDefault || runOnce('init')) {
+    if (resizeWithoutZoom || isDevicePixelRatioDefault || once) {
+        if(once){
+            once = false;
+        }
         const isAboveDesignWidth = windowWidth > relativeDesignWidth;
 
         if (windowWidth > cutOff) {
