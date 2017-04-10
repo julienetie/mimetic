@@ -887,9 +887,13 @@ var mimetic = mimeticPartial(initializeMimetic, defaults$2);
 var _chai = chai;
 var expect = _chai.expect;
 
+mimetic();
 describe('mimetic', function () {
     it('Should exist', function () {
         expect(mimetic).to.be.a('function');
+    });
+
+    it('Should be a function', function () {
         expect('efeoifh').to.be.a('function');
     });
 });
