@@ -4,6 +4,35 @@
 	(factory((global.mimeticTest = global.mimeticTest || {})));
 }(this, (function (exports) { 'use strict';
 
+/** 
+ * Default config properties if not defined.
+ */
+var defaults = {
+    loadEvent: 'DOMContentLoaded', // Load type
+    mobileWidth: 640, // Width before disabling for mobile phone devices.
+    scaleDelay: 16, // Miliseconds between calls on resize.
+    preserveDevicePixelRatio: false, // Preserve the device pixel ratio on zoom.
+    rootSelector: 'html', // Use the HTML element as the root element. 
+    onScale: undefined,
+    onZoom: undefined,
+    onResize: undefined,
+    cutOffWidth: 0, // The minimum width to disable resizing.
+    relativeDesignWidth: 1024, // The width relative to the font size.
+    enableScale: true
+};
+
+var _chai = chai;
+var expect = _chai.expect;
+
+
+var defaultsKeys = Object.keys(defaults);
+
+describe('defaults', function () {
+    it('Should consist of properties', function () {
+        expect(defaultsKeys).to.have.length.above(1);
+    });
+});
+
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
   return typeof obj;
 } : function (obj) {
@@ -196,7 +225,7 @@ var windowGlobal = typeof window !== 'undefined' ? window : (typeof self === 'un
 var optionNames = 'handler,delay,incept,useCapture,orientationchange'.split(',');
 
 // Default options that correspond with the optionNames.
-var defaults$$1 = [function () {}, 16, false, false, true];
+var defaults$2 = [function () {}, 16, false, false, true];
 
 /** 
  * Each option name is paired with the option value
@@ -284,7 +313,7 @@ var resizillaPartial = function resizillaPartial(defaults$$1, windowObject) {
 };
 
 // Creates the Resizilla function.
-var resizilla = resizillaPartial(defaults$$1, windowGlobal);
+var resizilla = resizillaPartial(defaults$2, windowGlobal);
 
 var objectAssignPolyfill$1 = function objectAssignPolyfill() {
     if (typeof Object.assign != 'function') {
@@ -712,13 +741,13 @@ var hasScaleCallback = false;
 var hasZoomCallback = false;
 var hasResizeCallback = false;
 var resizeRootFontSize = function resizeRootFontSize(preCalculatedValues) {
+    console.log(preCalculatedValues);
     var windowWidth = preCalculatedValues.windowWidth,
         windowOuterWidth = preCalculatedValues.windowOuterWidth,
         isDevicePixelRatioDefault = preCalculatedValues.isDevicePixelRatioDefault,
         relativeDesignWidth = preCalculatedValues.relativeDesignWidth,
         cutOff = preCalculatedValues.cutOff,
         rootElement = preCalculatedValues.rootElement,
-        rootElementStyle = preCalculatedValues.rootElementStyle,
         designWidthRatio = preCalculatedValues.designWidthRatio,
         devicePixelRatioRound = preCalculatedValues.devicePixelRatioRound,
         rootFontSize = preCalculatedValues.rootFontSize,
@@ -746,7 +775,7 @@ var resizeRootFontSize = function resizeRootFontSize(preCalculatedValues) {
              * Set the rootElement's font size.
              */
             if (enableScale) {
-                rootElementStyle.fontSize = (rootFontSize * designWidthRatio * evalDevicePixelRatio).toFixed(6) + 'rem';
+                rootElement.style.fontSize = (rootFontSize * designWidthRatio * evalDevicePixelRatio).toFixed(6) + 'rem';
             }
 
             /** 
@@ -834,23 +863,6 @@ var mimeticPartial = function mimeticPartial(initializeMimetic, defaults) {
     };
 };
 
-/** 
- * Default config properties if not defined.
- */
-var defaults$2 = {
-    loadEvent: 'DOMContentLoaded', // Load type
-    mobileWidth: 640, // Width before disabling for mobile phone devices.
-    scaleDelay: 16, // Miliseconds between calls on resize.
-    preserveDevicePixelRatio: false, // Preserve the device pixel ratio on zoom.
-    rootSelector: 'html', // Use the HTML element as the root element. 
-    onScale: undefined,
-    onZoom: undefined,
-    onResize: undefined,
-    cutOffWidth: 0, // The minimum width to disable resizing.
-    relativeDesignWidth: 1024, // The width relative to the font size.
-    enableScale: true
-};
-
 objectAssignPolyfill$1();
 
 //Object Freeze polyfill.
@@ -882,19 +894,73 @@ var getRootREMValue = basicCompose(pxToRem, getFontSize);
 var initializeMimetic = initializeMimeticPartial(getRootElement, getRootREMValue, CSSUnitsToPixels, setRootFontSize, resizilla);
 
 // The MIMETIC API. 
-var mimetic = mimeticPartial(initializeMimetic, defaults$2);
+var mimetic = mimeticPartial(initializeMimetic, defaults);
 
-var _chai = chai;
-var expect = _chai.expect;
+var _chai$1 = chai;
+var expect$1 = _chai$1.expect;
 
-mimetic();
+var _mimetic = mimetic();
+var kill = _mimetic.kill;
+var revive = _mimetic.revive;
+
+after(function () {
+    kill();
+    console.log('MIMETIC has been killed for index.js');
+    // document.documentElement.style.fontSize = '10px';
+});
+
 describe('mimetic', function () {
     it('Should exist', function () {
-        expect(mimetic).to.be.a('function');
+        expect$1(mimetic).to.be.a('function');
     });
 
-    it('Should be a function', function () {
-        expect('efeoifh').to.be.a('function');
+    it('Should contain a kill method', function () {
+        expect$1(kill).to.be.a('function');
+    });
+
+    it('Should contain a revive method', function () {
+        expect$1(revive).to.be.a('function');
+    });
+});
+
+var _chai$2 = chai;
+var expect$2 = _chai$2.expect;
+
+
+var preCalculatedValues = {
+    "windowWidth": 1283,
+    "windowOuterWidth": 1920,
+    "isDevicePixelRatioDefault": false,
+    "relativeDesignWidth": 1024,
+    "cutOff": 640,
+    "rootElement": document.documentElement,
+    "designWidthRatio": 1.2529296875,
+    "devicePixelRatioRound": 1.49649,
+    "rootFontSize": 1,
+    "enableScale": true,
+    "preserveDevicePixelRatio": false,
+    "clientWidth": 1919,
+    "defaultDevicePixelRatio": 1
+};
+
+var getRootFontsize = function getRootFontsize(rootElement) {
+    return window.getComputedStyle(rootElement).getPropertyValue('font-size');
+};
+
+describe('resizeRootFontSize', function () {
+    it('Should exist', function () {
+        expect$2(resizeRootFontSize).to.be.a('function');
+    });
+
+    //@TODO Test is failing as resizeRootFontSize is impure, should contain no DOM APIs.
+    it('Should have a root font size of 1.875rem when given the preCalculatedValues', function () {
+        resizeRootFontSize(preCalculatedValues);
+        var rootFontSize = getRootFontsize(document.documentElement);
+        console.log('RootFontSize', rootFontSize);
+
+        // Will incorrectly pass if window width is 1920.
+        expect$2(rootFontSize).to.equal('30px');
+        expect$2(true).to.equal(false);
     });
 });
 

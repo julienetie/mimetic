@@ -1,5 +1,5 @@
 import runOnce from 'run-once';
-import {isCallBackDefined} from './utilities';
+import { isCallBackDefined } from './utilities';
 
 /** 
  * Calculate and apply the new font size to the root element.
@@ -10,6 +10,7 @@ let hasScaleCallback = false;
 let hasZoomCallback = false;
 let hasResizeCallback = false;
 const resizeRootFontSize = (preCalculatedValues) => {
+    console.log(preCalculatedValues)
     const {
         windowWidth,
         windowOuterWidth,
@@ -17,7 +18,6 @@ const resizeRootFontSize = (preCalculatedValues) => {
         relativeDesignWidth,
         cutOff,
         rootElement,
-        rootElementStyle,
         designWidthRatio,
         devicePixelRatioRound,
         rootFontSize,
@@ -46,7 +46,7 @@ const resizeRootFontSize = (preCalculatedValues) => {
              * Set the rootElement's font size.
              */
             if (enableScale) {
-                rootElementStyle.fontSize = (rootFontSize * designWidthRatio * evalDevicePixelRatio).toFixed(6) + 'rem';
+                rootElement.style.fontSize = (rootFontSize * designWidthRatio * evalDevicePixelRatio).toFixed(6) + 'rem';
             }
 
             /** 
