@@ -1196,10 +1196,6 @@ rollup-watch@^2.5.0:
   dependencies:
     semver "^5.1.0"
 
-run-once@*:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/run-once/-/run-once-1.0.0.tgz#ef8413c8ae8a9814d77e2bea840cbfaed74d7f8d"
-
 rx@2.3.24:
   version "2.3.24"
   resolved "https://registry.yarnpkg.com/rx/-/rx-2.3.24.tgz#14f950a4217d7e35daa71bbcbe58eff68ea4b2b7"

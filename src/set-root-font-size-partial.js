@@ -2,70 +2,78 @@
  * Set Root Font Size.
  */
 const setRootFontSizePartial = (resizeRootFontSize) => {
-    let requestId;
-    let outerWidth;
-    let outerHeight;
     const windowRef = window;
     const documentRef = windowRef.document;
-    return (settings) => {
-        /** 
-         * Destructured settings.
-         */
-        const {
-            rootElement,
-            rootFontSize,
-            initialOuterHeight,
-            initialOuterWidth,
-            relativeDesignWidth,
-            mobileWidth,
-            cutOffWidth,
-            enableScale,
-            preserveDevicePixelRatio,
-            onScale,
-            onZoom,
-            onResize,
-            mobileWidthPX,
-            cutOffWidthPX
-        } = settings;
+    let requestId;
+    let lastOuterWidth;
+    let lastOuterHeight;
 
 
-        /** 
-         * Get Real time values.
-         */
-        const windowWidth = windowRef.innerWidth;
-        const windowOuterWidth = windowRef.outerWidth;
-        const windowOuterHeight = windowRef.outerHeight;
-        const cliWidth = documentRef.documentElement.clientWidth;
-        const outerPerClient = windowOuterWidth / cliWidth;
-        const opcR = outerPerClient < 1.05 && outerPerClient > 0.95 ? 1 : outerPerClient;
-        const safarIDPR = Number((opcR).toFixed(5));
-        const safarIDPRRounded = Number(safarIDPR.toFixed(1));
-        const iEDPR = Number(screen.deviceXDPI / screen.logicalXDPI);
-        const devicePixelRatioRound = Math.abs(iEDPR ? iEDPR : devicePixelRatio === 1 ? safarIDPR : devicePixelRatio);
-        const windowResize = windowOuterWidth !== outerWidth && windowOuterHeight !== outerHeight;
-        const clientWidth = parseInt(cliWidth * devicePixelRatioRound);
-        const defaultDevicePixelRatio = Math.round(cliWidth * devicePixelRatioRound / windowOuterWidth);
+    return ({
+        rootElement,
+        rootFontSize,
+        initialOuterHeight,
+        initialOuterWidth,
+        relativeDesignWidth,
+        mobileWidth,
+        cutOffWidth,
+        enableScale,
+        preserveDevicePixelRatio,
+        onScale,
+        onZoom,
+        onResize,
+        mobileWidthPX,
+        cutOffWidthPX
+    }) => {
+        // Real time DOM measurments.
+        const innerWidth = windowRef.innerWidth;
+        const outerWidth = windowRef.outerWidth;
+        const outerHeight = windowRef.outerHeight;
+        const clientWidth = documentRef.documentElement.clientWidth;
+        const DPR = windowRef.devicePixelRatio;
+
+        // Ratio between the outer and client width.
+        const outerClientRatio = outerWidth / clientWidth;
+
+        // A calulated DPR within the proximity of 0.05. for devices (eg.safari) that have a fixed DPR.
+        // @TODO check on large display devices with DPRs greater than 1. 
+        const OCRProximity = outerClientRatio < 1.05 && outerClientRatio > 0.95 ? 1 : outerClientRatio;
+
+        // A calculated DPR safe for safari browsers.
+        const safariSafeDPR = Number((OCRProximity).toFixed(5));
+
+        // Legacy internet explorer devicePixelRatio.
+        const IEDPR = Number(screen.deviceXDPI / screen.logicalXDPI);
+
+        // The devicePixelRatio with polyfilled support.
+        const calculatedDPR = Math.abs(IEDPR ? IEDPR : DPR === 1 ? safariSafeDPR : DPR);
+
+        // The real viewport width. 
+        const viewportWidth = parseInt(clientWidth * calculatedDPR);
+
+        // The default device pixel ratio. 
+        const defaultDPR = Math.round(clientWidth * calculatedDPR / outerWidth);
 
 
         /** 
          * Set variable inital values if not yet set.
          */
-        if (outerWidth === undefined) {
-            outerWidth = initialOuterWidth;
-            outerHeight = initialOuterHeight;
+        if (lastOuterWidth === undefined) {
+            lastOuterWidth = initialOuterWidth;
+            lastOuterHeight = initialOuterHeight;
         }
 
 
         /**
          * The window width compared to the design width.
          */
-        const designWidthRatio = windowWidth / relativeDesignWidth;
+        const designWidthRatio = innerWidth / relativeDesignWidth;
 
 
         /**
          * Check to see if the window is at the default zoom level.
          */
-        const isDevicePixelRatioDefault = defaultDevicePixelRatio === devicePixelRatioRound;
+        const isDevicePixelRatioDefault = defaultDPR === calculatedDPR;
 
 
         /** 
@@ -78,30 +86,30 @@ const setRootFontSizePartial = (resizeRootFontSize) => {
          * Mutate on next available frame.
          */
         resizeRootFontSize({
-            windowWidth,
-            windowOuterWidth,
+            innerWidth,
+            outerWidth,
             isDevicePixelRatioDefault,
             relativeDesignWidth,
             cutOff,
             rootElement,
             designWidthRatio,
-            devicePixelRatioRound,
+            calculatedDPR,
             rootFontSize,
             enableScale,
             preserveDevicePixelRatio,
             onScale,
             onZoom,
             onResize,
-            clientWidth,
-            defaultDevicePixelRatio
+            viewportWidth,
+            defaultDPR
         })
 
 
         /**
          * Updated Outer browser dimensions.
          */
-        outerWidth = windowOuterWidth;
-        outerHeight = windowOuterWidth;
+        lastOuterWidth = outerWidth;
+        lastOuterHeight = outerWidth;
     }
 }
 

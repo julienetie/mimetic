@@ -88,14 +88,14 @@
 
 
     function styleBackgroundOnZoom(details) {
-        console.log('clientWidth', details.clientWidth);
-        console.log('windowWidth', details.windowWidth);
-        console.log('evalDevicePixelRatio', details.evalDevicePixelRatio);
-        console.log('devicePixelRatioRound', details.devicePixelRatioRound);
-        console.log('ddd', details.ddd);
+        console.log('viewportWidth', details.viewportWidth);
+        console.log('innerWidth', details.innerWidth);
+        console.log('evalDPR', details.evalDPR);
+        console.log('calculatedDPR', details.calculatedDPR);
+        console.log('normalizedDPR', details.normalizedDPR);
 
 
-        var dpr = details.devicePixelRatioRound;
+        var dpr = details.calculatedDPR;
 
         var textSelectors = ['h1', 'p', 'a', 'h2', 'h3', 'span', '.stat'];
 

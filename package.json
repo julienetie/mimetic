@@ -29,7 +29,6 @@
         "rollup-watch": "^2.5.0"
     },
     "dependencies": {
-        "resizilla": "^0.9.2",
-        "run-once": "*"
+        "resizilla": "^0.9.2"
     }
 }

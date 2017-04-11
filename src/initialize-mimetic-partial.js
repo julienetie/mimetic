@@ -52,8 +52,6 @@ function initializeMimeticPartial(
             initialOuterWidth: window.outerWidth,
             rootFontSize,
             rootElement,
-            rootElementStyle: rootElement.style,
-            window,
             mobileWidthPX,
             cutOffWidthPX
         }, config);

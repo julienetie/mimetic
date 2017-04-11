@@ -115,6 +115,18 @@ vVVv    vVVv                 ': |_| \_\___||___/_/___|_|_|_|\__,_| ''
  * Copyright Julien Etienne 2015 All Rights Reserved.
  */
 // Initial time of the timing lapse.
+/**
+ *  volve - Tiny, Performant Debounce and Throttle Functions,
+ *     License:  MIT
+ *      Copyright Julien Etienne 2016 All Rights Reserved.
+ *        github:  https://github.com/julienetie/volve
+ *‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
+ */
+
+/**
+ * Date.now polyfill.
+ * {@link https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Date/now}
+ */
 if (!Date.now) {
     Date.now = function now() {
         return new Date().getTime();
@@ -549,8 +561,6 @@ function initializeMimeticPartial(getRootElement, getRootREMValue, CSSUnitsToPix
             initialOuterWidth: window.outerWidth,
             rootFontSize: rootFontSize,
             rootElement: rootElement,
-            rootElementStyle: rootElement.style,
-            window: window,
             mobileWidthPX: mobileWidthPX,
             cutOffWidthPX: cutOffWidthPX
         }, config);
@@ -592,64 +602,72 @@ function initializeMimeticPartial(getRootElement, getRootREMValue, CSSUnitsToPix
  */
 var setRootFontSizePartial = function setRootFontSizePartial(resizeRootFontSize) {
   var requestId = void 0;
-  var outerWidth = void 0;
-  var outerHeight = void 0;
+  var lastOuterWidth = void 0;
+  var lastOuterHeight = void 0;
   var windowRef = window;
   var documentRef = windowRef.document;
-  return function (settings) {
-    /** 
-     * Destructured settings.
-     */
-    var rootElement = settings.rootElement,
-        rootFontSize = settings.rootFontSize,
-        initialOuterHeight = settings.initialOuterHeight,
-        initialOuterWidth = settings.initialOuterWidth,
-        relativeDesignWidth = settings.relativeDesignWidth,
-        mobileWidth = settings.mobileWidth,
-        cutOffWidth = settings.cutOffWidth,
-        enableScale = settings.enableScale,
-        preserveDevicePixelRatio = settings.preserveDevicePixelRatio,
-        onScale = settings.onScale,
-        onZoom = settings.onZoom,
-        onResize = settings.onResize,
-        mobileWidthPX = settings.mobileWidthPX,
-        cutOffWidthPX = settings.cutOffWidthPX;
+  return function (_ref) {
+    var rootElement = _ref.rootElement,
+        rootFontSize = _ref.rootFontSize,
+        initialOuterHeight = _ref.initialOuterHeight,
+        initialOuterWidth = _ref.initialOuterWidth,
+        relativeDesignWidth = _ref.relativeDesignWidth,
+        mobileWidth = _ref.mobileWidth,
+        cutOffWidth = _ref.cutOffWidth,
+        enableScale = _ref.enableScale,
+        preserveDevicePixelRatio = _ref.preserveDevicePixelRatio,
+        onScale = _ref.onScale,
+        onZoom = _ref.onZoom,
+        onResize = _ref.onResize,
+        mobileWidthPX = _ref.mobileWidthPX,
+        cutOffWidthPX = _ref.cutOffWidthPX;
 
-    /** 
-     * Get Real time values.
-     */
+    // Real time DOM measurments.
+    var innerWidth = windowRef.innerWidth;
+    var outerWidth = windowRef.outerWidth;
+    var outerHeight = windowRef.outerHeight;
+    var clientWidth = documentRef.documentElement.clientWidth;
+    var DPR = windowRef.devicePixelRatio;
 
-    var windowWidth = windowRef.innerWidth;
-    var windowOuterWidth = windowRef.outerWidth;
-    var windowOuterHeight = windowRef.outerHeight;
-    var cliWidth = documentRef.documentElement.clientWidth;
-    var outerPerClient = windowOuterWidth / cliWidth;
-    var opcR = outerPerClient < 1.05 && outerPerClient > 0.95 ? 1 : outerPerClient;
-    var safarIDPR = Number(opcR.toFixed(5));
-    var safarIDPRRounded = Number(safarIDPR.toFixed(1));
-    var iEDPR = Number(screen.deviceXDPI / screen.logicalXDPI);
-    var devicePixelRatioRound = Math.abs(iEDPR ? iEDPR : devicePixelRatio === 1 ? safarIDPR : devicePixelRatio);
-    var windowResize = windowOuterWidth !== outerWidth && windowOuterHeight !== outerHeight;
-    var clientWidth = parseInt(cliWidth * devicePixelRatioRound);
-    var defaultDevicePixelRatio = Math.round(cliWidth * devicePixelRatioRound / windowOuterWidth);
+    // Ratio between the outer and client width.
+    var outerClientRatio = outerWidth / clientWidth;
+
+    // A calulated DPR within the proximity of 0.05. for devices (eg.safari) that have a fixed DPR.
+    // @TODO check on large display devices with DPRs greater than 1. 
+    var OCRProximity = outerClientRatio < 1.05 && outerClientRatio > 0.95 ? 1 : outerClientRatio;
+
+    // A calculated DPR safe for safari browsers.
+    var safariSafeDPR = Number(OCRProximity.toFixed(5));
+
+    // Legacy internet explorer devicePixelRatio.
+    var IEDPR = Number(screen.deviceXDPI / screen.logicalXDPI);
+
+    // The devicePixelRatio with polyfilled support.
+    var calculatedDPR = Math.abs(IEDPR ? IEDPR : DPR === 1 ? safariSafeDPR : DPR);
+
+    // The real viewport width. 
+    var viewportWidth = parseInt(clientWidth * calculatedDPR);
+
+    // The default device pixel ratio. 
+    var defaultDPR = Math.round(clientWidth * calculatedDPR / outerWidth);
 
     /** 
      * Set variable inital values if not yet set.
      */
-    if (outerWidth === undefined) {
-      outerWidth = initialOuterWidth;
-      outerHeight = initialOuterHeight;
+    if (lastOuterWidth === undefined) {
+      lastOuterWidth = initialOuterWidth;
+      lastOuterHeight = initialOuterHeight;
     }
 
     /**
      * The window width compared to the design width.
      */
-    var designWidthRatio = windowWidth / relativeDesignWidth;
+    var designWidthRatio = innerWidth / relativeDesignWidth;
 
     /**
      * Check to see if the window is at the default zoom level.
      */
-    var isDevicePixelRatioDefault = defaultDevicePixelRatio === devicePixelRatioRound;
+    var isDevicePixelRatioDefault = defaultDPR === calculatedDPR;
 
     /** 
      * The minimum veiwport size to not react to.
@@ -660,94 +678,83 @@ var setRootFontSizePartial = function setRootFontSizePartial(resizeRootFontSize)
      * Mutate on next available frame.
      */
     resizeRootFontSize({
-      windowWidth: windowWidth,
-      windowOuterWidth: windowOuterWidth,
+      innerWidth: innerWidth,
+      outerWidth: outerWidth,
       isDevicePixelRatioDefault: isDevicePixelRatioDefault,
       relativeDesignWidth: relativeDesignWidth,
       cutOff: cutOff,
       rootElement: rootElement,
       designWidthRatio: designWidthRatio,
-      devicePixelRatioRound: devicePixelRatioRound,
+      calculatedDPR: calculatedDPR,
       rootFontSize: rootFontSize,
       enableScale: enableScale,
       preserveDevicePixelRatio: preserveDevicePixelRatio,
       onScale: onScale,
       onZoom: onZoom,
       onResize: onResize,
-      clientWidth: clientWidth,
-      defaultDevicePixelRatio: defaultDevicePixelRatio
+      viewportWidth: viewportWidth,
+      defaultDPR: defaultDPR
     });
 
     /**
      * Updated Outer browser dimensions.
      */
-    outerWidth = windowOuterWidth;
-    outerHeight = windowOuterWidth;
+    lastOuterWidth = outerWidth;
+    lastOuterHeight = outerWidth;
   };
 };
 
-/**
- * Pass a condition once with a given reference.
- * @param {string} reference - A unique reference per conditon.
- * @return {Boolean}
- */
-function once(reference) {
-    if (!once.prototype.references) {
-        once.prototype.references = {};
-    }
-    // Store reference if dosen't exist.
-    if (!once.prototype.references.hasOwnProperty(reference)) {
-        once.prototype.references[reference] = null;
-        return true;
-    } else {
-        return false;
-    }
-}
-
-/** 
- * Calculate and apply the new font size to the root element.
- */
 var wasLastBeyondMobileWidth = true;
 var lastDevicePixelRatio = void 0;
 var hasScaleCallback = false;
 var hasZoomCallback = false;
 var hasResizeCallback = false;
 var APIParameters = void 0;
+var callbacksRequireValidation = true;
+var initalRenderOnce = true;
+
+/** 
+ * Calculate and apply the new font size to the root element.
+ */
 var resizeRootFontSize = function resizeRootFontSize(_ref) {
-    var windowWidth = _ref.windowWidth,
-        windowOuterWidth = _ref.windowOuterWidth,
+    var innerWidth = _ref.innerWidth,
+        outerWidth = _ref.outerWidth,
         isDevicePixelRatioDefault = _ref.isDevicePixelRatioDefault,
         relativeDesignWidth = _ref.relativeDesignWidth,
         cutOff = _ref.cutOff,
         rootElement = _ref.rootElement,
         designWidthRatio = _ref.designWidthRatio,
-        devicePixelRatioRound = _ref.devicePixelRatioRound,
+        calculatedDPR = _ref.calculatedDPR,
         rootFontSize = _ref.rootFontSize,
         enableScale = _ref.enableScale,
         preserveDevicePixelRatio = _ref.preserveDevicePixelRatio,
         onScale = _ref.onScale,
         onZoom = _ref.onZoom,
         onResize = _ref.onResize,
-        clientWidth = _ref.clientWidth,
-        defaultDevicePixelRatio = _ref.defaultDevicePixelRatio;
+        viewportWidth = _ref.viewportWidth,
+        defaultDPR = _ref.defaultDPR;
 
+    // Calculates the devicePixelRatio as if the default was 1.
+    var normalizedDPR = 1 / defaultDPR * calculatedDPR;
 
-    /** 
-     * Evaluated devicePixelRatio
-     */
-    var ddd = 1 / defaultDevicePixelRatio * devicePixelRatioRound;
-    var evalDevicePixelRatio = preserveDevicePixelRatio ? devicePixelRatioRound : ddd;
-    var resizeWithoutZoom = devicePixelRatioRound === lastDevicePixelRatio;
+    // The preserved or non-preserved DPR via API settings.
+    var evalDPR = preserveDevicePixelRatio ? calculatedDPR : normalizedDPR;
 
-    if (resizeWithoutZoom || isDevicePixelRatioDefault || once('init')) {
-        var isAboveDesignWidth = windowWidth > relativeDesignWidth;
+    // Truthy if the browser is resized without being zoomed.
+    var resizeWithoutZoom = calculatedDPR === lastDevicePixelRatio;
 
-        if (windowWidth > cutOff) {
+    if (resizeWithoutZoom || isDevicePixelRatioDefault || initalRenderOnce) {
+        if (initalRenderOnce) {
+            initalRenderOnce = false;
+        }
+        var isAboveDesignWidth = innerWidth > relativeDesignWidth;
+
+        if (innerWidth > cutOff) {
             /** 
              * Set the rootElement's font size.
              */
             if (enableScale) {
-                rootElement.style.fontSize = (rootFontSize * designWidthRatio * evalDevicePixelRatio).toFixed(6) + 'rem';
+                rootElement.style.fontSize = (rootFontSize * designWidthRatio * evalDPR).toFixed(6) + 'rem';
             }
 
             /** 
@@ -771,15 +778,17 @@ var resizeRootFontSize = function resizeRootFontSize(_ref) {
     }
 
     // The parameters passed to each callback as an object.
-    APIParameters = { clientWidth: clientWidth, windowWidth: windowWidth, evalDevicePixelRatio: evalDevicePixelRatio, devicePixelRatioRound: devicePixelRatioRound, ddd: ddd };
+    APIParameters = {
+        viewportWidth: viewportWidth,
+        innerWidth: innerWidth,
+        evalDPR: evalDPR,
+        calculatedDPR: calculatedDPR,
+        normalizedDPR: normalizedDPR
+    };
 
-    /** 
-     * Callbacks.
-     */
-    if (once('callbacks') && windowWidth > cutOff) {
-        /** 
-         * Validates callbacks once.
-         */
+    // Validates callbacks once.
+    if (callbacksRequireValidation && innerWidth > cutOff) {
+        callbacksRequireValidation = false;
         hasScaleCallback = isCallBackDefined(onScale);
         hasZoomCallback = isCallBackDefined(onZoom);
         hasResizeCallback = isCallBackDefined(onResize);
@@ -801,7 +810,7 @@ var resizeRootFontSize = function resizeRootFontSize(_ref) {
     }
 
     // Store the last device pixel ratio for future comparision.
-    lastDevicePixelRatio = devicePixelRatioRound;
+    lastDevicePixelRatio = calculatedDPR;
 };
 
 /**
@@ -856,6 +865,7 @@ var defaults$2 = {
     enableScale: true
 };
 
+//Object Assign polyfill.
 objectAssignPolyfill$1();
 
 //Object Freeze polyfill.

@@ -87,9 +87,9 @@ Below is the list of config options passed as an object:
 | enableScale | Booolean  | Enables scaling of relative units | true |  
 | loadEvent | String - LoadEvent type  | native load event to use before auctioning | "DOMContentLoaded" | 
 | mobileWidth | String - CSS units | The minimal width to disable scaling for mobile devices  | "40em" |
-| onResize | ( clientWidth , windowWidth, devicePixelRatio) => {} | Callback on scale and or zoom | undefined |   
-| onScale | ( clientWidth , windowWidth, devicePixelRatio) => {} | Callback on resize only | undefined |  
-| onZoom | ( clientWidth , windowWidth, devicePixelRatio) => {} | Callback on zoom only | undefined |
+| onResize | ({viewportWidth, innerWidth, evalDPR, calculatedDPR, normalizedDPR}) => {} | Callback on scale and or zoom | undefined |   
+| onScale | ({viewportWidth, innerWidth, evalDPR, calculatedDPR, normalizedDPR}) => {} | Callback on resize only | undefined |  
+| onZoom | ({viewportWidth, innerWidth, evalDPR, calculatedDPR, normalizedDPR}) => {} | Callback on zoom only | undefined |
 | preserveDevicePixelRatio | Boolean | Normalises the device pixel ratio for high ratio devices | false |
 | relativeDesignWidth | String - CSS units  | The width relative to the font size | "1024px" |
 | scaleDelay | Number - Milliseconds | The debounced delay to call on resize | 16  |

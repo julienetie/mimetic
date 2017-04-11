@@ -1,55 +1,74 @@
-import runOnce from 'run-once';
 import { isCallBackDefined } from './utilities';
 
-/** 
- * Calculate and apply the new font size to the root element.
- */
 let wasLastBeyondMobileWidth = true;
 let lastDevicePixelRatio;
 let hasScaleCallback = false;
 let hasZoomCallback = false;
 let hasResizeCallback = false;
 let APIParameters;
-const windowRef = window;
-const documentRef = windowRef.document;
+let callbacksRequireValidation = true;
+let initalRenderOnce = true;
 
-
+/** 
+ * Calculate and apply the new font size to the root element.
+ */
 const resizeRootFontSize = ({
-    windowWidth,
-    windowOuterWidth,
+    innerWidth,
+    outerWidth,
     isDevicePixelRatioDefault,
     relativeDesignWidth,
     cutOff,
     rootElement,
     designWidthRatio,
-    devicePixelRatioRound,
+    calculatedDPR,
     rootFontSize,
     enableScale,
     preserveDevicePixelRatio,
     onScale,
     onZoom,
     onResize,
-    clientWidth,
-    defaultDevicePixelRatio
+    viewportWidth,
+    defaultDPR
 }) => {
+    console.log({
+    innerWidth,
+    outerWidth,
+    isDevicePixelRatioDefault,
+    relativeDesignWidth,
+    cutOff,
+    rootElement,
+    designWidthRatio,
+    calculatedDPR,
+    rootFontSize,
+    enableScale,
+    preserveDevicePixelRatio,
+    onScale,
+    onZoom,
+    onResize,
+    viewportWidth,
+    defaultDPR
+})
+    // Calculates the devicePixelRatio as if the default was 1.
+    const normalizedDPR = (1 / defaultDPR) * calculatedDPR;
 
+    // The preserved or non-preserved DPR via API settings.
+    const evalDPR = preserveDevicePixelRatio ? calculatedDPR : normalizedDPR;
 
-    /** 
-     * Evaluated devicePixelRatio
-     */
-    const ddd = (1 / defaultDevicePixelRatio) * devicePixelRatioRound;
-    const evalDevicePixelRatio = preserveDevicePixelRatio ? devicePixelRatioRound : ddd;
-    const resizeWithoutZoom = devicePixelRatioRound === lastDevicePixelRatio;
+    // Truthy if the browser is resized without being zoomed.
+    const resizeWithoutZoom = calculatedDPR === lastDevicePixelRatio;
 
-    if (resizeWithoutZoom || isDevicePixelRatioDefault || runOnce('init')) {
-        const isAboveDesignWidth = windowWidth > relativeDesignWidth;
+    if (resizeWithoutZoom || isDevicePixelRatioDefault || initalRenderOnce) {
+        if (initalRenderOnce) {
+            initalRenderOnce = false;
+        }
+        const isAboveDesignWidth = innerWidth > relativeDesignWidth;
 
-        if (windowWidth > cutOff) {
+        if (innerWidth > cutOff) {
             /** 
              * Set the rootElement's font size.
              */
             if (enableScale) {
-                rootElement.style.fontSize = (rootFontSize * designWidthRatio * evalDevicePixelRatio).toFixed(6) + 'rem';
+                rootElement.style.fontSize = (rootFontSize * designWidthRatio * evalDPR).toFixed(6) + 'rem';
             }
 
             /** 
@@ -72,16 +91,20 @@ const resizeRootFontSize = ({
         }
     }
 
-    // The parameters passed to each callback as an object.
-    APIParameters = { clientWidth, windowWidth, evalDevicePixelRatio, devicePixelRatioRound, ddd };
 
-    /** 
-     * Callbacks.
-     */
-    if (runOnce('callbacks') && windowWidth > cutOff) {
-        /** 
-         * Validates callbacks once.
-         */
+    // The parameters passed to each callback as an object.
+    APIParameters = {
+        viewportWidth,
+        innerWidth,
+        evalDPR,
+        calculatedDPR,
+        normalizedDPR
+    };
+
+
+    // Validates callbacks once.
+    if (callbacksRequireValidation && innerWidth > cutOff) {
+        callbacksRequireValidation = false;
         hasScaleCallback = isCallBackDefined(onScale);
         hasZoomCallback = isCallBackDefined(onZoom);
         hasResizeCallback = isCallBackDefined(onResize);
@@ -107,7 +130,7 @@ const resizeRootFontSize = ({
 
 
     // Store the last device pixel ratio for future comparision.
-    lastDevicePixelRatio = devicePixelRatioRound;
+    lastDevicePixelRatio = calculatedDPR;
 };
 
 export default resizeRootFontSize;
