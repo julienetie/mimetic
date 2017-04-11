@@ -2,17 +2,17 @@
  * Set Root Font Size.
  */
 const setRootFontSizePartial = (resizeRootFontSize) => {
-    var requestId;
-    var outerWidth;
-    var outerHeight;
+    let requestId;
+    let outerWidth;
+    let outerHeight;
+    const windowRef = window;
+    const documentRef = windowRef.document;
     return (settings) => {
         /** 
          * Destructured settings.
          */
         const {
-            window,
             rootElement,
-            rootElementStyle,
             rootFontSize,
             initialOuterHeight,
             initialOuterWidth,
@@ -32,10 +32,10 @@ const setRootFontSizePartial = (resizeRootFontSize) => {
         /** 
          * Get Real time values.
          */
-        const windowWidth = window.innerWidth;
-        const windowOuterWidth = window.outerWidth;
-        const windowOuterHeight = window.outerHeight;
-        const cliWidth = document.documentElement.clientWidth;
+        const windowWidth = windowRef.innerWidth;
+        const windowOuterWidth = windowRef.outerWidth;
+        const windowOuterHeight = windowRef.outerHeight;
+        const cliWidth = documentRef.documentElement.clientWidth;
         const outerPerClient = windowOuterWidth / cliWidth;
         const opcR = outerPerClient < 1.05 && outerPerClient > 0.95 ? 1 : outerPerClient;
         const safarIDPR = Number((opcR).toFixed(5));
@@ -78,14 +78,12 @@ const setRootFontSizePartial = (resizeRootFontSize) => {
          * Mutate on next available frame.
          */
         resizeRootFontSize({
-            // timestamp,
             windowWidth,
             windowOuterWidth,
             isDevicePixelRatioDefault,
             relativeDesignWidth,
             cutOff,
             rootElement,
-            rootElementStyle,
             designWidthRatio,
             devicePixelRatioRound,
             rootFontSize,

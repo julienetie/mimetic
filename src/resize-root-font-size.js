@@ -9,31 +9,34 @@ let lastDevicePixelRatio;
 let hasScaleCallback = false;
 let hasZoomCallback = false;
 let hasResizeCallback = false;
-const resizeRootFontSize = (preCalculatedValues) => {
-    console.log(preCalculatedValues)
-    const {
-        windowWidth,
-        windowOuterWidth,
-        isDevicePixelRatioDefault,
-        relativeDesignWidth,
-        cutOff,
-        rootElement,
-        designWidthRatio,
-        devicePixelRatioRound,
-        rootFontSize,
-        enableScale,
-        preserveDevicePixelRatio,
-        onScale,
-        onZoom,
-        onResize,
-        clientWidth,
-        defaultDevicePixelRatio
-    } = preCalculatedValues;
+let APIParameters;
+const windowRef = window;
+const documentRef = windowRef.document;
+
+
+const resizeRootFontSize = ({
+    windowWidth,
+    windowOuterWidth,
+    isDevicePixelRatioDefault,
+    relativeDesignWidth,
+    cutOff,
+    rootElement,
+    designWidthRatio,
+    devicePixelRatioRound,
+    rootFontSize,
+    enableScale,
+    preserveDevicePixelRatio,
+    onScale,
+    onZoom,
+    onResize,
+    clientWidth,
+    defaultDevicePixelRatio
+}) => {
+
 
     /** 
      * Evaluated devicePixelRatio
      */
-
     const ddd = (1 / defaultDevicePixelRatio) * devicePixelRatioRound;
     const evalDevicePixelRatio = preserveDevicePixelRatio ? devicePixelRatioRound : ddd;
     const resizeWithoutZoom = devicePixelRatioRound === lastDevicePixelRatio;
@@ -69,7 +72,9 @@ const resizeRootFontSize = (preCalculatedValues) => {
         }
     }
 
-    // console.log('resizeWithoutZoom', resizeWithoutZoom)
+    // The parameters passed to each callback as an object.
+    APIParameters = { clientWidth, windowWidth, evalDevicePixelRatio, devicePixelRatioRound, ddd };
+
     /** 
      * Callbacks.
      */
@@ -81,21 +86,27 @@ const resizeRootFontSize = (preCalculatedValues) => {
         hasZoomCallback = isCallBackDefined(onZoom);
         hasResizeCallback = isCallBackDefined(onResize);
     }
+
+
+    // Action onScale during resize without zoom.    
     if (resizeWithoutZoom && hasScaleCallback) {
-        onScale(clientWidth, windowWidth, evalDevicePixelRatio, devicePixelRatioRound);
+        onScale(APIParameters);
     }
 
+
+    // Action onZoom during resize without scale.
     if (!resizeWithoutZoom && hasZoomCallback) {
-        onZoom({ clientWidth, windowWidth, evalDevicePixelRatio, devicePixelRatioRound, ddd });
+        onZoom(APIParameters);
     }
 
+
+    // Action onResize during either zoom or scale.
     if (hasResizeCallback) {
-        onResize(clientWidth, windowWidth, evalDevicePixelRatio, devicePixelRatioRound);
+        onResize(APIParameters);
     }
 
-    /** 
-     * Set the last ratio from the current.
-     */
+
+    // Store the last device pixel ratio for future comparision.
     lastDevicePixelRatio = devicePixelRatioRound;
 };
 

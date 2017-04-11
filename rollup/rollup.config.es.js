@@ -3,7 +3,7 @@ import nodeResolve from 'rollup-plugin-node-resolve';
 
 export default {
     moduleName: 'mimetic',
-    entry: 'src/index.js',
+    entry: './src/index.js',
     plugins: [babel({
             babelrc: false,
             exclude: 'node_modules/**'
@@ -14,5 +14,5 @@ export default {
         })
     ],
     format: 'es',
-    dest: 'dist/mimetic.es.js'
+    dest: './dist/mimetic.es.js'
 };

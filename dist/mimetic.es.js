@@ -26,18 +26,6 @@ vVVv    vVVv                 ': |_| \_\___||___/_/___|_|_|_|\__,_| ''
  * Copyright Julien Etienne 2015 All Rights Reserved.
  */
 // Initial time of the timing lapse.
-/**
- *  volve - Tiny, Performant Debounce and Throttle Functions,
- *     License:  MIT
- *      Copyright Julien Etienne 2016 All Rights Reserved.
- *        github:  https://github.com/julienetie/volve
- *‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
- */
-
-/**
- * Date.now polyfill.
- * {@link https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Date/now}
- */
 if (!Date.now) {
     Date.now = function now() {
         return new Date().getTime();
@@ -494,17 +482,17 @@ function initializeMimeticPartial(getRootElement, getRootREMValue, CSSUnitsToPix
  * Set Root Font Size.
  */
 const setRootFontSizePartial = resizeRootFontSize => {
-  var requestId;
-  var outerWidth;
-  var outerHeight;
+  let requestId;
+  let outerWidth;
+  let outerHeight;
+  const windowRef = window;
+  const documentRef = windowRef.document;
   return settings => {
     /** 
      * Destructured settings.
      */
     const {
-      window,
       rootElement,
-      rootElementStyle,
       rootFontSize,
       initialOuterHeight,
       initialOuterWidth,
@@ -523,10 +511,10 @@ const setRootFontSizePartial = resizeRootFontSize => {
     /** 
      * Get Real time values.
      */
-    const windowWidth = window.innerWidth;
-    const windowOuterWidth = window.outerWidth;
-    const windowOuterHeight = window.outerHeight;
-    const cliWidth = document.documentElement.clientWidth;
+    const windowWidth = windowRef.innerWidth;
+    const windowOuterWidth = windowRef.outerWidth;
+    const windowOuterHeight = windowRef.outerHeight;
+    const cliWidth = documentRef.documentElement.clientWidth;
     const outerPerClient = windowOuterWidth / cliWidth;
     const opcR = outerPerClient < 1.05 && outerPerClient > 0.95 ? 1 : outerPerClient;
     const safarIDPR = Number(opcR.toFixed(5));
@@ -564,14 +552,12 @@ const setRootFontSizePartial = resizeRootFontSize => {
      * Mutate on next available frame.
      */
     resizeRootFontSize({
-      // timestamp,
       windowWidth,
       windowOuterWidth,
       isDevicePixelRatioDefault,
       relativeDesignWidth,
       cutOff,
       rootElement,
-      rootElementStyle,
       designWidthRatio,
       devicePixelRatioRound,
       rootFontSize,
@@ -618,31 +604,29 @@ let lastDevicePixelRatio;
 let hasScaleCallback = false;
 let hasZoomCallback = false;
 let hasResizeCallback = false;
-const resizeRootFontSize = preCalculatedValues => {
-    const {
-        windowWidth,
-        windowOuterWidth,
-        isDevicePixelRatioDefault,
-        relativeDesignWidth,
-        cutOff,
-        rootElement,
-        rootElementStyle,
-        designWidthRatio,
-        devicePixelRatioRound,
-        rootFontSize,
-        enableScale,
-        preserveDevicePixelRatio,
-        onScale,
-        onZoom,
-        onResize,
-        clientWidth,
-        defaultDevicePixelRatio
-    } = preCalculatedValues;
+let APIParameters;
+const resizeRootFontSize = ({
+    windowWidth,
+    windowOuterWidth,
+    isDevicePixelRatioDefault,
+    relativeDesignWidth,
+    cutOff,
+    rootElement,
+    designWidthRatio,
+    devicePixelRatioRound,
+    rootFontSize,
+    enableScale,
+    preserveDevicePixelRatio,
+    onScale,
+    onZoom,
+    onResize,
+    clientWidth,
+    defaultDevicePixelRatio
+}) => {
 
     /** 
      * Evaluated devicePixelRatio
      */
-
     const ddd = 1 / defaultDevicePixelRatio * devicePixelRatioRound;
     const evalDevicePixelRatio = preserveDevicePixelRatio ? devicePixelRatioRound : ddd;
     const resizeWithoutZoom = devicePixelRatioRound === lastDevicePixelRatio;
@@ -655,7 +639,7 @@ const resizeRootFontSize = preCalculatedValues => {
              * Set the rootElement's font size.
              */
             if (enableScale) {
-                rootElementStyle.fontSize = (rootFontSize * designWidthRatio * evalDevicePixelRatio).toFixed(6) + 'rem';
+                rootElement.style.fontSize = (rootFontSize * designWidthRatio * evalDevicePixelRatio).toFixed(6) + 'rem';
             }
 
             /** 
@@ -678,7 +662,9 @@ const resizeRootFontSize = preCalculatedValues => {
         }
     }
 
-    // console.log('resizeWithoutZoom', resizeWithoutZoom)
+    // The parameters passed to each callback as an object.
+    APIParameters = { clientWidth, windowWidth, evalDevicePixelRatio, devicePixelRatioRound, ddd };
+
     /** 
      * Callbacks.
      */
@@ -690,21 +676,23 @@ const resizeRootFontSize = preCalculatedValues => {
         hasZoomCallback = isCallBackDefined(onZoom);
         hasResizeCallback = isCallBackDefined(onResize);
     }
+
+    // Action onScale during resize without zoom.    
     if (resizeWithoutZoom && hasScaleCallback) {
-        onScale(clientWidth, windowWidth, evalDevicePixelRatio, devicePixelRatioRound);
+        onScale(APIParameters);
     }
 
+    // Action onZoom during resize without scale.
     if (!resizeWithoutZoom && hasZoomCallback) {
-        onZoom({ clientWidth, windowWidth, evalDevicePixelRatio, devicePixelRatioRound, ddd });
+        onZoom(APIParameters);
     }
 
+    // Action onResize during either zoom or scale.
     if (hasResizeCallback) {
-        onResize(clientWidth, windowWidth, evalDevicePixelRatio, devicePixelRatioRound);
+        onResize(APIParameters);
     }
 
-    /** 
-     * Set the last ratio from the current.
-     */
+    // Store the last device pixel ratio for future comparision.
     lastDevicePixelRatio = devicePixelRatioRound;
 };
 
@@ -758,7 +746,6 @@ const defaults$1 = {
     enableScale: true
 };
 
-//Object Assign polyfill.
 objectAssignPolyfill$1();
 
 //Object Freeze polyfill.

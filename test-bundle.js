@@ -619,17 +619,19 @@ function initializeMimeticPartial(getRootElement, getRootREMValue, CSSUnitsToPix
 /** 
  * Set Root Font Size.
  */
-var setRootFontSizePartial = function setRootFontSizePartial(resizeRootFontSize) {
-  var requestId;
-  var outerWidth;
-  var outerHeight;
+var setRootFontSizePartial = function setRootFontSizePartial(resizeRootFontSize, window) {
+  var windowRef = window;
+  var documentRef = window.document;
+  var requestId = void 0;
+  var outerWidth = void 0;
+  var outerHeight = void 0;
+
   return function (settings) {
     /** 
      * Destructured settings.
      */
-    var window = settings.window,
+    var windowRef = settings.windowRef,
         rootElement = settings.rootElement,
-        rootElementStyle = settings.rootElementStyle,
         rootFontSize = settings.rootFontSize,
         initialOuterHeight = settings.initialOuterHeight,
         initialOuterWidth = settings.initialOuterWidth,
@@ -648,9 +650,9 @@ var setRootFontSizePartial = function setRootFontSizePartial(resizeRootFontSize)
      * Get Real time values.
      */
 
-    var windowWidth = window.innerWidth;
-    var windowOuterWidth = window.outerWidth;
-    var windowOuterHeight = window.outerHeight;
+    var windowWidth = windowRef.innerWidth;
+    var windowOuterWidth = windowRef.outerWidth;
+    var windowOuterHeight = windowRef.outerHeight;
     var cliWidth = document.documentElement.clientWidth;
     var outerPerClient = windowOuterWidth / cliWidth;
     var opcR = outerPerClient < 1.05 && outerPerClient > 0.95 ? 1 : outerPerClient;
@@ -689,7 +691,7 @@ var setRootFontSizePartial = function setRootFontSizePartial(resizeRootFontSize)
      * Mutate on next available frame.
      */
     resizeRootFontSize({
-      // timestamp,
+      windowRef: windowRef,
       windowWidth: windowWidth,
       windowOuterWidth: windowOuterWidth,
       isDevicePixelRatioDefault: isDevicePixelRatioDefault,
@@ -961,6 +963,16 @@ describe('resizeRootFontSize', function () {
         // Will incorrectly pass if window width is 1920.
         expect$2(rootFontSize).to.equal('30px');
         expect$2(true).to.equal(false);
+    });
+});
+
+var _chai$3 = chai;
+var expect$3 = _chai$3.expect;
+
+
+describe('setRootFontSizePartial', function () {
+    it('Should exist', function () {
+        expect$3(setRootFontSizePartial).to.be.a('function');
     });
 });
 
