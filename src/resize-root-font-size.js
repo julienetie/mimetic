@@ -30,24 +30,6 @@ const resizeRootFontSize = ({
     viewportWidth,
     defaultDPR
 }) => {
-    console.log({
-    innerWidth,
-    outerWidth,
-    isDevicePixelRatioDefault,
-    relativeDesignWidth,
-    cutOff,
-    rootElement,
-    designWidthRatio,
-    calculatedDPR,
-    rootFontSize,
-    enableScale,
-    preserveDevicePixelRatio,
-    onScale,
-    onZoom,
-    onResize,
-    viewportWidth,
-    defaultDPR
-})
     // Calculates the devicePixelRatio as if the default was 1.
     const normalizedDPR = (1 / defaultDPR) * calculatedDPR;
 
