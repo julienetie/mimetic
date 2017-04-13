@@ -12,7 +12,13 @@ const defaults = {
     onResize: undefined,
     cutOffWidth: 0, // The minimum width to disable resizing.
     relativeDesignWidth: 1024, // The width relative to the font size.
-    enableScale: true
+    enableScale: true,
+    /** 
+     * This is important particularly when users maximises and reverts the browser
+     * window. This delay determines the debounce threshold but also the trailing 
+     * edge call.
+     */
+    lateDetectionDelay: 500
 }
 
 export default defaults;

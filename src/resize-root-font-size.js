@@ -8,28 +8,33 @@ let hasResizeCallback = false;
 let APIParameters;
 let callbacksRequireValidation = true;
 let initalRenderOnce = true;
-
+let setRootFontSizeTimeoutId;
+let lastOuterWidth;
 /** 
  * Calculate and apply the new font size to the root element.
  */
-const resizeRootFontSize = ({
-    innerWidth,
-    outerWidth,
-    isDevicePixelRatioDefault,
-    relativeDesignWidth,
-    cutOff,
-    rootElement,
-    designWidthRatio,
-    calculatedDPR,
-    rootFontSize,
-    enableScale,
-    preserveDevicePixelRatio,
-    onScale,
-    onZoom,
-    onResize,
-    viewportWidth,
-    defaultDPR
-}) => {
+const resizeRootFontSize = (settings, setRootFontSizeTail) => {
+
+    const {
+        innerWidth,
+        outerWidth,
+        isDevicePixelRatioDefault,
+        relativeDesignWidth,
+        cutOff,
+        rootElement,
+        designWidthRatio,
+        calculatedDPR,
+        rootFontSize,
+        enableScale,
+        preserveDevicePixelRatio,
+        onScale,
+        onZoom,
+        onResize,
+        viewportWidth,
+        defaultDPR,
+        lateDetectionDelay
+    } = settings;
+
     // Calculates the devicePixelRatio as if the default was 1.
     const normalizedDPR = (1 / defaultDPR) * calculatedDPR;
 
@@ -38,6 +43,16 @@ const resizeRootFontSize = ({
 
     // Truthy if the browser is resized without being zoomed.
     const resizeWithoutZoom = calculatedDPR === lastDevicePixelRatio;
+
+
+    // Assigns lastOuterWidth with an inital value, never expected to be zero.
+    if (!lastOuterWidth) {
+        lastOuterWidth = outerWidth;
+    }
+
+
+    // Determine if the resize event was last with or without zoom.
+    const resizeWithoutZoom2 = outerWidth === lastOuterWidth;
 
     if (resizeWithoutZoom || isDevicePixelRatioDefault || initalRenderOnce) {
         if (initalRenderOnce) {
@@ -70,6 +85,18 @@ const resizeRootFontSize = ({
              * Reset as within mobileWidth.
              */
             wasLastBeyondMobileWidth = false;
+        }
+    }
+
+    clearTimeout(setRootFontSizeTimeoutId);
+    if (resizeWithoutZoom2) {
+        // setRootFontSizeTail to be independently conditional.
+        if (setRootFontSizeTail) {
+            setRootFontSizeTimeoutId = setTimeout(
+                () => {
+                    setRootFontSizeTail()
+                }, lateDetectionDelay
+            );
         }
     }
 
@@ -113,6 +140,9 @@ const resizeRootFontSize = ({
 
     // Store the last device pixel ratio for future comparision.
     lastDevicePixelRatio = calculatedDPR;
+
+
+    lastOuterWidth = outerWidth;
 };
 
 export default resizeRootFontSize;

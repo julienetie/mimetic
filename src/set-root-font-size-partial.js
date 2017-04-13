@@ -23,8 +23,9 @@ const setRootFontSizePartial = (resizeRootFontSize) => {
         onZoom,
         onResize,
         mobileWidthPX,
-        cutOffWidthPX
-    }) => {
+        cutOffWidthPX,
+        lateDetectionDelay
+    }, setRootFontSize) => {
         // Real time DOM measurments.
         const innerWidth = windowRef.innerWidth;
         const outerWidth = windowRef.outerWidth;
@@ -101,8 +102,9 @@ const setRootFontSizePartial = (resizeRootFontSize) => {
             onZoom,
             onResize,
             viewportWidth,
-            defaultDPR
-        })
+            defaultDPR,
+            lateDetectionDelay
+        },setRootFontSize);
 
 
         /**

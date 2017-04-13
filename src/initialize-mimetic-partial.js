@@ -23,7 +23,7 @@ function initializeMimeticPartial(
      */
     function initalizeMimeticFinal(config) {
         // Destructured API parameters.
-        const { loadEvent, mobileWidth, rootSelector, scaleDelay, cutOffWidth } = config;
+        const { loadEvent, mobileWidth, rootSelector, scaleDelay, cutOffWidth, lateDetectionDelay } = config;
 
 
         // Store the scaleDelay for kill and revive.
@@ -62,12 +62,13 @@ function initializeMimeticPartial(
 
 
         // Immediately set the root font size according to MIMETIC.
-        setRootFontSize(settings);
+        const setRootFontSizeScope = () => setRootFontSize(settings);
 
+        setRootFontSizeScope();
 
         // On window resize set the root font size according to MIMETIC.
         resize.resizilla = resizilla(() => {
-            setRootFontSize(settings);
+            setRootFontSize(settings, setRootFontSizeScope);
         }, scaleDelay, false);
     }
 
@@ -83,7 +84,7 @@ function initializeMimeticPartial(
      */
     initalizeMimeticFinal.prototype.revive = function() {
         resize.resizilla = resizilla(() => {
-            setRootFontSize(resize.settings);
+            setRootFontSize(resize.settings, setRootFontSizeScope);
         }, resize.scaleDelay, false);
     }
 
