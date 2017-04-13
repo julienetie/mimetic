@@ -26,6 +26,18 @@ vVVv    vVVv                 ': |_| \_\___||___/_/___|_|_|_|\__,_| ''
  * Copyright Julien Etienne 2015 All Rights Reserved.
  */
 // Initial time of the timing lapse.
+/**
+ *  volve - Tiny, Performant Debounce and Throttle Functions,
+ *     License:  MIT
+ *      Copyright Julien Etienne 2016 All Rights Reserved.
+ *        github:  https://github.com/julienetie/volve
+ *‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
+ */
+
+/**
+ * Date.now polyfill.
+ * {@link https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Date/now}
+ */
 if (!Date.now) {
     Date.now = function now() {
         return new Date().getTime();
@@ -778,6 +790,7 @@ const defaults$1 = {
   lateDetectionDelay: 500
 };
 
+//Object Assign polyfill.
 objectAssignPolyfill$1();
 
 //Object Freeze polyfill.
