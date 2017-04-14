@@ -33,8 +33,17 @@ It enables developers to:
 - Design more aesthetically pleasing websites.
 - Future proof designs from MIMETIC sized rem units to future relative-percentile units by simply changing the unit and root font-size. 
 
-### Why not use blah? 
-Viewport units allow you to scale fonts to viewport dimensions but unfortunately they prevent the browser’s ability to zoom. This is important for accessibility. There are other libraries that can scale text to the viewport/ container but they either break zoom or have impractical cross browser compatibility issues. MIMETIC is able to decipher 
+### Why not use something else?
+There are a few existing libraries out there that attempt to scale fonts on the web accordingly but unfortunatley they suffer from a few side-effects such as...
+
+- Inconsistent browser compatibility.
+- Difficult to no ability to zoom, thus breaking accessibility.
+- Doesn't scale padding/ margin/ line-height and other relative dimensions and doesn’t respect the style attributes on elements (overwrite your inline styles). You must specify relative dimensions (padding/ margin)(More maintenance), or you can’t specify relative dimensions.
+- Scales to a container (which is the inverse effect of MIMETIC).
+- jQuery dependent
+- Does exactly what vw, vh, vmin, vmax does on mobile.
+- Fonts blur.
+- No longer being maintained.
 
 ### What do I need to know?
 There’s a few simple concepts you need to understand to create _Scalable Web Design_ via MIMETIC.
