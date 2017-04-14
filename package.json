@@ -5,10 +5,10 @@
     "main": "dist/mimetic.js",
     "jsnext:main": "dist/mimetic.es.js",
     "scripts": {
-        "watch": "concurrently \"rollup -c ./rollup/rollup.config.umd.js -w\" \"rollup -c ./rollup/rollup.config.es.js -w\"",
-        "build": "rollup -c ./rollup/rollup.config.umd.js && rollup -c ./rollup/rollup.config.es.js",
+        "watch": "./node_modules/.bin/concurrently \"./node_modules/.bin/rollup -c ./rollup/rollup.config.umd.js -w\" \"./node_modules/.bin/rollup -c ./rollup/rollup.config.es.js -w\"",
+        "build": "./node_modules/.bin/rollup -c ./rollup/rollup.config.umd.js && ./node_modules/.bin/rollup -c ./rollup/rollup.config.es.js",
         "build-client-test": "watchify ./test/*.js -o ./test/_client-test.js -t [ babelify --presets [ es2015 ] ] -v",
-        "test": "concurrently \"node server.js\" \"rollup -c ./rollup/config.test.js -w\""
+        "test": "./node_modules/.bin/concurrently \"node server.js\" \"./node_modules/.bin/rollup -c ./rollup/config.test.js -w\""
     },
     "repository": {
         "type": "git",
