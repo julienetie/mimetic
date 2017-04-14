@@ -7,4 +7,4 @@ before_install:
 install:
   - yarn
 script:
-  - yarn test
+  - yarn test-build
