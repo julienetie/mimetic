@@ -1,14 +1,6 @@
 import mimetic from '../src/index';
 
-const { expect } = chai;
 const { kill, revive } = mimetic();
-
-
-after(() => {
-    kill();
-    console.log('MIMETIC has been killed for index.js');
-});
-
 
 describe('mimetic', () => {
     it('Should exist', () => {

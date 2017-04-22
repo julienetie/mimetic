@@ -1,13 +1,13 @@
 /**
  * Sets up intializeMimetic via partial application.
- * @param {Function} getRootElement - Gets the root font element.
+ * @param {Function} document.
  * @param {Function} getRootREMValue - Gets the root font-size in REM units.
  * @param {Function} CSSUnitsToPixels - Converts any CSS units to pixels.
  * @param {Function} setRootFontSize - Sets the new root font size.
  * @param {Function} resizilla - Calls handler on window resize and orientationchange events.
  */
 function initializeMimeticPartial(
-    getRootElement,
+    document,
     getRootREMValue,
     CSSUnitsToPixels,
     setRootFontSize,
@@ -30,10 +30,6 @@ function initializeMimeticPartial(
         resize.scaleDelay = scaleDelay;
 
 
-        // The root font element.
-        const rootElement = getRootElement(rootSelector);
-
-
         // The intial root font size.
         const rootFontSize = getRootREMValue(document);
 
@@ -51,7 +47,6 @@ function initializeMimeticPartial(
             initialOuterHeight: window.outerHeight,
             initialOuterWidth: window.outerWidth,
             rootFontSize,
-            rootElement,
             mobileWidthPX,
             cutOffWidthPX
         }, config);

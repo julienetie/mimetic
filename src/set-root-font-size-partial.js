@@ -10,18 +10,17 @@ const setRootFontSizePartial = (resizeRootFontSize) => {
 
 
     return ({
-        rootElement,
         rootFontSize,
         initialOuterHeight,
         initialOuterWidth,
         relativeDesignWidth,
         mobileWidth,
         cutOffWidth,
-        enableScale,
         preserveDevicePixelRatio,
         onScale,
         onZoom,
         onResize,
+        enableScale,
         mobileWidthPX,
         cutOffWidthPX,
         lateDetectionDelay
@@ -71,12 +70,6 @@ const setRootFontSizePartial = (resizeRootFontSize) => {
         const designWidthRatio = innerWidth / relativeDesignWidth;
 
 
-        /**
-         * Check to see if the window is at the default zoom level.
-         */
-        const isDevicePixelRatioDefault = defaultDPR === calculatedDPR;
-
-
         /** 
          * The minimum veiwport size to not react to.
          */
@@ -89,10 +82,8 @@ const setRootFontSizePartial = (resizeRootFontSize) => {
         resizeRootFontSize({
             innerWidth,
             outerWidth,
-            isDevicePixelRatioDefault,
             relativeDesignWidth,
             cutOff,
-            rootElement,
             designWidthRatio,
             calculatedDPR,
             rootFontSize,
@@ -105,7 +96,6 @@ const setRootFontSizePartial = (resizeRootFontSize) => {
             defaultDPR,
             lateDetectionDelay
         },setRootFontSize);
-
 
         /**
          * Updated Outer browser dimensions.

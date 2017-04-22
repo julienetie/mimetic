@@ -10,7 +10,9 @@
     <script src="./node_modules/chai/chai.js"></script>
     <script src="./node_modules/mocha/mocha.js"></script>
     <script>
-    mocha.setup('bdd')
+    const { expect } = chai;
+    mocha.setup('bdd');
+    window.isNode = false;
     </script>
     <script src="./test-bundle.js"></script>
     <script>

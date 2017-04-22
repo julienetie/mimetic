@@ -1,5 +1,5 @@
 import defaults from '../src/defaults';
-const { expect } = chai;
+// const { expect } = chai;
 const defaultsKeys = Object.keys(defaults);
 
 

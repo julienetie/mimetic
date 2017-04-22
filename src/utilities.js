@@ -14,8 +14,8 @@ export const basicCompose = (a, b) => {
 export const pxToRem = (fontSizePx) => parseInt(fontSizePx) / 16;
 
 
-// Checks callback type.
-export const isCallBackDefined = (callback) => typeof callback === 'function';
+// Is Function.
+export const isFunction = (value) => typeof value === 'function';
 
 
 // Gets the element's root font size.

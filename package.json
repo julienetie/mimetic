@@ -7,15 +7,8 @@
     "scripts": {
         "watch": "./node_modules/.bin/concurrently \"./node_modules/.bin/rollup -c ./rollup/rollup.config.umd.js -w\" \"./node_modules/.bin/rollup -c ./rollup/rollup.config.es.js -w\"",
         "build": "./node_modules/.bin/rollup -c ./rollup/rollup.config.umd.js && ./node_modules/.bin/rollup -c ./rollup/rollup.config.es.js",
-        "build-client-test": "watchify ./test/*.js -o ./test/_client-test.js -t [ babelify --presets [ es2015 ] ] -v",
-        "test": "./node_modules/.bin/concurrently \"node server.js\" \"./node_modules/.bin/rollup -c ./rollup/config.test.js -w\"",
-        "test-build": "./node_modules/.bin/concurrently \"node server.js\" \"./node_modules/.bin/rollup -c ./rollup/config.test.js\"",
-        "tests": "npm run single && npm run local && npm run parallel",
-        "single": "./node_modules/.bin/nightwatch -c conf/single.conf.js",
-        "local": "node scripts/local.runner.js -c conf/local.conf.js",
-        "parallel": "./node_modules/.bin/nightwatch -c conf/parallel.conf.js -e chrome,firefox,safari,ie",
-        "parallel_local": "node scripts/local.runner.js -c conf/parallel_local.conf.js -e chrome,firefox,safari",
-        "suite": "./node_modules/.bin/nightwatch -c conf/suite.conf.js"
+        "unit-test": "./node_modules/.bin/mocha --compilers js:babel-register --recursive",
+        "unit-test-client": "./node_modules/.bin/concurrently \"node server.js\" \"./node_modules/.bin/rollup -c ./rollup/config.test.js -w\""
     },
     "repository": {
         "type": "git",
@@ -31,8 +24,10 @@
         "concurrently": "^3.4.0",
         "dotenv": "^4.0.0",
         "express": "^4.15.2",
+        "jsdom": "^9.12.0",
         "mocha": "^3.2.0",
         "nightwatch": "^0.9.14",
+        "opn": "^4.0.2",
         "rollup": "^0.41.6",
         "rollup-plugin-babel": "^2.6.1",
         "rollup-plugin-multi-entry": "^2.0.1",

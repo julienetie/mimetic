@@ -115,18 +115,6 @@ vVVv    vVVv                 ': |_| \_\___||___/_/___|_|_|_|\__,_| ''
  * Copyright Julien Etienne 2015 All Rights Reserved.
  */
 // Initial time of the timing lapse.
-/**
- *  volve - Tiny, Performant Debounce and Throttle Functions,
- *     License:  MIT
- *      Copyright Julien Etienne 2016 All Rights Reserved.
- *        github:  https://github.com/julienetie/volve
- *‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
- */
-
-/**
- * Date.now polyfill.
- * {@link https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Date/now}
- */
 if (!Date.now) {
     Date.now = function now() {
         return new Date().getTime();
@@ -460,9 +448,9 @@ var pxToRem = function pxToRem(fontSizePx) {
     return parseInt(fontSizePx) / 16;
 };
 
-// Checks callback type.
-var isCallBackDefined = function isCallBackDefined(callback) {
-    return typeof callback === 'function';
+// Is Function.
+var isFunction = function isFunction(value) {
+    return typeof value === 'function';
 };
 
 // Gets the element's root font size.
@@ -517,13 +505,13 @@ var CSSUnitsToPixels = function CSSUnitsToPixels(value) {
 
 /**
  * Sets up intializeMimetic via partial application.
- * @param {Function} getRootElement - Gets the root font element.
+ * @param {Function} document.
  * @param {Function} getRootREMValue - Gets the root font-size in REM units.
  * @param {Function} CSSUnitsToPixels - Converts any CSS units to pixels.
  * @param {Function} setRootFontSize - Sets the new root font size.
  * @param {Function} resizilla - Calls handler on window resize and orientationchange events.
  */
-function initializeMimeticPartial(getRootElement, getRootREMValue, CSSUnitsToPixels, setRootFontSize, resizilla) {
+function initializeMimeticPartial(document, getRootREMValue, CSSUnitsToPixels, setRootFontSize, resizilla) {
     // A resize object to store MIMETIC's resizilla's requirements.
     var resize = {};
 
@@ -544,9 +532,6 @@ function initializeMimeticPartial(getRootElement, getRootREMValue, CSSUnitsToPix
 
         resize.scaleDelay = scaleDelay;
 
-        // The root font element.
-        var rootElement = getRootElement(rootSelector);
-
         // The intial root font size.
         var rootFontSize = getRootREMValue(document);
 
@@ -561,7 +546,6 @@ function initializeMimeticPartial(getRootElement, getRootREMValue, CSSUnitsToPix
             initialOuterHeight: window.outerHeight,
             initialOuterWidth: window.outerWidth,
             rootFontSize: rootFontSize,
-            rootElement: rootElement,
             mobileWidthPX: mobileWidthPX,
             cutOffWidthPX: cutOffWidthPX
         }, config);
@@ -613,18 +597,17 @@ var setRootFontSizePartial = function setRootFontSizePartial(resizeRootFontSize)
   var lastOuterHeight = void 0;
 
   return function (_ref, setRootFontSize) {
-    var rootElement = _ref.rootElement,
-        rootFontSize = _ref.rootFontSize,
+    var rootFontSize = _ref.rootFontSize,
         initialOuterHeight = _ref.initialOuterHeight,
         initialOuterWidth = _ref.initialOuterWidth,
         relativeDesignWidth = _ref.relativeDesignWidth,
         mobileWidth = _ref.mobileWidth,
         cutOffWidth = _ref.cutOffWidth,
-        enableScale = _ref.enableScale,
         preserveDevicePixelRatio = _ref.preserveDevicePixelRatio,
         onScale = _ref.onScale,
         onZoom = _ref.onZoom,
         onResize = _ref.onResize,
+        enableScale = _ref.enableScale,
         mobileWidthPX = _ref.mobileWidthPX,
         cutOffWidthPX = _ref.cutOffWidthPX,
         lateDetectionDelay = _ref.lateDetectionDelay;
@@ -671,11 +654,6 @@ var setRootFontSizePartial = function setRootFontSizePartial(resizeRootFontSize)
      */
     var designWidthRatio = innerWidth / relativeDesignWidth;
 
-    /**
-     * Check to see if the window is at the default zoom level.
-     */
-    var isDevicePixelRatioDefault = defaultDPR === calculatedDPR;
-
     /** 
      * The minimum veiwport size to not react to.
      */
@@ -687,10 +665,8 @@ var setRootFontSizePartial = function setRootFontSizePartial(resizeRootFontSize)
     resizeRootFontSize({
       innerWidth: innerWidth,
       outerWidth: outerWidth,
-      isDevicePixelRatioDefault: isDevicePixelRatioDefault,
       relativeDesignWidth: relativeDesignWidth,
       cutOff: cutOff,
-      rootElement: rootElement,
       designWidthRatio: designWidthRatio,
       calculatedDPR: calculatedDPR,
       rootFontSize: rootFontSize,
@@ -713,114 +689,93 @@ var setRootFontSizePartial = function setRootFontSizePartial(resizeRootFontSize)
 };
 
 var wasLastBeyondMobileWidth = true;
-var lastDevicePixelRatio = void 0;
+var renderOnce = void 0;
+
+/** 
+ * Directly mutates the root font size of a given Element.
+ * @param 
+ */
+var mutateRootFontSizePartial = function mutateRootFontSizePartial(rootElement) {
+    return function (rootFontSizeFinal, resizeWithoutZoom, hasScaledOrDPRIsDefault, isDevicePixelRatioDefault, isAboveDesignWidth, isBeyondCutoff, enableScale) {
+        if (hasScaledOrDPRIsDefault || renderOnce) {
+            if (renderOnce) {
+                renderOnce = false;
+            }
+
+            if (isBeyondCutoff) {
+                // Set the rootElement's font size if scale is enabled.
+                if (enableScale) {
+                    rootElement.style.fontSize = rootFontSizeFinal.toFixed(6) + 'rem';
+                }
+
+                // Indicate that the viewport has exceeded the mobileWidth.
+                wasLastBeyondMobileWidth = true;
+            } else if (wasLastBeyondMobileWidth) {
+                /** 
+                 * Prevent odd behaviour when refreshed.
+                 * By removing the style attribute once when 
+                 * within the mobileWidth.
+                 */
+                if (wasLastBeyondMobileWidth) {
+                    rootElement.removeAttribute('style');
+                }
+
+                // Reset as within mobileWidth.
+                wasLastBeyondMobileWidth = false;
+            }
+        }
+    };
+};
+
+/** 
+ * Default config properties if not defined.
+ */
+var defaults$2 = {
+  loadEvent: 'DOMContentLoaded', // Load type
+  mobileWidth: 640, // Width before disabling for mobile phone devices.
+  scaleDelay: 16, // Miliseconds between calls on resize.
+  preserveDevicePixelRatio: false, // Preserve the device pixel ratio on zoom.
+  rootSelector: 'html', // Use the HTML element as the root element. 
+  onScale: undefined,
+  onZoom: undefined,
+  onResize: undefined,
+  cutOffWidth: 0, // The minimum width to disable resizing.
+  relativeDesignWidth: 1024, // The width relative to the font size.
+  enableScale: true,
+  /** 
+   * This is important particularly when users maximises and reverts the browser
+   * window. This delay determines the debounce threshold but also the trailing 
+   * edge call.
+   */
+  lateDetectionDelay: 500
+};
+
+var rootSelector$1 = defaults$2.rootSelector;
+
+// The root font element.
+
+var rootElement = getRootElement(rootSelector$1);
+
+/**
+ * Mutate root font size with pre-sets.
+ * @param {HTMLElement} rootElement - Root element option.
+ * @param {Boolean} rootElement - Enable scale option.
+ * @return {Function} mutateRootFontSize.
+ */
+var mutateRootFontSize = mutateRootFontSizePartial(rootElement);
+
+var callbacksRequireValidation = true;
 var hasScaleCallback = false;
 var hasZoomCallback = false;
 var hasResizeCallback = false;
-var APIParameters = void 0;
-var callbacksRequireValidation = true;
-var initalRenderOnce = true;
-var setRootFontSizeTimeoutId = void 0;
-var lastOuterWidth = void 0;
-/** 
- * Calculate and apply the new font size to the root element.
- */
-var resizeRootFontSize = function resizeRootFontSize(settings, setRootFontSizeTail) {
-    var innerWidth = settings.innerWidth,
-        outerWidth = settings.outerWidth,
-        isDevicePixelRatioDefault = settings.isDevicePixelRatioDefault,
-        relativeDesignWidth = settings.relativeDesignWidth,
-        cutOff = settings.cutOff,
-        rootElement = settings.rootElement,
-        designWidthRatio = settings.designWidthRatio,
-        calculatedDPR = settings.calculatedDPR,
-        rootFontSize = settings.rootFontSize,
-        enableScale = settings.enableScale,
-        preserveDevicePixelRatio = settings.preserveDevicePixelRatio,
-        onScale = settings.onScale,
-        onZoom = settings.onZoom,
-        onResize = settings.onResize,
-        viewportWidth = settings.viewportWidth,
-        defaultDPR = settings.defaultDPR,
-        lateDetectionDelay = settings.lateDetectionDelay;
 
-    // Calculates the devicePixelRatio as if the default was 1.
-
-    var normalizedDPR = 1 / defaultDPR * calculatedDPR;
-
-    // The preserved or non-preserved DPR via API settings.
-    var evalDPR = preserveDevicePixelRatio ? calculatedDPR : normalizedDPR;
-
-    // Truthy if the browser is resized without being zoomed.
-    var resizeWithoutZoom = calculatedDPR === lastDevicePixelRatio;
-
-    // Assigns lastOuterWidth with an inital value, never expected to be zero.
-    if (!lastOuterWidth) {
-        lastOuterWidth = outerWidth;
-    }
-
-    // Determine if the resize event was last with or without zoom.
-    var resizeWithoutZoom2 = outerWidth === lastOuterWidth;
-
-    if (resizeWithoutZoom || isDevicePixelRatioDefault || initalRenderOnce) {
-        if (initalRenderOnce) {
-            initalRenderOnce = false;
-        }
-        var isAboveDesignWidth = innerWidth > relativeDesignWidth;
-
-        if (innerWidth > cutOff) {
-            /** 
-             * Set the rootElement's font size.
-             */
-            if (enableScale) {
-                rootElement.style.fontSize = (rootFontSize * designWidthRatio * evalDPR).toFixed(6) + 'rem';
-            }
-
-            /** 
-             * Indicate that the viewport has exceeded the mobileWidth.
-             */
-            wasLastBeyondMobileWidth = true;
-        } else if (wasLastBeyondMobileWidth) {
-            /** 
-             * Prevent odd behaviour when refreshed.
-             * By removing the style attribute once when 
-             * within the mobileWidth.
-             */
-            if (wasLastBeyondMobileWidth) {
-                rootElement.removeAttribute("style");
-            }
-            /** 
-             * Reset as within mobileWidth.
-             */
-            wasLastBeyondMobileWidth = false;
-        }
-    }
-
-    clearTimeout(setRootFontSizeTimeoutId);
-    if (resizeWithoutZoom2) {
-        // setRootFontSizeTail to be independently conditional.
-        if (setRootFontSizeTail) {
-            setRootFontSizeTimeoutId = setTimeout(function () {
-                setRootFontSizeTail();
-            }, lateDetectionDelay);
-        }
-    }
-
-    // The parameters passed to each callback as an object.
-    APIParameters = {
-        viewportWidth: viewportWidth,
-        innerWidth: innerWidth,
-        evalDPR: evalDPR,
-        calculatedDPR: calculatedDPR,
-        normalizedDPR: normalizedDPR
-    };
-
+var setCallbacks = function setCallbacks(APIParameters, isBeyondCutoff, resizeWithoutZoom, onScale, onZoom, onResize) {
     // Validates callbacks once.
-    if (callbacksRequireValidation && innerWidth > cutOff) {
+    if (callbacksRequireValidation && isBeyondCutoff) {
         callbacksRequireValidation = false;
-        hasScaleCallback = isCallBackDefined(onScale);
-        hasZoomCallback = isCallBackDefined(onZoom);
-        hasResizeCallback = isCallBackDefined(onResize);
+        hasScaleCallback = isFunction(onScale);
+        hasZoomCallback = isFunction(onZoom);
+        hasResizeCallback = isFunction(onResize);
     }
 
     // Action onScale during resize without zoom.    
@@ -837,10 +792,88 @@ var resizeRootFontSize = function resizeRootFontSize(settings, setRootFontSizeTa
     if (hasResizeCallback) {
         onResize(APIParameters);
     }
+};
+
+var lastDevicePixelRatio = void 0;
+var setRootFontSizeTimeoutId = void 0;
+var lastOuterWidth = void 0;
+/** 
+ * Calculate and apply the new font size to the root element.
+ */
+var resizeRootFontSize = function resizeRootFontSize(settings, setRootFontSizeTail) {
+    var innerWidth = settings.innerWidth,
+        outerWidth = settings.outerWidth,
+        relativeDesignWidth = settings.relativeDesignWidth,
+        cutOff = settings.cutOff,
+        designWidthRatio = settings.designWidthRatio,
+        calculatedDPR = settings.calculatedDPR,
+        rootFontSize = settings.rootFontSize,
+        enableScale = settings.enableScale,
+        preserveDevicePixelRatio = settings.preserveDevicePixelRatio,
+        onScale = settings.onScale,
+        onZoom = settings.onZoom,
+        onResize = settings.onResize,
+        viewportWidth = settings.viewportWidth,
+        defaultDPR = settings.defaultDPR,
+        lateDetectionDelay = settings.lateDetectionDelay;
+
+    // Assigns lastOuterWidth with an inital value, never expected to be zero.
+
+    if (!lastOuterWidth) {
+        lastOuterWidth = outerWidth;
+    }
+
+    // Calculates the devicePixelRatio as if the default was 1.
+    var normalizedDPR = 1 / defaultDPR * calculatedDPR;
+
+    // The preserved or non-preserved DPR via API settings.
+    var evalDPR = preserveDevicePixelRatio ? calculatedDPR : normalizedDPR;
+
+    // Truthy if the browser is resized without being zoomed.
+    var resizeWithoutZoom = calculatedDPR === lastDevicePixelRatio;
+
+    // Check to see if the window is at the default zoom level.
+    var isDevicePixelRatioDefault = defaultDPR === calculatedDPR;
+
+    // Determine if the resize event was last with or without zoom.
+    var resizeWithoutZoom2 = outerWidth === lastOuterWidth;
+
+    var isAboveDesignWidth = innerWidth > relativeDesignWidth;
+
+    var isBeyondCutoff = innerWidth > cutOff;
+
+    var rootFontSizeFinal = rootFontSize * designWidthRatio * evalDPR;
+
+    var hasScaledOrDPRIsDefault = resizeWithoutZoom || isDevicePixelRatioDefault;
+
+    mutateRootFontSize(rootFontSizeFinal, resizeWithoutZoom, hasScaledOrDPRIsDefault, isDevicePixelRatioDefault, isAboveDesignWidth, isBeyondCutoff, enableScale);
+
+    clearTimeout(setRootFontSizeTimeoutId);
+
+    if (resizeWithoutZoom2) {
+        // setRootFontSizeTail to be independently conditional.
+        if (setRootFontSizeTail) {
+            setRootFontSizeTimeoutId = setTimeout(function () {
+                setRootFontSizeTail();
+            }, lateDetectionDelay);
+        }
+    }
+
+    // The parameters passed to each callback as an object.
+    var APIParameters = {
+        viewportWidth: viewportWidth,
+        innerWidth: innerWidth,
+        evalDPR: evalDPR,
+        calculatedDPR: calculatedDPR,
+        normalizedDPR: normalizedDPR
+    };
+
+    setCallbacks(APIParameters, isBeyondCutoff, resizeWithoutZoom, onScale, onZoom, onResize);
 
     // Store the last device pixel ratio for future comparision.
     lastDevicePixelRatio = calculatedDPR;
 
+    // Re-assign the lastOuterWidth.
     lastOuterWidth = outerWidth;
 };
 
@@ -879,30 +912,6 @@ var mimeticPartial = function mimeticPartial(initializeMimetic, defaults) {
     };
 };
 
-/** 
- * Default config properties if not defined.
- */
-var defaults$2 = {
-  loadEvent: 'DOMContentLoaded', // Load type
-  mobileWidth: 640, // Width before disabling for mobile phone devices.
-  scaleDelay: 16, // Miliseconds between calls on resize.
-  preserveDevicePixelRatio: false, // Preserve the device pixel ratio on zoom.
-  rootSelector: 'html', // Use the HTML element as the root element. 
-  onScale: undefined,
-  onZoom: undefined,
-  onResize: undefined,
-  cutOffWidth: 0, // The minimum width to disable resizing.
-  relativeDesignWidth: 1024, // The width relative to the font size.
-  enableScale: true,
-  /** 
-   * This is important particularly when users maximises and reverts the browser
-   * window. This delay determines the debounce threshold but also the trailing 
-   * edge call.
-   */
-  lateDetectionDelay: 500
-};
-
-//Object Assign polyfill.
 objectAssignPolyfill$1();
 
 //Object Freeze polyfill.
@@ -931,7 +940,7 @@ var getRootREMValue = basicCompose(pxToRem, getFontSize);
  resizilla's event listeners and a revive method to 
  restart Mimetic's initalization.
 */
-var initializeMimetic = initializeMimeticPartial(getRootElement, getRootREMValue, CSSUnitsToPixels, setRootFontSize, resizilla);
+var initializeMimetic = initializeMimeticPartial(document, getRootREMValue, CSSUnitsToPixels, setRootFontSize, resizilla);
 
 // The MIMETIC API. 
 var mimetic = mimeticPartial(initializeMimetic, defaults$2);

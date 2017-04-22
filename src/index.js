@@ -10,11 +10,10 @@ import defaults from './defaults';
 import {
     basicCompose,
     pxToRem,
-    isCallBackDefined,
     getFontSize,
-    getRootElement
 } from './utilities';
 
+const { rootSelector, enableScale } = defaults;
 
 //Object Assign polyfill.
 objectAssignPolyfill();
@@ -53,13 +52,12 @@ const getRootREMValue = basicCompose(
  restart Mimetic's initalization.
 */
 const initializeMimetic = initializeMimeticPartial(
-    getRootElement,
+    document,
     getRootREMValue,
     CSSUnitsToPixels,
     setRootFontSize,
     resizilla
 );
-
 
 // The MIMETIC API. 
 const mimetic = mimeticPartial(initializeMimetic, defaults);
