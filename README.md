@@ -1,3 +1,5 @@
+
+[![npm version](https://badge.fury.io/js/mimetic.svg)](https://badge.fury.io/js/mimetic) [![Build Status](https://travis-ci.org/julienetie/mimetic.svg?branch=master)](https://travis-ci.org/julienetie/mimetic)
 <img src="http://oi67.tinypic.com/1z4a421.jpg">
 
 
