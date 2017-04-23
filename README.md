@@ -106,4 +106,6 @@ Below is the list of config options passed as an object:
 | scaleDelay | Number - Milliseconds | The debounced delay to call on resize | 16  |
 
 
+Thanks to [BrowserStack](https://www.browserstack.com) for sponsoring the cross browser & device testing of the project.
+
 MIT (c) 2017 Julien Etienne.
