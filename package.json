@@ -1,6 +1,6 @@
 {
   "name": "mimetic",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "description": "Scalable Fonts & Zoom Detection",
   "main": "dist/mimetic.js",
   "jsnext:main": "dist/mimetic.es.js",
