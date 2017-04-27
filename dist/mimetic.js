@@ -115,6 +115,18 @@ vVVv    vVVv                 ': |_| \_\___||___/_/___|_|_|_|\__,_| ''
  * Copyright Julien Etienne 2015 All Rights Reserved.
  */
 // Initial time of the timing lapse.
+/**
+ *  volve - Tiny, Performant Debounce and Throttle Functions,
+ *     License:  MIT
+ *      Copyright Julien Etienne 2016 All Rights Reserved.
+ *        github:  https://github.com/julienetie/volve
+ *‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
+ */
+
+/**
+ * Date.now polyfill.
+ * {@link https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Date/now}
+ */
 if (!Date.now) {
     Date.now = function now() {
         return new Date().getTime();
@@ -333,7 +345,7 @@ var objectFreezePolyfill = function objectFreezePolyfill() {
     }
 };
 
-/** 
+/**
  * CSS Fixed units with pixel values.
  */
 var CSSFixedUnits = [{
@@ -370,7 +382,7 @@ var CSSFixedUnits = [{
     PXValue: 32
 }];
 
-/** 
+/**
  * CSS Units with pixel factor.
  */
 var CSSUnits = [{
@@ -431,6 +443,9 @@ var CSSUnits = [{
     PXFactor: 16
 }];
 
+var windowRef = window;
+var documentRef = windowRef.document;
+
 // Checks if string or number is a number.
 var isNumber = function isNumber(value) {
     return Number(value) === value;
@@ -445,7 +460,7 @@ var basicCompose = function basicCompose(a, b) {
 
 // converts pixels to REM values.
 var pxToRem = function pxToRem(fontSizePx) {
-    return parseInt(fontSizePx) / 16;
+    return parseInt(fontSizePx, 10) / 16;
 };
 
 // Is Function.
@@ -455,7 +470,7 @@ var isFunction = function isFunction(value) {
 
 // Gets the element's root font size.
 var getFontSize = function getFontSize(element) {
-    return window.getComputedStyle(element.documentElement, null).getPropertyValue('font-size');
+    return windowRef.getComputedStyle(element.documentElement, null).getPropertyValue('font-size');
 };
 
 // Gets the root element.
@@ -469,14 +484,13 @@ var getRootElement = function getRootElement(element) {
         }
     };
 
-    if (element instanceof Element) {
+    if (element instanceof windowRef.Element) {
         if (element.nodeType === 1) {
             return element;
-        } else {
-            // @TODO Throw new error.
         }
+        throw new Error('rootElement is not a valid element');
     }
-    return elements.hasOwnProperty(element) ? elements[element](document) : document.querySelector(element);
+    return elements[element] ? elements[element](documentRef) : documentRef.querySelector(element);
 };
 
 var aliasValueToPX = function aliasValueToPX(value) {
@@ -486,21 +500,16 @@ var aliasValueToPX = function aliasValueToPX(value) {
 };
 
 var CSSUnitsToPixels = function CSSUnitsToPixels(value) {
-
     if (isNumber(value)) {
         return value;
     }
-
     var suffix = value.replace(/[^a-z]+/gi, '');
-    var numberValue = value.replace(/[^\d\.]*/g, '');
-
-    var metricInfo = CSSUnits.filter(function (metricInfo) {
-        return suffix === metricInfo.unit;
+    var numberValue = value.replace(/[^\d.]*/g, '');
+    var metricInfo = CSSUnits.filter(function (info) {
+        return suffix === info.unit;
     }).shift();
-
     var PXValue = metricInfo ? numberValue * metricInfo.PXFactor : aliasValueToPX(value);
-
-    return parseInt(PXValue);
+    return parseInt(PXValue, 10);
 };
 
 /**
@@ -515,18 +524,16 @@ function initializeMimeticPartial(document, getRootREMValue, CSSUnitsToPixels, s
     // A resize object to store MIMETIC's resizilla's requirements.
     var resize = {};
 
+    console.log('ayyyyy');
     /**
      * The intializeMimetic function.
      * @param {object} config - The API parameters.
      */
     function initalizeMimeticFinal(config) {
         // Destructured API parameters.
-        var loadEvent = config.loadEvent,
-            mobileWidth = config.mobileWidth,
-            rootSelector = config.rootSelector,
+        var mobileWidth = config.mobileWidth,
             scaleDelay = config.scaleDelay,
-            cutOffWidth = config.cutOffWidth,
-            lateDetectionDelay = config.lateDetectionDelay;
+            cutOffWidth = config.cutOffWidth;
 
         // Store the scaleDelay for kill and revive.
 
@@ -550,14 +557,14 @@ function initializeMimeticPartial(document, getRootREMValue, CSSUnitsToPixels, s
             cutOffWidthPX: cutOffWidthPX
         }, config);
 
-        // Store the settings for kill and revive. 
+        // Store the settings for kill and revive.
         resize.settings = settings;
 
         // Immediately set the root font size according to MIMETIC.
         var setRootFontSizeScope = function setRootFontSizeScope() {
             return setRootFontSize(settings);
         };
-
+        resize.setRootFontSizeScope = setRootFontSizeScope;
         setRootFontSizeScope();
 
         // On window resize set the root font size according to MIMETIC.
@@ -566,39 +573,35 @@ function initializeMimeticPartial(document, getRootREMValue, CSSUnitsToPixels, s
         }, scaleDelay, false);
     }
 
-    /** 
+    /**
      * Remove both event listeners set via resizilla.
      */
     initalizeMimeticFinal.prototype.kill = function () {
-        resize.resizilla.destroy();
+        return resize.resizilla.destroy();
     };
 
-    /** 
+    /**
      * Re-instate resizilla.
      */
-    initalizeMimeticFinal.prototype.revive = function () {
+    initalizeMimeticFinal.prototype.revive = function revive() {
         resize.resizilla = resizilla(function () {
-            setRootFontSize(resize.settings, setRootFontSizeScope);
+            setRootFontSize(resize.settings, resize.setRootFontSizeScope);
         }, resize.scaleDelay, false);
     };
 
-    // Return as intializeMimetic.
     return initalizeMimeticFinal;
 }
 
-/** 
+/**
  * Set Root Font Size.
  */
 var setRootFontSizePartial = function setRootFontSizePartial(resizeRootFontSize) {
   var windowRef = window;
   var documentRef = windowRef.document;
-  var requestId = void 0;
   var lastOuterWidth = void 0;
-  var lastOuterHeight = void 0;
 
   return function (_ref, setRootFontSize) {
     var rootFontSize = _ref.rootFontSize,
-        initialOuterHeight = _ref.initialOuterHeight,
         initialOuterWidth = _ref.initialOuterWidth,
         relativeDesignWidth = _ref.relativeDesignWidth,
         mobileWidth = _ref.mobileWidth,
@@ -615,38 +618,38 @@ var setRootFontSizePartial = function setRootFontSizePartial(resizeRootFontSize)
     // Real time DOM measurments.
     var innerWidth = windowRef.innerWidth;
     var outerWidth = windowRef.outerWidth;
-    var outerHeight = windowRef.outerHeight;
     var clientWidth = documentRef.documentElement.clientWidth;
     var DPR = windowRef.devicePixelRatio;
 
     // Ratio between the outer and client width.
     var outerClientRatio = outerWidth / clientWidth;
 
-    // A calulated DPR within the proximity of 0.05. for devices (eg.safari) that have a fixed DPR.
-    // @TODO check on large display devices with DPRs greater than 1. 
+    // A calulated DPR within the proximity of 0.05. for devices (eg.safari)
+    // that have a fixed DPR.
+    // @TODO check on large display devices with DPRs greater than 1.
     var OCRProximity = outerClientRatio < 1.05 && outerClientRatio > 0.95 ? 1 : outerClientRatio;
 
     // A calculated DPR safe for safari browsers.
     var safariSafeDPR = Number(OCRProximity.toFixed(5));
 
     // Legacy internet explorer devicePixelRatio.
-    var IEDPR = Number(screen.deviceXDPI / screen.logicalXDPI);
+    var IEDPR = Number(windowRef.screen.deviceXDPI / windowRef.screen.logicalXDPI);
 
     // The devicePixelRatio with polyfilled support.
-    var calculatedDPR = Math.abs(IEDPR ? IEDPR : DPR === 1 ? safariSafeDPR : DPR);
+    var alt = DPR === 1 ? safariSafeDPR : DPR;
+    var calculatedDPR = Math.abs(IEDPR || alt);
 
-    // The real viewport width. 
-    var viewportWidth = parseInt(clientWidth * calculatedDPR);
+    // The real viewport width.
+    var viewportWidth = parseInt(clientWidth * calculatedDPR, 10);
 
-    // The default device pixel ratio. 
-    var defaultDPR = Math.round(clientWidth * calculatedDPR / outerWidth);
+    // The default device pixel ratio.
+    var defaultDPR = Math.round(clientWidth * (calculatedDPR / outerWidth));
 
-    /** 
+    /**
      * Set variable inital values if not yet set.
      */
     if (lastOuterWidth === undefined) {
       lastOuterWidth = initialOuterWidth;
-      lastOuterHeight = initialOuterHeight;
     }
 
     /**
@@ -654,7 +657,7 @@ var setRootFontSizePartial = function setRootFontSizePartial(resizeRootFontSize)
      */
     var designWidthRatio = innerWidth / relativeDesignWidth;
 
-    /** 
+    /**
      * The minimum veiwport size to not react to.
      */
     var cutOff = cutOffWidthPX > mobileWidthPX ? cutOffWidthPX : mobileWidthPX;
@@ -684,16 +687,15 @@ var setRootFontSizePartial = function setRootFontSizePartial(resizeRootFontSize)
      * Updated Outer browser dimensions.
      */
     lastOuterWidth = outerWidth;
-    lastOuterHeight = outerWidth;
   };
 };
 
 var wasLastBeyondMobileWidth = true;
 var renderOnce = void 0;
 
-/** 
+/**
  * Directly mutates the root font size of a given Element.
- * @param 
+ * @param
  */
 var mutateRootFontSizePartial = function mutateRootFontSizePartial(rootElement) {
     return function (rootFontSizeFinal, resizeWithoutZoom, hasScaledOrDPRIsDefault, isDevicePixelRatioDefault, isAboveDesignWidth, isBeyondCutoff, enableScale) {
@@ -705,15 +707,16 @@ var mutateRootFontSizePartial = function mutateRootFontSizePartial(rootElement) 
             if (isBeyondCutoff) {
                 // Set the rootElement's font size if scale is enabled.
                 if (enableScale) {
-                    rootElement.style.fontSize = rootFontSizeFinal.toFixed(6) + 'rem';
+                    // eslint-disable-next-line
+                    rootElement.style.fontSize = rootFontSizeFinal.toFixed(4) + 'rem';
                 }
 
                 // Indicate that the viewport has exceeded the mobileWidth.
                 wasLastBeyondMobileWidth = true;
             } else if (wasLastBeyondMobileWidth) {
-                /** 
+                /**
                  * Prevent odd behaviour when refreshed.
-                 * By removing the style attribute once when 
+                 * By removing the style attribute once when
                  * within the mobileWidth.
                  */
                 if (wasLastBeyondMobileWidth) {
@@ -727,7 +730,7 @@ var mutateRootFontSizePartial = function mutateRootFontSizePartial(rootElement) 
     };
 };
 
-/** 
+/**
  * Default config properties if not defined.
  */
 var defaults$2 = {
@@ -735,26 +738,27 @@ var defaults$2 = {
   mobileWidth: 640, // Width before disabling for mobile phone devices.
   scaleDelay: 16, // Miliseconds between calls on resize.
   preserveDevicePixelRatio: false, // Preserve the device pixel ratio on zoom.
-  rootSelector: 'html', // Use the HTML element as the root element. 
+  rootSelector: 'html', // Use the HTML element as the root element.
   onScale: undefined,
   onZoom: undefined,
   onResize: undefined,
   cutOffWidth: 0, // The minimum width to disable resizing.
   relativeDesignWidth: 1024, // The width relative to the font size.
   enableScale: true,
-  /** 
+  /**
    * This is important particularly when users maximises and reverts the browser
-   * window. This delay determines the debounce threshold but also the trailing 
+   * window. This delay determines the debounce threshold but also the trailing
    * edge call.
    */
   lateDetectionDelay: 500
 };
 
-var rootSelector$1 = defaults$2.rootSelector;
+// Default root selector. Not an option.
+var rootSelector = defaults$2.rootSelector;
 
 // The root font element.
 
-var rootElement = getRootElement(rootSelector$1);
+var rootElement = getRootElement(rootSelector);
 
 /**
  * Mutate root font size with pre-sets.
@@ -778,7 +782,7 @@ var setCallbacks = function setCallbacks(APIParameters, isBeyondCutoff, resizeWi
         hasResizeCallback = isFunction(onResize);
     }
 
-    // Action onScale during resize without zoom.    
+    // Action onScale during resize without zoom.
     if (resizeWithoutZoom && hasScaleCallback) {
         onScale(APIParameters);
     }
@@ -797,7 +801,7 @@ var setCallbacks = function setCallbacks(APIParameters, isBeyondCutoff, resizeWi
 var lastDevicePixelRatio = void 0;
 var setRootFontSizeTimeoutId = void 0;
 var lastOuterWidth = void 0;
-/** 
+/**
  * Calculate and apply the new font size to the root element.
  */
 var resizeRootFontSize = function resizeRootFontSize(settings, setRootFontSizeTail) {
@@ -884,7 +888,7 @@ var resizeRootFontSize = function resizeRootFontSize(settings, setRootFontSizeTa
 var mimeticPartial = function mimeticPartial(initializeMimetic, defaults) {
     return function (configurationObj) {
         // Assing configuration as an object.
-        var configuration = configurationObj ? configurationObj : {};
+        var configuration = configurationObj || {};
 
         // Merge configuration into defaults.
         var overriddenDefaults = Object.assign(defaults, configuration);
@@ -912,17 +916,18 @@ var mimeticPartial = function mimeticPartial(initializeMimetic, defaults) {
     };
 };
 
+// Object Assign polyfill.
 objectAssignPolyfill$1();
 
-//Object Freeze polyfill.
+// Object Freeze polyfill.
 objectFreezePolyfill();
 
 /*
- initializeMimetic initalizes resizilla 
- (A window resize plugin) to call setRootFontSize 
+ initializeMimetic initalizes resizilla
+ (A window resize plugin) to call setRootFontSize
  on window resize.
 
- setRootFontSize -> resizeRootFontSize which does 
+ setRootFontSize -> resizeRootFontSize which does
  `rootElement.style.fontSize = 'xrem';`
 
  This function is initally called on resize.
@@ -932,17 +937,17 @@ var setRootFontSize = setRootFontSizePartial(resizeRootFontSize);
 // Gets the root element value in REM units.
 var getRootREMValue = basicCompose(pxToRem, getFontSize);
 
-/* 
- Called initally and on prototype.revivie() to 
+/*
+ Called initally and on prototype.revivie() to
  setup and implement resizilla's event listeners.
 
- initalizeMimetic contains a kill method to remove 
- resizilla's event listeners and a revive method to 
+ initalizeMimetic contains a kill method to remove
+ resizilla's event listeners and a revive method to
  restart Mimetic's initalization.
 */
 var initializeMimetic = initializeMimeticPartial(document, getRootREMValue, CSSUnitsToPixels, setRootFontSize, resizilla);
 
-// The MIMETIC API. 
+// The MIMETIC API.
 var mimetic = mimeticPartial(initializeMimetic, defaults$2);
 
 return mimetic;

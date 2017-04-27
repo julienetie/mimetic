@@ -13,22 +13,21 @@ import {
     getFontSize,
 } from './utilities';
 
-const { rootSelector, enableScale } = defaults;
 
-//Object Assign polyfill.
+// Object Assign polyfill.
 objectAssignPolyfill();
 
 
-//Object Freeze polyfill.
+// Object Freeze polyfill.
 objectFreezePolyfill();
 
 
 /*
- initializeMimetic initalizes resizilla 
- (A window resize plugin) to call setRootFontSize 
+ initializeMimetic initalizes resizilla
+ (A window resize plugin) to call setRootFontSize
  on window resize.
 
- setRootFontSize -> resizeRootFontSize which does 
+ setRootFontSize -> resizeRootFontSize which does
  `rootElement.style.fontSize = 'xrem';`
 
  This function is initally called on resize.
@@ -39,16 +38,16 @@ const setRootFontSize = setRootFontSizePartial(resizeRootFontSize);
 // Gets the root element value in REM units.
 const getRootREMValue = basicCompose(
     pxToRem,
-    getFontSize
+    getFontSize,
 );
 
 
-/* 
- Called initally and on prototype.revivie() to 
+/*
+ Called initally and on prototype.revivie() to
  setup and implement resizilla's event listeners.
 
- initalizeMimetic contains a kill method to remove 
- resizilla's event listeners and a revive method to 
+ initalizeMimetic contains a kill method to remove
+ resizilla's event listeners and a revive method to
  restart Mimetic's initalization.
 */
 const initializeMimetic = initializeMimeticPartial(
@@ -56,10 +55,11 @@ const initializeMimetic = initializeMimeticPartial(
     getRootREMValue,
     CSSUnitsToPixels,
     setRootFontSize,
-    resizilla
+    resizilla,
 );
 
-// The MIMETIC API. 
+
+// The MIMETIC API.
 const mimetic = mimeticPartial(initializeMimetic, defaults);
 
 

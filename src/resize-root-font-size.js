@@ -5,7 +5,7 @@ import setCallbacks from './set-callbacks';
 let lastDevicePixelRatio;
 let setRootFontSizeTimeoutId;
 let lastOuterWidth;
-/** 
+/**
  * Calculate and apply the new font size to the root element.
  */
 const resizeRootFontSize = (settings, setRootFontSizeTail) => {
@@ -24,7 +24,7 @@ const resizeRootFontSize = (settings, setRootFontSizeTail) => {
         onResize,
         viewportWidth,
         defaultDPR,
-        lateDetectionDelay
+        lateDetectionDelay,
     } = settings;
 
     // Assigns lastOuterWidth with an inital value, never expected to be zero.
@@ -63,7 +63,7 @@ const resizeRootFontSize = (settings, setRootFontSizeTail) => {
         isDevicePixelRatioDefault,
         isAboveDesignWidth,
         isBeyondCutoff,
-        enableScale
+        enableScale,
     );
 
 
@@ -75,8 +75,8 @@ const resizeRootFontSize = (settings, setRootFontSizeTail) => {
         if (setRootFontSizeTail) {
             setRootFontSizeTimeoutId = setTimeout(
                 () => {
-                    setRootFontSizeTail()
-                }, lateDetectionDelay
+                    setRootFontSizeTail();
+                }, lateDetectionDelay,
             );
         }
     }
@@ -88,7 +88,7 @@ const resizeRootFontSize = (settings, setRootFontSizeTail) => {
         innerWidth,
         evalDPR,
         calculatedDPR,
-        normalizedDPR
+        normalizedDPR,
     };
 
 
@@ -98,7 +98,7 @@ const resizeRootFontSize = (settings, setRootFontSizeTail) => {
         resizeWithoutZoom,
         onScale,
         onZoom,
-        onResize
+        onResize,
     );
 
     // Store the last device pixel ratio for future comparision.
@@ -107,5 +107,6 @@ const resizeRootFontSize = (settings, setRootFontSizeTail) => {
     // Re-assign the lastOuterWidth.
     lastOuterWidth = outerWidth;
 };
+
 
 export default resizeRootFontSize;

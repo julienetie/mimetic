@@ -11,10 +11,10 @@ function initializeMimeticPartial(
     getRootREMValue,
     CSSUnitsToPixels,
     setRootFontSize,
-    resizilla
-) {
+    resizilla,
+    ) {
     // A resize object to store MIMETIC's resizilla's requirements.
-    var resize = {};
+    const resize = {};
 
 
     /**
@@ -23,7 +23,11 @@ function initializeMimeticPartial(
      */
     function initalizeMimeticFinal(config) {
         // Destructured API parameters.
-        const { loadEvent, mobileWidth, rootSelector, scaleDelay, cutOffWidth, lateDetectionDelay } = config;
+        const {
+            mobileWidth,
+            scaleDelay,
+            cutOffWidth,
+        } = config;
 
 
         // Store the scaleDelay for kill and revive.
@@ -48,18 +52,19 @@ function initializeMimeticPartial(
             initialOuterWidth: window.outerWidth,
             rootFontSize,
             mobileWidthPX,
-            cutOffWidthPX
+            cutOffWidthPX,
         }, config);
 
 
-        // Store the settings for kill and revive. 
+        // Store the settings for kill and revive.
         resize.settings = settings;
 
 
         // Immediately set the root font size according to MIMETIC.
         const setRootFontSizeScope = () => setRootFontSize(settings);
-
+        resize.setRootFontSizeScope = setRootFontSizeScope;
         setRootFontSizeScope();
+
 
         // On window resize set the root font size according to MIMETIC.
         resize.resizilla = resizilla(() => {
@@ -67,25 +72,25 @@ function initializeMimeticPartial(
         }, scaleDelay, false);
     }
 
-    /** 
+
+    /**
      * Remove both event listeners set via resizilla.
      */
-    initalizeMimeticFinal.prototype.kill = function() {
-        resize.resizilla.destroy();
-    }
+    initalizeMimeticFinal.prototype.kill = () => resize.resizilla.destroy();
 
-    /** 
+
+    /**
      * Re-instate resizilla.
      */
-    initalizeMimeticFinal.prototype.revive = function() {
+    initalizeMimeticFinal.prototype.revive = function revive() {
         resize.resizilla = resizilla(() => {
-            setRootFontSize(resize.settings, setRootFontSizeScope);
+            setRootFontSize(resize.settings, resize.setRootFontSizeScope);
         }, resize.scaleDelay, false);
-    }
+    };
 
-    // Return as intializeMimetic.
     return initalizeMimeticFinal;
 }
 
 
 export default initializeMimeticPartial;
+

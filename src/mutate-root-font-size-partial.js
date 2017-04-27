@@ -1,36 +1,39 @@
 let wasLastBeyondMobileWidth = true;
 let renderOnce;
 
-/** 
+
+/**
  * Directly mutates the root font size of a given Element.
- * @param 
+ * @param
  */
-const mutateRootFontSizePartial = (rootElement) => (
+const mutateRootFontSizePartial = rootElement => (
     rootFontSizeFinal,
     resizeWithoutZoom,
     hasScaledOrDPRIsDefault,
     isDevicePixelRatioDefault,
     isAboveDesignWidth,
     isBeyondCutoff,
-    enableScale
+    enableScale,
 ) => {
     if (hasScaledOrDPRIsDefault || renderOnce) {
         if (renderOnce) {
             renderOnce = false;
         }
 
+
         if (isBeyondCutoff) {
             // Set the rootElement's font size if scale is enabled.
             if (enableScale) {
+                // eslint-disable-next-line
                 rootElement.style.fontSize = rootFontSizeFinal.toFixed(4) + 'rem';
             }
 
             // Indicate that the viewport has exceeded the mobileWidth.
             wasLastBeyondMobileWidth = true;
         } else if (wasLastBeyondMobileWidth) {
-            /** 
+            /**
              * Prevent odd behaviour when refreshed.
-             * By removing the style attribute once when 
+             * By removing the style attribute once when
              * within the mobileWidth.
              */
             if (wasLastBeyondMobileWidth) {
@@ -41,7 +44,7 @@ const mutateRootFontSizePartial = (rootElement) => (
             wasLastBeyondMobileWidth = false;
         }
     }
-}
+};
 
 
 export default mutateRootFontSizePartial;

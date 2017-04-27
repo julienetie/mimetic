@@ -2,5 +2,17 @@
     "extends": "airbnb-base",
     "plugins": [
         "import"
-    ]
+    ],
+    "rules": {
+        "indent": [
+            "error",
+            4
+        ],
+        "arrow-body-style": [2, "as-needed"]
+    },
+    "comma-dangle" : ["error", {"functions": "never"}],
+    "globals": {
+        "document": true,
+         "window": true
+    }
 }

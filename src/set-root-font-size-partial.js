@@ -1,17 +1,14 @@
-/** 
+/**
  * Set Root Font Size.
  */
 const setRootFontSizePartial = (resizeRootFontSize) => {
     const windowRef = window;
     const documentRef = windowRef.document;
-    let requestId;
     let lastOuterWidth;
-    let lastOuterHeight;
 
 
     return ({
         rootFontSize,
-        initialOuterHeight,
         initialOuterWidth,
         relativeDesignWidth,
         mobileWidth,
@@ -23,44 +20,45 @@ const setRootFontSizePartial = (resizeRootFontSize) => {
         enableScale,
         mobileWidthPX,
         cutOffWidthPX,
-        lateDetectionDelay
+        lateDetectionDelay,
     }, setRootFontSize) => {
         // Real time DOM measurments.
         const innerWidth = windowRef.innerWidth;
         const outerWidth = windowRef.outerWidth;
-        const outerHeight = windowRef.outerHeight;
         const clientWidth = documentRef.documentElement.clientWidth;
         const DPR = windowRef.devicePixelRatio;
 
         // Ratio between the outer and client width.
         const outerClientRatio = outerWidth / clientWidth;
 
-        // A calulated DPR within the proximity of 0.05. for devices (eg.safari) that have a fixed DPR.
-        // @TODO check on large display devices with DPRs greater than 1. 
-        const OCRProximity = outerClientRatio < 1.05 && outerClientRatio > 0.95 ? 1 : outerClientRatio;
+        // A calulated DPR within the proximity of 0.05. for devices (eg.safari)
+        // that have a fixed DPR.
+        // @TODO check on large display devices with DPRs greater than 1.
+        const OCRProximity = outerClientRatio < 1.05 && outerClientRatio > 0.95
+        ? 1 : outerClientRatio;
 
         // A calculated DPR safe for safari browsers.
         const safariSafeDPR = Number((OCRProximity).toFixed(5));
 
         // Legacy internet explorer devicePixelRatio.
-        const IEDPR = Number(screen.deviceXDPI / screen.logicalXDPI);
+        const IEDPR = Number(windowRef.screen.deviceXDPI / windowRef.screen.logicalXDPI);
 
         // The devicePixelRatio with polyfilled support.
-        const calculatedDPR = Math.abs(IEDPR ? IEDPR : DPR === 1 ? safariSafeDPR : DPR);
+        const alt = DPR === 1 ? safariSafeDPR : DPR;
+        const calculatedDPR = Math.abs(IEDPR || alt);
 
-        // The real viewport width. 
-        const viewportWidth = parseInt(clientWidth * calculatedDPR);
+        // The real viewport width.
+        const viewportWidth = parseInt(clientWidth * calculatedDPR, 10);
 
-        // The default device pixel ratio. 
-        const defaultDPR = Math.round(clientWidth * calculatedDPR / outerWidth);
+        // The default device pixel ratio.
+        const defaultDPR = Math.round(clientWidth * (calculatedDPR / outerWidth));
 
 
-        /** 
+        /**
          * Set variable inital values if not yet set.
          */
         if (lastOuterWidth === undefined) {
             lastOuterWidth = initialOuterWidth;
-            lastOuterHeight = initialOuterHeight;
         }
 
 
@@ -70,7 +68,7 @@ const setRootFontSizePartial = (resizeRootFontSize) => {
         const designWidthRatio = innerWidth / relativeDesignWidth;
 
 
-        /** 
+        /**
          * The minimum veiwport size to not react to.
          */
         const cutOff = cutOffWidthPX > mobileWidthPX ? cutOffWidthPX : mobileWidthPX;
@@ -94,16 +92,15 @@ const setRootFontSizePartial = (resizeRootFontSize) => {
             onResize,
             viewportWidth,
             defaultDPR,
-            lateDetectionDelay
-        },setRootFontSize);
+            lateDetectionDelay,
+        }, setRootFontSize);
 
         /**
          * Updated Outer browser dimensions.
          */
         lastOuterWidth = outerWidth;
-        lastOuterHeight = outerWidth;
-    }
-}
+    };
+};
 
 
 export default setRootFontSizePartial;

@@ -1,9 +1,11 @@
 import { isFunction } from './utilities';
 
+
 let callbacksRequireValidation = true;
 let hasScaleCallback = false;
 let hasZoomCallback = false;
 let hasResizeCallback = false;
+
 
 const setCallbacks = (
     APIParameters,
@@ -11,7 +13,7 @@ const setCallbacks = (
     resizeWithoutZoom,
     onScale,
     onZoom,
-    onResize
+    onResize,
 ) => {
     // Validates callbacks once.
     if (callbacksRequireValidation && isBeyondCutoff) {
@@ -22,7 +24,7 @@ const setCallbacks = (
     }
 
 
-    // Action onScale during resize without zoom.    
+    // Action onScale during resize without zoom.
     if (resizeWithoutZoom && hasScaleCallback) {
         onScale(APIParameters);
     }
@@ -38,6 +40,6 @@ const setCallbacks = (
     if (hasResizeCallback) {
         onResize(APIParameters);
     }
-}
+};
 
 export default setCallbacks;
