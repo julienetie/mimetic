@@ -13,24 +13,23 @@ const mutateRootFontSizePartial = rootElement => (
     enableScale,
     isMobileLikeDevice,
 ) => {
- if(resizeWithoutZoom || renderOnce){  
-    if (hasScaledOrDPRIsDefault || renderOnce) {
-        if (isBeyondCutoff || renderOnce) {
-            if (isBeyondCutoff && enableScale && !isMobileLikeDevice) {
-                // eslint-disable-next-line
-                console.log('RENDERED')
-                rootElement.style.fontSize = rootFontSizeFinal.toFixed(4) + 'rem';
-                renderOnce = false;
+    if (resizeWithoutZoom || renderOnce) {
+        if (hasScaledOrDPRIsDefault || renderOnce) {
+            if (isBeyondCutoff || renderOnce) {
+                if (isBeyondCutoff && enableScale && !isMobileLikeDevice) {
+                    // eslint-disable-next-line
+                    rootElement.style.fontSize = rootFontSizeFinal.toFixed(4) + 'rem';
+                    renderOnce = false;
+                } else {
+                    rootElement.removeAttribute('style');
+                }
             } else {
                 rootElement.removeAttribute('style');
             }
         } else {
             rootElement.removeAttribute('style');
         }
-    } else {
-        rootElement.removeAttribute('style');
     }
-}
 };
 
 

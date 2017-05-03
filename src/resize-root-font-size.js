@@ -85,8 +85,8 @@ const resizeRootFontSize = (settings, setRootFontSizeTail) => {
         if (setRootFontSizeTail) {
             setRootFontSizeTimeoutId = setTimeout(
                 () => {
-                    setRootFontSizeTail(); 
-                    setRootFontSizeTail(); 
+                    setRootFontSizeTail();
+                    setRootFontSizeTail();
                 }, lateDetectionDelay,
             );
         }
