@@ -13,7 +13,7 @@ const resizeRootFontSize = (settings, setRootFontSizeTail) => {
         innerWidth,
         outerWidth,
         relativeDesignWidth,
-        cutOff,
+        // cutOff,
         designWidthRatio,
         calculatedDPR,
         rootFontSize,
@@ -25,6 +25,7 @@ const resizeRootFontSize = (settings, setRootFontSizeTail) => {
         viewportWidth,
         defaultDPR,
         lateDetectionDelay,
+        mediaQueryCutOff
     } = settings;
 
     // Assigns lastOuterWidth with an inital value, never expected to be zero.
@@ -49,19 +50,19 @@ const resizeRootFontSize = (settings, setRootFontSizeTail) => {
 
     const isAboveDesignWidth = innerWidth > relativeDesignWidth;
 
-    const isBeyondCutoff = innerWidth > cutOff;
+    // const isBeyondCutoff = innerWidth > cutOff;
 
     const rootFontSizeFinal = rootFontSize * designWidthRatio * evalDPR;
 
     const hasScaledOrDPRIsDefault = resizeWithoutZoom || isDevicePixelRatioDefault;
+
+    const isBeyondCutoff = !window.matchMedia(mediaQueryCutOff).matches;
 
 
     mutateRootFontSize(
         rootFontSizeFinal,
         resizeWithoutZoom,
         hasScaledOrDPRIsDefault,
-        isDevicePixelRatioDefault,
-        isAboveDesignWidth,
         isBeyondCutoff,
         enableScale,
     );
@@ -80,7 +81,7 @@ const resizeRootFontSize = (settings, setRootFontSizeTail) => {
             );
         }
     }
-
+    console.log(isBeyondCutoff)
 
     // The parameters passed to each callback as an object.
     const APIParameters = {

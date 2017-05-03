@@ -9,7 +9,7 @@
 function initializeMimeticPartial(
     document,
     getRootREMValue,
-    CSSUnitsToPixels,
+    // CSSUnitsToPixels,
     setRootFontSize,
     resizilla,
     ) {
@@ -24,7 +24,6 @@ function initializeMimeticPartial(
     function initalizeMimeticFinal(config) {
         // Destructured API parameters.
         const {
-            mobileWidth,
             scaleDelay,
             cutOffWidth,
         } = config;
@@ -38,12 +37,12 @@ function initializeMimeticPartial(
         const rootFontSize = getRootREMValue(document);
 
 
-        // mobileWidth in pixels.
-        const mobileWidthPX = CSSUnitsToPixels(mobileWidth);
+        // // mobileWidth in pixels.
+        // const mobileWidthPX = CSSUnitsToPixels(mobileWidth);
 
 
         // Cut off width in pixels.
-        const cutOffWidthPX = CSSUnitsToPixels(cutOffWidth);
+        // const cutOffWidthPX = CSSUnitsToPixels(cutOffWidth);
 
 
         // Provide parameters to setRootFontSize. @TODO remove config, only use what is needed.
@@ -51,8 +50,8 @@ function initializeMimeticPartial(
             initialOuterHeight: window.outerHeight,
             initialOuterWidth: window.outerWidth,
             rootFontSize,
-            mobileWidthPX,
-            cutOffWidthPX,
+            // mobileWidthPX,
+            // cutOffWidthPX,
         }, config);
 
 

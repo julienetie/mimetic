@@ -11,16 +11,17 @@ const setRootFontSizePartial = (resizeRootFontSize) => {
         rootFontSize,
         initialOuterWidth,
         relativeDesignWidth,
-        mobileWidth,
-        cutOffWidth,
+        // mobileWidth,
+        // cutOffWidth,
         preserveDevicePixelRatio,
         onScale,
         onZoom,
         onResize,
         enableScale,
-        mobileWidthPX,
-        cutOffWidthPX,
+        // mobileWidthPX,
+        // cutOffWidthPX,
         lateDetectionDelay,
+        mediaQueryCutOff,
     }, setRootFontSize) => {
         // Real time DOM measurments.
         const innerWidth = windowRef.innerWidth;
@@ -71,7 +72,7 @@ const setRootFontSizePartial = (resizeRootFontSize) => {
         /**
          * The minimum veiwport size to not react to.
          */
-        const cutOff = cutOffWidthPX > mobileWidthPX ? cutOffWidthPX : mobileWidthPX;
+        // const cutOff = cutOffWidthPX > mobileWidthPX ? cutOffWidthPX : mobileWidthPX;
 
 
         /**
@@ -81,7 +82,7 @@ const setRootFontSizePartial = (resizeRootFontSize) => {
             innerWidth,
             outerWidth,
             relativeDesignWidth,
-            cutOff,
+            // cutOff,
             designWidthRatio,
             calculatedDPR,
             rootFontSize,
@@ -93,6 +94,7 @@ const setRootFontSizePartial = (resizeRootFontSize) => {
             viewportWidth,
             defaultDPR,
             lateDetectionDelay,
+            mediaQueryCutOff,
         }, setRootFontSize);
 
         /**

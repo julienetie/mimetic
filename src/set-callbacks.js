@@ -16,7 +16,7 @@ const setCallbacks = (
     onResize,
 ) => {
     // Validates callbacks once.
-    if (callbacksRequireValidation && isBeyondCutoff) {
+    if (callbacksRequireValidation) {
         callbacksRequireValidation = false;
         hasScaleCallback = isFunction(onScale);
         hasZoomCallback = isFunction(onZoom);

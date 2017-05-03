@@ -1,7 +1,7 @@
 import resizilla from 'resizilla';
 import objectAssignPolyfill from '../libs/object-assign-polyfill';
 import objectFreezePolyfill from '../libs/object-freeze-polyfill';
-import CSSUnitsToPixels from './css-units-to-pixels';
+// import CSSUnitsToPixels from './css-units-to-pixels';
 import initializeMimeticPartial from './initialize-mimetic-partial';
 import setRootFontSizePartial from './set-root-font-size-partial';
 import resizeRootFontSize from './resize-root-font-size';
@@ -53,7 +53,7 @@ const getRootREMValue = basicCompose(
 const initializeMimetic = initializeMimeticPartial(
     document,
     getRootREMValue,
-    CSSUnitsToPixels,
+    // CSSUnitsToPixels,
     setRootFontSize,
     resizilla,
 );
