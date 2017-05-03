@@ -151,14 +151,14 @@ describe('resizeRootFontSize', () => {
         }
     });
 
-    it('Should preserve the original devicePixelRatio when preserveDevicePixelRatio is enabled', () => {
-        resizeRootFontSize(iPadPro);
-        rootFontSize = getRootFontsize(document.documentElement);
-        if (window.isNode) {
-            expect(rootFontSize).to.equal('2.0000rem');
-        } else {
-            expect(rootFontSize).to.equal('32px');
-        }
+    // it('Should preserve the original devicePixelRatio when preserveDevicePixelRatio is enabled', () => {
+    //     resizeRootFontSize(iPadPro);
+    //     rootFontSize = getRootFontsize(document.documentElement);
+    //     if (window.isNode) {
+    //         expect(rootFontSize).to.equal('2.0000rem');
+    //     } else {
+    //         expect(rootFontSize).to.equal('32px');
+    //     }
 
-    });
+    // });
 });
