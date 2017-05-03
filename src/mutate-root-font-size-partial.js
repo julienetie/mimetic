@@ -11,22 +11,26 @@ const mutateRootFontSizePartial = rootElement => (
     hasScaledOrDPRIsDefault,
     isBeyondCutoff,
     enableScale,
-    isMobileLikeDevice
+    isMobileLikeDevice,
 ) => {
+ if(resizeWithoutZoom || renderOnce){  
     if (hasScaledOrDPRIsDefault || renderOnce) {
         if (isBeyondCutoff || renderOnce) {
             if (isBeyondCutoff && enableScale && !isMobileLikeDevice) {
+                // eslint-disable-next-line
+                console.log('RENDERED')
                 rootElement.style.fontSize = rootFontSizeFinal.toFixed(4) + 'rem';
+                renderOnce = false;
             } else {
                 rootElement.removeAttribute('style');
             }
-            renderOnce = false;
         } else {
             rootElement.removeAttribute('style');
         }
     } else {
         rootElement.removeAttribute('style');
     }
+}
 };
 
 

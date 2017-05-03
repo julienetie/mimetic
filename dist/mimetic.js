@@ -353,8 +353,7 @@ setRootFontSize, resizilla) {
      */
     function initalizeMimeticFinal(config) {
         // Destructured API parameters.
-        var scaleDelay = config.scaleDelay,
-            cutOffWidth = config.cutOffWidth;
+        var scaleDelay = config.scaleDelay;
 
         // Store the scaleDelay for kill and revive.
 
@@ -417,98 +416,92 @@ setRootFontSize, resizilla) {
  * Set Root Font Size.
  */
 var setRootFontSizePartial = function setRootFontSizePartial(resizeRootFontSize) {
-  var windowRef = window;
-  var documentRef = windowRef.document;
-  var lastOuterWidth = void 0;
+    var windowRef = window;
+    var documentRef = windowRef.document;
+    var lastOuterWidth = void 0;
 
-  return function (_ref, setRootFontSize) {
-    var rootFontSize = _ref.rootFontSize,
-        initialOuterWidth = _ref.initialOuterWidth,
-        relativeDesignWidth = _ref.relativeDesignWidth,
-        preserveDevicePixelRatio = _ref.preserveDevicePixelRatio,
-        onScale = _ref.onScale,
-        onZoom = _ref.onZoom,
-        onResize = _ref.onResize,
-        enableScale = _ref.enableScale,
-        lateDetectionDelay = _ref.lateDetectionDelay,
-        mediaQueryCutOff = _ref.mediaQueryCutOff,
-        deviceSplitting = _ref.deviceSplitting;
+    return function (_ref, setRootFontSize) {
+        var rootFontSize = _ref.rootFontSize,
+            initialOuterWidth = _ref.initialOuterWidth,
+            relativeDesignWidth = _ref.relativeDesignWidth,
+            preserveDevicePixelRatio = _ref.preserveDevicePixelRatio,
+            onScale = _ref.onScale,
+            onZoom = _ref.onZoom,
+            onResize = _ref.onResize,
+            enableScale = _ref.enableScale,
+            lateDetectionDelay = _ref.lateDetectionDelay,
+            mediaQueryCutOff = _ref.mediaQueryCutOff,
+            deviceSplitting = _ref.deviceSplitting;
 
-    // Real time DOM measurments.
-    var innerWidth = windowRef.innerWidth;
-    var outerWidth = windowRef.outerWidth;
-    var clientWidth = documentRef.documentElement.clientWidth;
-    var DPR = windowRef.devicePixelRatio;
+        // Real time DOM measurments.
+        var innerWidth = windowRef.innerWidth;
+        var outerWidth = windowRef.outerWidth;
+        var clientWidth = documentRef.documentElement.clientWidth;
+        var DPR = windowRef.devicePixelRatio;
 
-    // Ratio between the outer and client width.
-    var outerClientRatio = outerWidth / clientWidth;
+        // Ratio between the outer and client width.
+        var outerClientRatio = outerWidth / clientWidth;
 
-    // A calulated DPR within the proximity of 0.05. for devices (eg.safari)
-    // that have a fixed DPR.
-    // @TODO check on large display devices with DPRs greater than 1.
-    var OCRProximity = outerClientRatio < 1.05 && outerClientRatio > 0.95 ? 1 : outerClientRatio;
+        // A calulated DPR within the proximity of 0.05. for devices (eg.safari)
+        // that have a fixed DPR.
+        // @TODO check on large display devices with DPRs greater than 1.
+        var OCRProximity = outerClientRatio < 1.05 && outerClientRatio > 0.95 ? 1 : outerClientRatio;
 
-    // A calculated DPR safe for safari browsers.
-    var safariSafeDPR = Number(OCRProximity.toFixed(5));
+        // A calculated DPR safe for safari browsers.
+        var safariSafeDPR = Number(OCRProximity.toFixed(5));
 
-    // Legacy internet explorer devicePixelRatio.
-    var IEDPR = Number(windowRef.screen.deviceXDPI / windowRef.screen.logicalXDPI);
+        // Legacy internet explorer devicePixelRatio.
+        var IEDPR = Number(windowRef.screen.deviceXDPI / windowRef.screen.logicalXDPI);
 
-    // The devicePixelRatio with polyfilled support.
-    var alt = DPR === 1 ? safariSafeDPR : DPR;
-    var calculatedDPR = Math.abs(IEDPR || alt);
+        // The devicePixelRatio with polyfilled support.
+        var alt = DPR === 1 ? safariSafeDPR : DPR;
+        var calculatedDPR = Math.abs(IEDPR || alt);
 
-    // The real viewport width.
-    var viewportWidth = parseInt(clientWidth * calculatedDPR, 10);
+        // The real viewport width.
+        var viewportWidth = parseInt(clientWidth * calculatedDPR, 10);
 
-    // The default device pixel ratio.
-    var defaultDPR = Math.round(clientWidth * (calculatedDPR / outerWidth));
+        // The default device pixel ratio.
+        var defaultDPR = Math.round(clientWidth * (calculatedDPR / outerWidth));
 
-    /**
-     * Set variable inital values if not yet set.
-     */
-    if (lastOuterWidth === undefined) {
-      lastOuterWidth = initialOuterWidth;
-    }
+        /**
+         * Set variable inital values if not yet set.
+         */
+        if (lastOuterWidth === undefined) {
+            lastOuterWidth = initialOuterWidth;
+        }
 
-    /**
-     * The window width compared to the design width.
-     */
-    var designWidthRatio = innerWidth / relativeDesignWidth;
+        /**
+         * The window width compared to the design width.
+         */
+        var designWidthRatio = innerWidth / relativeDesignWidth;
 
-    /**
-     * The minimum veiwport size to not react to.
-     */
-    // const cutOff = cutOffWidthPX > mobileWidthPX ? cutOffWidthPX : mobileWidthPX;
+        /**
+         * Mutate on next available frame.
+         */
+        resizeRootFontSize({
+            innerWidth: innerWidth,
+            outerWidth: outerWidth,
+            relativeDesignWidth: relativeDesignWidth,
+            designWidthRatio: designWidthRatio,
+            calculatedDPR: calculatedDPR,
+            rootFontSize: rootFontSize,
+            enableScale: enableScale,
+            preserveDevicePixelRatio: preserveDevicePixelRatio,
+            onScale: onScale,
+            onZoom: onZoom,
+            onResize: onResize,
+            viewportWidth: viewportWidth,
+            defaultDPR: defaultDPR,
+            lateDetectionDelay: lateDetectionDelay,
+            mediaQueryCutOff: mediaQueryCutOff,
+            deviceSplitting: deviceSplitting
+        }, setRootFontSize);
 
-
-    /**
-     * Mutate on next available frame.
-     */
-    resizeRootFontSize({
-      innerWidth: innerWidth,
-      outerWidth: outerWidth,
-      relativeDesignWidth: relativeDesignWidth,
-      designWidthRatio: designWidthRatio,
-      calculatedDPR: calculatedDPR,
-      rootFontSize: rootFontSize,
-      enableScale: enableScale,
-      preserveDevicePixelRatio: preserveDevicePixelRatio,
-      onScale: onScale,
-      onZoom: onZoom,
-      onResize: onResize,
-      viewportWidth: viewportWidth,
-      defaultDPR: defaultDPR,
-      lateDetectionDelay: lateDetectionDelay,
-      mediaQueryCutOff: mediaQueryCutOff,
-      deviceSplitting: deviceSplitting
-    }, setRootFontSize);
-
-    /**
-     * Updated Outer browser dimensions.
-     */
-    lastOuterWidth = outerWidth;
-  };
+        /**
+         * Updated Outer browser dimensions.
+         */
+        lastOuterWidth = outerWidth;
+    };
 };
 
 var renderOnce = true;
@@ -519,19 +512,23 @@ var renderOnce = true;
  */
 var mutateRootFontSizePartial = function mutateRootFontSizePartial(rootElement) {
     return function (rootFontSizeFinal, resizeWithoutZoom, hasScaledOrDPRIsDefault, isBeyondCutoff, enableScale, isMobileLikeDevice) {
-        if (hasScaledOrDPRIsDefault || renderOnce) {
-            if (isBeyondCutoff || renderOnce) {
-                if (isBeyondCutoff && enableScale && !isMobileLikeDevice) {
-                    rootElement.style.fontSize = rootFontSizeFinal.toFixed(4) + 'rem';
+        if (resizeWithoutZoom || renderOnce) {
+            if (hasScaledOrDPRIsDefault || renderOnce) {
+                if (isBeyondCutoff || renderOnce) {
+                    if (isBeyondCutoff && enableScale && !isMobileLikeDevice) {
+                        // eslint-disable-next-line
+                        console.log('RENDERED');
+                        rootElement.style.fontSize = rootFontSizeFinal.toFixed(4) + 'rem';
+                        renderOnce = false;
+                    } else {
+                        rootElement.removeAttribute('style');
+                    }
                 } else {
                     rootElement.removeAttribute('style');
                 }
-                renderOnce = false;
             } else {
                 rootElement.removeAttribute('style');
             }
-        } else {
-            rootElement.removeAttribute('style');
         }
     };
 };
@@ -558,7 +555,7 @@ var defaults$2 = {
   lateDetectionDelay: 500,
   mediaQueryCutOff: '(min-width: 40.063em)',
   /**
-   * This is an experimental feature that will only activate MIMETIC for 
+   * This is an experimental feature that will only activate MIMETIC for
    * non-mobile-like devices. There fore media queries for max & min width and height
    * will behave similarly to the depreciated max | min device-width / device-height
    * without the use of the depreciated syntax.
@@ -661,9 +658,10 @@ var setCallbacks = function setCallbacks(APIParameters, isBeyondCutoff, resizeWi
 var isMobileLikeDeviceTail = function isMobileLikeDeviceTail() {
     var widthGreaterThanHeight = window.screen.width > window.screen.height;
     var noInnerDimensions = window.outerWidth === 0 && window.outerHeight === 0;
-
-    var msLandscape = (screen.msOrientation || '').indexOf('landscape') === 0 ? 90 : (screen.msOrientation || '').indexOf('portrait') === 0 ? 0 : false;
+    var isPortrait = (window.screen.msOrientation || '').indexOf('portrait') === 0 ? 0 : false;
+    var msLandscape = (window.screen.msOrientation || '').indexOf('landscape') === 0 ? 90 : isPortrait;
     var screenOrientationAngle = void 0;
+
     if (window.screen.orientation !== undefined) {
         screenOrientationAngle = window.screen.orientation.angle;
     }
@@ -671,8 +669,10 @@ var isMobileLikeDeviceTail = function isMobileLikeDeviceTail() {
     var otherOrientation = window.orientation === undefined ? screenOrientationAngle : window.orientation;
     var clientOrientation = msLandscape === false ? otherOrientation : msLandscape;
     var positiveOrientation = Math.abs(clientOrientation);
-
-    var isDeviceMobileLike = noInnerDimensions || !widthGreaterThanHeight && positiveOrientation !== 90 || widthGreaterThanHeight && positiveOrientation === 90 && devicePixelRatio !== 1 || !widthGreaterThanHeight;
+    var portraitCheck = !widthGreaterThanHeight && positiveOrientation !== 90;
+    var landscapeCheck = widthGreaterThanHeight && positiveOrientation === 90;
+    var angleChek = portraitCheck || landscapeCheck && window.devicePixelRatio !== 1;
+    var isDeviceMobileLike = noInnerDimensions || angleChek || !widthGreaterThanHeight;
 
     return isDeviceMobileLike;
 };
@@ -688,7 +688,6 @@ var lastScreenWidth = void 0;
 var resizeRootFontSize = function resizeRootFontSize(settings, setRootFontSizeTail) {
     var innerWidth = settings.innerWidth,
         outerWidth = settings.outerWidth,
-        relativeDesignWidth = settings.relativeDesignWidth,
         designWidthRatio = settings.designWidthRatio,
         calculatedDPR = settings.calculatedDPR,
         rootFontSize = settings.rootFontSize,
@@ -727,8 +726,6 @@ var resizeRootFontSize = function resizeRootFontSize(settings, setRootFontSizeTa
     // Determine if the resize event was last with or without zoom.
     var resizeWithoutZoom2 = outerWidth === lastOuterWidth;
 
-    var isAboveDesignWidth = innerWidth > relativeDesignWidth;
-
     var rootFontSizeFinal = rootFontSize * designWidthRatio * evalDPR;
 
     var hasScaledOrDPRIsDefault = resizeWithoutZoom || isDevicePixelRatioDefault;
@@ -752,10 +749,10 @@ var resizeRootFontSize = function resizeRootFontSize(settings, setRootFontSizeTa
         if (setRootFontSizeTail) {
             setRootFontSizeTimeoutId = setTimeout(function () {
                 setRootFontSizeTail();
+                setRootFontSizeTail();
             }, lateDetectionDelay);
         }
     }
-    console.log('isBeyondCutoff', isBeyondCutoff);
 
     // The parameters passed to each callback as an object.
     var APIParameters = {

@@ -25,7 +25,6 @@ function initializeMimeticPartial(
         // Destructured API parameters.
         const {
             scaleDelay,
-            cutOffWidth,
         } = config;
 
 

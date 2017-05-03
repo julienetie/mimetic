@@ -67,12 +67,6 @@ const setRootFontSizePartial = (resizeRootFontSize) => {
 
 
         /**
-         * The minimum veiwport size to not react to.
-         */
-        // const cutOff = cutOffWidthPX > mobileWidthPX ? cutOffWidthPX : mobileWidthPX;
-
-
-        /**
          * Mutate on next available frame.
          */
         resizeRootFontSize({

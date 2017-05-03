@@ -20,7 +20,7 @@ const defaults = {
     lateDetectionDelay: 500,
     mediaQueryCutOff: '(min-width: 40.063em)',
     /**
-     * This is an experimental feature that will only activate MIMETIC for 
+     * This is an experimental feature that will only activate MIMETIC for
      * non-mobile-like devices. There fore media queries for max & min width and height
      * will behave similarly to the depreciated max | min device-width / device-height
      * without the use of the depreciated syntax.

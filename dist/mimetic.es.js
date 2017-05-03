@@ -262,8 +262,7 @@ setRootFontSize, resizilla) {
     function initalizeMimeticFinal(config) {
         // Destructured API parameters.
         const {
-            scaleDelay,
-            cutOffWidth
+            scaleDelay
         } = config;
 
         // Store the scaleDelay for kill and revive.
@@ -322,98 +321,92 @@ setRootFontSize, resizilla) {
  * Set Root Font Size.
  */
 const setRootFontSizePartial = resizeRootFontSize => {
-  const windowRef = window;
-  const documentRef = windowRef.document;
-  let lastOuterWidth;
+    const windowRef = window;
+    const documentRef = windowRef.document;
+    let lastOuterWidth;
 
-  return ({
-    rootFontSize,
-    initialOuterWidth,
-    relativeDesignWidth,
-    preserveDevicePixelRatio,
-    onScale,
-    onZoom,
-    onResize,
-    enableScale,
-    lateDetectionDelay,
-    mediaQueryCutOff,
-    deviceSplitting
-  }, setRootFontSize) => {
-    // Real time DOM measurments.
-    const innerWidth = windowRef.innerWidth;
-    const outerWidth = windowRef.outerWidth;
-    const clientWidth = documentRef.documentElement.clientWidth;
-    const DPR = windowRef.devicePixelRatio;
+    return ({
+        rootFontSize,
+        initialOuterWidth,
+        relativeDesignWidth,
+        preserveDevicePixelRatio,
+        onScale,
+        onZoom,
+        onResize,
+        enableScale,
+        lateDetectionDelay,
+        mediaQueryCutOff,
+        deviceSplitting
+    }, setRootFontSize) => {
+        // Real time DOM measurments.
+        const innerWidth = windowRef.innerWidth;
+        const outerWidth = windowRef.outerWidth;
+        const clientWidth = documentRef.documentElement.clientWidth;
+        const DPR = windowRef.devicePixelRatio;
 
-    // Ratio between the outer and client width.
-    const outerClientRatio = outerWidth / clientWidth;
+        // Ratio between the outer and client width.
+        const outerClientRatio = outerWidth / clientWidth;
 
-    // A calulated DPR within the proximity of 0.05. for devices (eg.safari)
-    // that have a fixed DPR.
-    // @TODO check on large display devices with DPRs greater than 1.
-    const OCRProximity = outerClientRatio < 1.05 && outerClientRatio > 0.95 ? 1 : outerClientRatio;
+        // A calulated DPR within the proximity of 0.05. for devices (eg.safari)
+        // that have a fixed DPR.
+        // @TODO check on large display devices with DPRs greater than 1.
+        const OCRProximity = outerClientRatio < 1.05 && outerClientRatio > 0.95 ? 1 : outerClientRatio;
 
-    // A calculated DPR safe for safari browsers.
-    const safariSafeDPR = Number(OCRProximity.toFixed(5));
+        // A calculated DPR safe for safari browsers.
+        const safariSafeDPR = Number(OCRProximity.toFixed(5));
 
-    // Legacy internet explorer devicePixelRatio.
-    const IEDPR = Number(windowRef.screen.deviceXDPI / windowRef.screen.logicalXDPI);
+        // Legacy internet explorer devicePixelRatio.
+        const IEDPR = Number(windowRef.screen.deviceXDPI / windowRef.screen.logicalXDPI);
 
-    // The devicePixelRatio with polyfilled support.
-    const alt = DPR === 1 ? safariSafeDPR : DPR;
-    const calculatedDPR = Math.abs(IEDPR || alt);
+        // The devicePixelRatio with polyfilled support.
+        const alt = DPR === 1 ? safariSafeDPR : DPR;
+        const calculatedDPR = Math.abs(IEDPR || alt);
 
-    // The real viewport width.
-    const viewportWidth = parseInt(clientWidth * calculatedDPR, 10);
+        // The real viewport width.
+        const viewportWidth = parseInt(clientWidth * calculatedDPR, 10);
 
-    // The default device pixel ratio.
-    const defaultDPR = Math.round(clientWidth * (calculatedDPR / outerWidth));
+        // The default device pixel ratio.
+        const defaultDPR = Math.round(clientWidth * (calculatedDPR / outerWidth));
 
-    /**
-     * Set variable inital values if not yet set.
-     */
-    if (lastOuterWidth === undefined) {
-      lastOuterWidth = initialOuterWidth;
-    }
+        /**
+         * Set variable inital values if not yet set.
+         */
+        if (lastOuterWidth === undefined) {
+            lastOuterWidth = initialOuterWidth;
+        }
 
-    /**
-     * The window width compared to the design width.
-     */
-    const designWidthRatio = innerWidth / relativeDesignWidth;
+        /**
+         * The window width compared to the design width.
+         */
+        const designWidthRatio = innerWidth / relativeDesignWidth;
 
-    /**
-     * The minimum veiwport size to not react to.
-     */
-    // const cutOff = cutOffWidthPX > mobileWidthPX ? cutOffWidthPX : mobileWidthPX;
+        /**
+         * Mutate on next available frame.
+         */
+        resizeRootFontSize({
+            innerWidth,
+            outerWidth,
+            relativeDesignWidth,
+            designWidthRatio,
+            calculatedDPR,
+            rootFontSize,
+            enableScale,
+            preserveDevicePixelRatio,
+            onScale,
+            onZoom,
+            onResize,
+            viewportWidth,
+            defaultDPR,
+            lateDetectionDelay,
+            mediaQueryCutOff,
+            deviceSplitting
+        }, setRootFontSize);
 
-
-    /**
-     * Mutate on next available frame.
-     */
-    resizeRootFontSize({
-      innerWidth,
-      outerWidth,
-      relativeDesignWidth,
-      designWidthRatio,
-      calculatedDPR,
-      rootFontSize,
-      enableScale,
-      preserveDevicePixelRatio,
-      onScale,
-      onZoom,
-      onResize,
-      viewportWidth,
-      defaultDPR,
-      lateDetectionDelay,
-      mediaQueryCutOff,
-      deviceSplitting
-    }, setRootFontSize);
-
-    /**
-     * Updated Outer browser dimensions.
-     */
-    lastOuterWidth = outerWidth;
-  };
+        /**
+         * Updated Outer browser dimensions.
+         */
+        lastOuterWidth = outerWidth;
+    };
 };
 
 let renderOnce = true;
@@ -423,19 +416,23 @@ let renderOnce = true;
  * @param
  */
 const mutateRootFontSizePartial = rootElement => (rootFontSizeFinal, resizeWithoutZoom, hasScaledOrDPRIsDefault, isBeyondCutoff, enableScale, isMobileLikeDevice) => {
-    if (hasScaledOrDPRIsDefault || renderOnce) {
-        if (isBeyondCutoff || renderOnce) {
-            if (isBeyondCutoff && enableScale && !isMobileLikeDevice) {
-                rootElement.style.fontSize = rootFontSizeFinal.toFixed(4) + 'rem';
+    if (resizeWithoutZoom || renderOnce) {
+        if (hasScaledOrDPRIsDefault || renderOnce) {
+            if (isBeyondCutoff || renderOnce) {
+                if (isBeyondCutoff && enableScale && !isMobileLikeDevice) {
+                    // eslint-disable-next-line
+                    console.log('RENDERED');
+                    rootElement.style.fontSize = rootFontSizeFinal.toFixed(4) + 'rem';
+                    renderOnce = false;
+                } else {
+                    rootElement.removeAttribute('style');
+                }
             } else {
                 rootElement.removeAttribute('style');
             }
-            renderOnce = false;
         } else {
             rootElement.removeAttribute('style');
         }
-    } else {
-        rootElement.removeAttribute('style');
     }
 };
 
@@ -461,7 +458,7 @@ const defaults$1 = {
   lateDetectionDelay: 500,
   mediaQueryCutOff: '(min-width: 40.063em)',
   /**
-   * This is an experimental feature that will only activate MIMETIC for 
+   * This is an experimental feature that will only activate MIMETIC for
    * non-mobile-like devices. There fore media queries for max & min width and height
    * will behave similarly to the depreciated max | min device-width / device-height
    * without the use of the depreciated syntax.
@@ -549,9 +546,10 @@ const setCallbacks = (APIParameters, isBeyondCutoff, resizeWithoutZoom, onScale,
 const isMobileLikeDeviceTail = () => {
     const widthGreaterThanHeight = window.screen.width > window.screen.height;
     const noInnerDimensions = window.outerWidth === 0 && window.outerHeight === 0;
-
-    const msLandscape = (screen.msOrientation || '').indexOf('landscape') === 0 ? 90 : (screen.msOrientation || '').indexOf('portrait') === 0 ? 0 : false;
+    const isPortrait = (window.screen.msOrientation || '').indexOf('portrait') === 0 ? 0 : false;
+    const msLandscape = (window.screen.msOrientation || '').indexOf('landscape') === 0 ? 90 : isPortrait;
     let screenOrientationAngle;
+
     if (window.screen.orientation !== undefined) {
         screenOrientationAngle = window.screen.orientation.angle;
     }
@@ -559,8 +557,10 @@ const isMobileLikeDeviceTail = () => {
     const otherOrientation = window.orientation === undefined ? screenOrientationAngle : window.orientation;
     const clientOrientation = msLandscape === false ? otherOrientation : msLandscape;
     const positiveOrientation = Math.abs(clientOrientation);
-
-    const isDeviceMobileLike = noInnerDimensions || !widthGreaterThanHeight && positiveOrientation !== 90 || widthGreaterThanHeight && positiveOrientation === 90 && devicePixelRatio !== 1 || !widthGreaterThanHeight;
+    const portraitCheck = !widthGreaterThanHeight && positiveOrientation !== 90;
+    const landscapeCheck = widthGreaterThanHeight && positiveOrientation === 90;
+    const angleChek = portraitCheck || landscapeCheck && window.devicePixelRatio !== 1;
+    const isDeviceMobileLike = noInnerDimensions || angleChek || !widthGreaterThanHeight;
 
     return isDeviceMobileLike;
 };
@@ -577,7 +577,6 @@ const resizeRootFontSize = (settings, setRootFontSizeTail) => {
     const {
         innerWidth,
         outerWidth,
-        relativeDesignWidth,
         designWidthRatio,
         calculatedDPR,
         rootFontSize,
@@ -616,8 +615,6 @@ const resizeRootFontSize = (settings, setRootFontSizeTail) => {
     // Determine if the resize event was last with or without zoom.
     const resizeWithoutZoom2 = outerWidth === lastOuterWidth;
 
-    const isAboveDesignWidth = innerWidth > relativeDesignWidth;
-
     const rootFontSizeFinal = rootFontSize * designWidthRatio * evalDPR;
 
     const hasScaledOrDPRIsDefault = resizeWithoutZoom || isDevicePixelRatioDefault;
@@ -641,10 +638,10 @@ const resizeRootFontSize = (settings, setRootFontSizeTail) => {
         if (setRootFontSizeTail) {
             setRootFontSizeTimeoutId = setTimeout(() => {
                 setRootFontSizeTail();
+                setRootFontSizeTail();
             }, lateDetectionDelay);
         }
     }
-    console.log('isBeyondCutoff', isBeyondCutoff);
 
     // The parameters passed to each callback as an object.
     const APIParameters = {

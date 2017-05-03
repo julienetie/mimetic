@@ -14,7 +14,6 @@ const resizeRootFontSize = (settings, setRootFontSizeTail) => {
     const {
         innerWidth,
         outerWidth,
-        relativeDesignWidth,
         designWidthRatio,
         calculatedDPR,
         rootFontSize,
@@ -27,7 +26,7 @@ const resizeRootFontSize = (settings, setRootFontSizeTail) => {
         defaultDPR,
         lateDetectionDelay,
         mediaQueryCutOff,
-        deviceSplitting
+        deviceSplitting,
     } = settings;
 
     // Assigns lastOuterWidth with an inital value, never expected to be zero.
@@ -53,13 +52,11 @@ const resizeRootFontSize = (settings, setRootFontSizeTail) => {
     // Determine if the resize event was last with or without zoom.
     const resizeWithoutZoom2 = outerWidth === lastOuterWidth;
 
-    const isAboveDesignWidth = innerWidth > relativeDesignWidth;
-
     const rootFontSizeFinal = rootFontSize * designWidthRatio * evalDPR;
 
     const hasScaledOrDPRIsDefault = resizeWithoutZoom || isDevicePixelRatioDefault;
 
-    const isBeyondCutoff = deviceSplitting ? true :window.matchMedia(mediaQueryCutOff).matches;
+    const isBeyondCutoff = deviceSplitting ? true : window.matchMedia(mediaQueryCutOff).matches;
 
     if (lastScreenWidth === undefined) {
         lastScreenWidth = screenWidth;
@@ -88,12 +85,13 @@ const resizeRootFontSize = (settings, setRootFontSizeTail) => {
         if (setRootFontSizeTail) {
             setRootFontSizeTimeoutId = setTimeout(
                 () => {
-                    setRootFontSizeTail();
+                    setRootFontSizeTail(); 
+                    setRootFontSizeTail(); 
                 }, lateDetectionDelay,
             );
         }
     }
-    console.log('isBeyondCutoff', isBeyondCutoff)
+
 
     // The parameters passed to each callback as an object.
     const APIParameters = {
