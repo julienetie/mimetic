@@ -431,7 +431,8 @@ var setRootFontSizePartial = function setRootFontSizePartial(resizeRootFontSize)
         onResize = _ref.onResize,
         enableScale = _ref.enableScale,
         lateDetectionDelay = _ref.lateDetectionDelay,
-        mediaQueryCutOff = _ref.mediaQueryCutOff;
+        mediaQueryCutOff = _ref.mediaQueryCutOff,
+        deviceSplitting = _ref.deviceSplitting;
 
     // Real time DOM measurments.
     var innerWidth = windowRef.innerWidth;
@@ -488,7 +489,6 @@ var setRootFontSizePartial = function setRootFontSizePartial(resizeRootFontSize)
       innerWidth: innerWidth,
       outerWidth: outerWidth,
       relativeDesignWidth: relativeDesignWidth,
-      // cutOff,
       designWidthRatio: designWidthRatio,
       calculatedDPR: calculatedDPR,
       rootFontSize: rootFontSize,
@@ -500,7 +500,8 @@ var setRootFontSizePartial = function setRootFontSizePartial(resizeRootFontSize)
       viewportWidth: viewportWidth,
       defaultDPR: defaultDPR,
       lateDetectionDelay: lateDetectionDelay,
-      mediaQueryCutOff: mediaQueryCutOff
+      mediaQueryCutOff: mediaQueryCutOff,
+      deviceSplitting: deviceSplitting
     }, setRootFontSize);
 
     /**
@@ -517,18 +518,20 @@ var renderOnce = true;
  * @param
  */
 var mutateRootFontSizePartial = function mutateRootFontSizePartial(rootElement) {
-    return function (rootFontSizeFinal, resizeWithoutZoom, hasScaledOrDPRIsDefault, isBeyondCutoff, enableScale) {
+    return function (rootFontSizeFinal, resizeWithoutZoom, hasScaledOrDPRIsDefault, isBeyondCutoff, enableScale, isMobileLikeDevice) {
         if (hasScaledOrDPRIsDefault || renderOnce) {
             if (isBeyondCutoff || renderOnce) {
-                if (isBeyondCutoff && enableScale) {
-                    console.log('Scaled');
+                if (isBeyondCutoff && enableScale && !isMobileLikeDevice) {
                     rootElement.style.fontSize = rootFontSizeFinal.toFixed(4) + 'rem';
+                } else {
+                    rootElement.removeAttribute('style');
                 }
                 renderOnce = false;
             } else {
-                console.log('Removed Scale');
                 rootElement.removeAttribute('style');
             }
+        } else {
+            rootElement.removeAttribute('style');
         }
     };
 };
@@ -553,7 +556,14 @@ var defaults$2 = {
    * edge call.
    */
   lateDetectionDelay: 500,
-  mediaQueryCutOff: '(max-width: 40em)'
+  mediaQueryCutOff: '(min-width: 40.063em)',
+  /**
+   * This is an experimental feature that will only activate MIMETIC for 
+   * non-mobile-like devices. There fore media queries for max & min width and height
+   * will behave similarly to the depreciated max | min device-width / device-height
+   * without the use of the depreciated syntax.
+   */
+  deviceSplitting: false
 };
 
 var windowRef = window;
@@ -648,9 +658,30 @@ var setCallbacks = function setCallbacks(APIParameters, isBeyondCutoff, resizeWi
     }
 };
 
+var isMobileLikeDeviceTail = function isMobileLikeDeviceTail() {
+    var widthGreaterThanHeight = window.screen.width > window.screen.height;
+    var noInnerDimensions = window.outerWidth === 0 && window.outerHeight === 0;
+
+    var msLandscape = (screen.msOrientation || '').indexOf('landscape') === 0 ? 90 : (screen.msOrientation || '').indexOf('portrait') === 0 ? 0 : false;
+    var screenOrientationAngle = void 0;
+    if (window.screen.orientation !== undefined) {
+        screenOrientationAngle = window.screen.orientation.angle;
+    }
+
+    var otherOrientation = window.orientation === undefined ? screenOrientationAngle : window.orientation;
+    var clientOrientation = msLandscape === false ? otherOrientation : msLandscape;
+    var positiveOrientation = Math.abs(clientOrientation);
+
+    var isDeviceMobileLike = noInnerDimensions || !widthGreaterThanHeight && positiveOrientation !== 90 || widthGreaterThanHeight && positiveOrientation === 90 && devicePixelRatio !== 1 || !widthGreaterThanHeight;
+
+    return isDeviceMobileLike;
+};
+
 var lastDevicePixelRatio = void 0;
 var setRootFontSizeTimeoutId = void 0;
 var lastOuterWidth = void 0;
+var isMobileLikeDevice = void 0;
+var lastScreenWidth = void 0;
 /**
  * Calculate and apply the new font size to the root element.
  */
@@ -669,13 +700,17 @@ var resizeRootFontSize = function resizeRootFontSize(settings, setRootFontSizeTa
         viewportWidth = settings.viewportWidth,
         defaultDPR = settings.defaultDPR,
         lateDetectionDelay = settings.lateDetectionDelay,
-        mediaQueryCutOff = settings.mediaQueryCutOff;
+        mediaQueryCutOff = settings.mediaQueryCutOff,
+        deviceSplitting = settings.deviceSplitting;
 
     // Assigns lastOuterWidth with an inital value, never expected to be zero.
 
     if (!lastOuterWidth) {
         lastOuterWidth = outerWidth;
     }
+
+    // Current screen width.
+    var screenWidth = window.screen.width;
 
     // Calculates the devicePixelRatio as if the default was 1.
     var normalizedDPR = 1 / defaultDPR * calculatedDPR;
@@ -694,15 +729,21 @@ var resizeRootFontSize = function resizeRootFontSize(settings, setRootFontSizeTa
 
     var isAboveDesignWidth = innerWidth > relativeDesignWidth;
 
-    // const isBeyondCutoff = innerWidth > cutOff;
-
     var rootFontSizeFinal = rootFontSize * designWidthRatio * evalDPR;
 
     var hasScaledOrDPRIsDefault = resizeWithoutZoom || isDevicePixelRatioDefault;
 
-    var isBeyondCutoff = !window.matchMedia(mediaQueryCutOff).matches;
+    var isBeyondCutoff = deviceSplitting ? true : window.matchMedia(mediaQueryCutOff).matches;
 
-    mutateRootFontSize(rootFontSizeFinal, resizeWithoutZoom, hasScaledOrDPRIsDefault, isBeyondCutoff, enableScale);
+    if (lastScreenWidth === undefined) {
+        lastScreenWidth = screenWidth;
+    }
+
+    if (screenWidth !== lastScreenWidth || isMobileLikeDevice === undefined) {
+        isMobileLikeDevice = isMobileLikeDeviceTail();
+    }
+
+    mutateRootFontSize(rootFontSizeFinal, resizeWithoutZoom, hasScaledOrDPRIsDefault, isBeyondCutoff, enableScale, isMobileLikeDevice);
 
     clearTimeout(setRootFontSizeTimeoutId);
 
@@ -714,7 +755,7 @@ var resizeRootFontSize = function resizeRootFontSize(settings, setRootFontSizeTa
             }, lateDetectionDelay);
         }
     }
-    console.log(isBeyondCutoff);
+    console.log('isBeyondCutoff', isBeyondCutoff);
 
     // The parameters passed to each callback as an object.
     var APIParameters = {
@@ -732,6 +773,9 @@ var resizeRootFontSize = function resizeRootFontSize(settings, setRootFontSizeTa
 
     // Re-assign the lastOuterWidth.
     lastOuterWidth = outerWidth;
+
+    // Screen Width
+    lastScreenWidth = screenWidth;
 };
 
 /**

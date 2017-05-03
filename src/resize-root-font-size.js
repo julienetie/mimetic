@@ -1,10 +1,12 @@
 import mutateRootFontSize from './mutate-root-font-size';
 import setCallbacks from './set-callbacks';
-
+import isMobileLikeDeviceTail from './is-mobile-like-device-tail';
 
 let lastDevicePixelRatio;
 let setRootFontSizeTimeoutId;
 let lastOuterWidth;
+let isMobileLikeDevice;
+let lastScreenWidth;
 /**
  * Calculate and apply the new font size to the root element.
  */
@@ -13,7 +15,6 @@ const resizeRootFontSize = (settings, setRootFontSizeTail) => {
         innerWidth,
         outerWidth,
         relativeDesignWidth,
-        // cutOff,
         designWidthRatio,
         calculatedDPR,
         rootFontSize,
@@ -25,13 +26,17 @@ const resizeRootFontSize = (settings, setRootFontSizeTail) => {
         viewportWidth,
         defaultDPR,
         lateDetectionDelay,
-        mediaQueryCutOff
+        mediaQueryCutOff,
+        deviceSplitting
     } = settings;
 
     // Assigns lastOuterWidth with an inital value, never expected to be zero.
     if (!lastOuterWidth) {
         lastOuterWidth = outerWidth;
     }
+
+    // Current screen width.
+    const screenWidth = window.screen.width;
 
     // Calculates the devicePixelRatio as if the default was 1.
     const normalizedDPR = (1 / defaultDPR) * calculatedDPR;
@@ -50,14 +55,20 @@ const resizeRootFontSize = (settings, setRootFontSizeTail) => {
 
     const isAboveDesignWidth = innerWidth > relativeDesignWidth;
 
-    // const isBeyondCutoff = innerWidth > cutOff;
-
     const rootFontSizeFinal = rootFontSize * designWidthRatio * evalDPR;
 
     const hasScaledOrDPRIsDefault = resizeWithoutZoom || isDevicePixelRatioDefault;
 
-    const isBeyondCutoff = !window.matchMedia(mediaQueryCutOff).matches;
+    const isBeyondCutoff = deviceSplitting ? true :window.matchMedia(mediaQueryCutOff).matches;
 
+    if (lastScreenWidth === undefined) {
+        lastScreenWidth = screenWidth;
+    }
+
+
+    if (screenWidth !== lastScreenWidth || isMobileLikeDevice === undefined) {
+        isMobileLikeDevice = isMobileLikeDeviceTail();
+    }
 
     mutateRootFontSize(
         rootFontSizeFinal,
@@ -65,6 +76,7 @@ const resizeRootFontSize = (settings, setRootFontSizeTail) => {
         hasScaledOrDPRIsDefault,
         isBeyondCutoff,
         enableScale,
+        isMobileLikeDevice,
     );
 
 
@@ -81,7 +93,7 @@ const resizeRootFontSize = (settings, setRootFontSizeTail) => {
             );
         }
     }
-    console.log(isBeyondCutoff)
+    console.log('isBeyondCutoff', isBeyondCutoff)
 
     // The parameters passed to each callback as an object.
     const APIParameters = {
@@ -107,6 +119,9 @@ const resizeRootFontSize = (settings, setRootFontSizeTail) => {
 
     // Re-assign the lastOuterWidth.
     lastOuterWidth = outerWidth;
+
+    // Screen Width
+    lastScreenWidth = screenWidth;
 };
 
 

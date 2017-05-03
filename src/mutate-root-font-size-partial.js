@@ -11,18 +11,21 @@ const mutateRootFontSizePartial = rootElement => (
     hasScaledOrDPRIsDefault,
     isBeyondCutoff,
     enableScale,
+    isMobileLikeDevice
 ) => {
     if (hasScaledOrDPRIsDefault || renderOnce) {
         if (isBeyondCutoff || renderOnce) {
-            if (isBeyondCutoff && enableScale) {
-                console.log('Scaled')
+            if (isBeyondCutoff && enableScale && !isMobileLikeDevice) {
                 rootElement.style.fontSize = rootFontSizeFinal.toFixed(4) + 'rem';
+            } else {
+                rootElement.removeAttribute('style');
             }
             renderOnce = false;
         } else {
-            console.log('Removed Scale')
             rootElement.removeAttribute('style');
         }
+    } else {
+        rootElement.removeAttribute('style');
     }
 };
 

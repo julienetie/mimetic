@@ -330,17 +330,14 @@ const setRootFontSizePartial = resizeRootFontSize => {
     rootFontSize,
     initialOuterWidth,
     relativeDesignWidth,
-    // mobileWidth,
-    // cutOffWidth,
     preserveDevicePixelRatio,
     onScale,
     onZoom,
     onResize,
     enableScale,
-    // mobileWidthPX,
-    // cutOffWidthPX,
     lateDetectionDelay,
-    mediaQueryCutOff
+    mediaQueryCutOff,
+    deviceSplitting
   }, setRootFontSize) => {
     // Real time DOM measurments.
     const innerWidth = windowRef.innerWidth;
@@ -397,7 +394,6 @@ const setRootFontSizePartial = resizeRootFontSize => {
       innerWidth,
       outerWidth,
       relativeDesignWidth,
-      // cutOff,
       designWidthRatio,
       calculatedDPR,
       rootFontSize,
@@ -409,7 +405,8 @@ const setRootFontSizePartial = resizeRootFontSize => {
       viewportWidth,
       defaultDPR,
       lateDetectionDelay,
-      mediaQueryCutOff
+      mediaQueryCutOff,
+      deviceSplitting
     }, setRootFontSize);
 
     /**
@@ -425,18 +422,20 @@ let renderOnce = true;
  * Directly mutates the root font size of a given Element.
  * @param
  */
-const mutateRootFontSizePartial = rootElement => (rootFontSizeFinal, resizeWithoutZoom, hasScaledOrDPRIsDefault, isBeyondCutoff, enableScale) => {
+const mutateRootFontSizePartial = rootElement => (rootFontSizeFinal, resizeWithoutZoom, hasScaledOrDPRIsDefault, isBeyondCutoff, enableScale, isMobileLikeDevice) => {
     if (hasScaledOrDPRIsDefault || renderOnce) {
         if (isBeyondCutoff || renderOnce) {
-            if (isBeyondCutoff && enableScale) {
-                console.log('Scaled');
+            if (isBeyondCutoff && enableScale && !isMobileLikeDevice) {
                 rootElement.style.fontSize = rootFontSizeFinal.toFixed(4) + 'rem';
+            } else {
+                rootElement.removeAttribute('style');
             }
             renderOnce = false;
         } else {
-            console.log('Removed Scale');
             rootElement.removeAttribute('style');
         }
+    } else {
+        rootElement.removeAttribute('style');
     }
 };
 
@@ -460,7 +459,14 @@ const defaults$1 = {
    * edge call.
    */
   lateDetectionDelay: 500,
-  mediaQueryCutOff: '(max-width: 40em)'
+  mediaQueryCutOff: '(min-width: 40.063em)',
+  /**
+   * This is an experimental feature that will only activate MIMETIC for 
+   * non-mobile-like devices. There fore media queries for max & min width and height
+   * will behave similarly to the depreciated max | min device-width / device-height
+   * without the use of the depreciated syntax.
+   */
+  deviceSplitting: false
 };
 
 const windowRef = window;
@@ -540,9 +546,30 @@ const setCallbacks = (APIParameters, isBeyondCutoff, resizeWithoutZoom, onScale,
     }
 };
 
+const isMobileLikeDeviceTail = () => {
+    const widthGreaterThanHeight = window.screen.width > window.screen.height;
+    const noInnerDimensions = window.outerWidth === 0 && window.outerHeight === 0;
+
+    const msLandscape = (screen.msOrientation || '').indexOf('landscape') === 0 ? 90 : (screen.msOrientation || '').indexOf('portrait') === 0 ? 0 : false;
+    let screenOrientationAngle;
+    if (window.screen.orientation !== undefined) {
+        screenOrientationAngle = window.screen.orientation.angle;
+    }
+
+    const otherOrientation = window.orientation === undefined ? screenOrientationAngle : window.orientation;
+    const clientOrientation = msLandscape === false ? otherOrientation : msLandscape;
+    const positiveOrientation = Math.abs(clientOrientation);
+
+    const isDeviceMobileLike = noInnerDimensions || !widthGreaterThanHeight && positiveOrientation !== 90 || widthGreaterThanHeight && positiveOrientation === 90 && devicePixelRatio !== 1 || !widthGreaterThanHeight;
+
+    return isDeviceMobileLike;
+};
+
 let lastDevicePixelRatio;
 let setRootFontSizeTimeoutId;
 let lastOuterWidth;
+let isMobileLikeDevice;
+let lastScreenWidth;
 /**
  * Calculate and apply the new font size to the root element.
  */
@@ -551,7 +578,6 @@ const resizeRootFontSize = (settings, setRootFontSizeTail) => {
         innerWidth,
         outerWidth,
         relativeDesignWidth,
-        // cutOff,
         designWidthRatio,
         calculatedDPR,
         rootFontSize,
@@ -563,13 +589,17 @@ const resizeRootFontSize = (settings, setRootFontSizeTail) => {
         viewportWidth,
         defaultDPR,
         lateDetectionDelay,
-        mediaQueryCutOff
+        mediaQueryCutOff,
+        deviceSplitting
     } = settings;
 
     // Assigns lastOuterWidth with an inital value, never expected to be zero.
     if (!lastOuterWidth) {
         lastOuterWidth = outerWidth;
     }
+
+    // Current screen width.
+    const screenWidth = window.screen.width;
 
     // Calculates the devicePixelRatio as if the default was 1.
     const normalizedDPR = 1 / defaultDPR * calculatedDPR;
@@ -588,15 +618,21 @@ const resizeRootFontSize = (settings, setRootFontSizeTail) => {
 
     const isAboveDesignWidth = innerWidth > relativeDesignWidth;
 
-    // const isBeyondCutoff = innerWidth > cutOff;
-
     const rootFontSizeFinal = rootFontSize * designWidthRatio * evalDPR;
 
     const hasScaledOrDPRIsDefault = resizeWithoutZoom || isDevicePixelRatioDefault;
 
-    const isBeyondCutoff = !window.matchMedia(mediaQueryCutOff).matches;
+    const isBeyondCutoff = deviceSplitting ? true : window.matchMedia(mediaQueryCutOff).matches;
 
-    mutateRootFontSize(rootFontSizeFinal, resizeWithoutZoom, hasScaledOrDPRIsDefault, isBeyondCutoff, enableScale);
+    if (lastScreenWidth === undefined) {
+        lastScreenWidth = screenWidth;
+    }
+
+    if (screenWidth !== lastScreenWidth || isMobileLikeDevice === undefined) {
+        isMobileLikeDevice = isMobileLikeDeviceTail();
+    }
+
+    mutateRootFontSize(rootFontSizeFinal, resizeWithoutZoom, hasScaledOrDPRIsDefault, isBeyondCutoff, enableScale, isMobileLikeDevice);
 
     clearTimeout(setRootFontSizeTimeoutId);
 
@@ -608,7 +644,7 @@ const resizeRootFontSize = (settings, setRootFontSizeTail) => {
             }, lateDetectionDelay);
         }
     }
-    console.log(isBeyondCutoff);
+    console.log('isBeyondCutoff', isBeyondCutoff);
 
     // The parameters passed to each callback as an object.
     const APIParameters = {
@@ -626,6 +662,9 @@ const resizeRootFontSize = (settings, setRootFontSizeTail) => {
 
     // Re-assign the lastOuterWidth.
     lastOuterWidth = outerWidth;
+
+    // Screen Width
+    lastScreenWidth = screenWidth;
 };
 
 /**
