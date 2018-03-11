@@ -103,4 +103,4 @@ Below is the list of config options passed as an object:
 
 Big thanks to [BrowserStack](https://www.browserstack.com) for sponsoring the cross browser & device testing of this project.
 
-MIT (c) 2017 Julien Etienne.
+MIT (c) 2018 Julien Etienne.
