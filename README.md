@@ -11,7 +11,7 @@
 # MIMETIC
 
 ## Scalable Fonts & Zoom Detection
-
+<img src="https://raw.githubusercontent.com/julienetie/img/master/1_DQD6cIuZ82YzLI9GoHFcqA.gif">
 ### What is this?
 <img src="https://media.giphy.com/media/13NkUb5hwB1afK/giphy.gif">
 
