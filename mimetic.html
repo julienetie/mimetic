@@ -344,14 +344,14 @@ transition: all 0.2s linear;
     </style>
     <script src="dist/mimetic.js"></script>
     <script>
-    const mimetic = Mimetic({
+    window.mimetic = mimetic({
         loadEvent: 'load',
         mobileWidth: '12pt',
         onScale: function(a, b, c) {
             console.log('hello world', a, c, b)
         }
     });
-window.mimetic = mimetic;
+ 
     // setTimeout(() => {
     //     console.info('bang')
     //     console.log(mimetic.kill())

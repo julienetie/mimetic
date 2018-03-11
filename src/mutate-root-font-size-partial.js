@@ -18,7 +18,7 @@ const mutateRootFontSizePartial = rootElement => (
             if (isBeyondCutoff || renderOnce) {
                 if (isBeyondCutoff && enableScale && !isMobileLikeDevice) {
                     // eslint-disable-next-line
-                    rootElement.style.fontSize = rootFontSizeFinal.toFixed(4) + 'rem';
+                    rootElement.style.fontSize = rootFontSizeFinal.toFixed(6) + 'rem';
                     renderOnce = false;
                 } else {
                     rootElement.removeAttribute('style');

@@ -4,3 +4,4 @@ website
 yarn.lock
 .env
 local.log
+dist

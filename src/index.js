@@ -1,6 +1,5 @@
 import resizilla from 'resizilla';
 import objectAssignPolyfill from '../libs/object-assign-polyfill';
-import objectFreezePolyfill from '../libs/object-freeze-polyfill';
 // import CSSUnitsToPixels from './css-units-to-pixels';
 import initializeMimeticPartial from './initialize-mimetic-partial';
 import setRootFontSizePartial from './set-root-font-size-partial';
@@ -16,10 +15,6 @@ import {
 
 // Object Assign polyfill.
 objectAssignPolyfill();
-
-
-// Object Freeze polyfill.
-objectFreezePolyfill();
 
 
 /*

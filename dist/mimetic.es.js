@@ -26,6 +26,46 @@ vVVv    vVVv                 ': |_| \_\___||___/_/___|_|_|_|\__,_| ''
  * Copyright Julien Etienne 2015 All Rights Reserved.
  */
 // Initial time of the timing lapse.
+var previousTime = 0;
+
+/**
+ * Native clearTimeout function for IE-9 cancelAnimationFrame
+ * @return {Function}
+ */
+const clearTimeoutWithId = id => {
+    window.clearTimeout(id);
+    id = null;
+};
+
+/**
+ * IE-9 Polyfill for requestAnimationFrame
+ * @callback {Number} Timestamp.
+ * @return {Function} setTimeout Function.
+ */
+function setTimeoutWithTimestamp(callback) {
+    const immediateTime = Date.now();
+    let lapsedTime = Math.max(previousTime + 16, immediateTime);
+    return setTimeout(function () {
+        callback(previousTime = lapsedTime);
+    }, lapsedTime - immediateTime);
+}
+
+// Request and cancel functions for IE9+ & modern mobile browsers. 
+const requestFrameFn = window.requestAnimationFrame || setTimeoutWithTimestamp;
+const cancelFrameFn = window.cancelAnimationFrame || clearTimeoutWithId;
+
+/**
+ *  volve - Tiny, Performant Debounce and Throttle Functions,
+ *     License:  MIT
+ *      Copyright Julien Etienne 2016 All Rights Reserved.
+ *        github:  https://github.com/julienetie/volve
+ *‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
+ */
+
+/**
+ * Date.now polyfill.
+ * {@link https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Date/now}
+ */
 if (!Date.now) {
     Date.now = function now() {
         return new Date().getTime();
@@ -42,8 +82,6 @@ if (!Date.now) {
 function debounce(callback, delay, lead) {
     var debounceRange = 0;
     var currentTime;
-    var lastCall;
-    var setDelay;
     var timeoutId;
 
     const call = parameters => {
@@ -73,7 +111,6 @@ const objectAssignPolyfill = () => {
     if (typeof Object.assign != 'function') {
         (function () {
             Object.assign = function (target) {
-                'use strict';
                 // We must check against these specific cases.
 
                 if (target === undefined || target === null) {
@@ -198,7 +235,6 @@ const objectAssignPolyfill$1 = () => {
     if (typeof Object.assign != 'function') {
         (function () {
             Object.assign = function (target) {
-                'use strict';
                 // We must check against these specific cases.
 
                 if (target === undefined || target === null) {
@@ -219,25 +255,6 @@ const objectAssignPolyfill$1 = () => {
                 return output;
             };
         })();
-    }
-};
-
-const objectFreezePolyfill = () => {
-    /** 
-     * Object.freeze polyfill
-     * ES5 15.2.3.9
-     * {@link http://es5.github.com/#x15.2.3.9}
-     */
-    if (!Object.freeze) {
-        Object.freeze = function freeze(object) {
-            if (Object(object) !== object) {
-                throw new TypeError('Object.freeze can only be called on Objects.');
-            }
-            // this is misleading and breaks feature-detection, but
-            // allows "securable" code to "gracefully" degrade to working
-            // but insecure code.
-            return object;
-        };
     }
 };
 
@@ -284,6 +301,8 @@ setRootFontSize, resizilla) {
             initialOuterHeight: window.outerHeight,
             initialOuterWidth: window.outerWidth,
             rootFontSize
+            // mobileWidthPX,
+            // cutOffWidthPX,
         }, config);
 
         // Store the settings for kill and revive.
@@ -323,7 +342,6 @@ setRootFontSize, resizilla) {
 const setRootFontSizePartial = resizeRootFontSize => {
     const windowRef = window;
     const documentRef = windowRef.document;
-    let lastOuterWidth;
 
     return ({
         rootFontSize,
@@ -369,13 +387,6 @@ const setRootFontSizePartial = resizeRootFontSize => {
         const defaultDPR = Math.round(clientWidth * (calculatedDPR / outerWidth));
 
         /**
-         * Set variable inital values if not yet set.
-         */
-        if (lastOuterWidth === undefined) {
-            lastOuterWidth = initialOuterWidth;
-        }
-
-        /**
          * The window width compared to the design width.
          */
         const designWidthRatio = innerWidth / relativeDesignWidth;
@@ -401,11 +412,6 @@ const setRootFontSizePartial = resizeRootFontSize => {
             mediaQueryCutOff,
             deviceSplitting
         }, setRootFontSize);
-
-        /**
-         * Updated Outer browser dimensions.
-         */
-        lastOuterWidth = outerWidth;
     };
 };
 
@@ -421,8 +427,7 @@ const mutateRootFontSizePartial = rootElement => (rootFontSizeFinal, resizeWitho
             if (isBeyondCutoff || renderOnce) {
                 if (isBeyondCutoff && enableScale && !isMobileLikeDevice) {
                     // eslint-disable-next-line
-                    console.log('RENDERED');
-                    rootElement.style.fontSize = rootFontSizeFinal.toFixed(4) + 'rem';
+                    rootElement.style.fontSize = rootFontSizeFinal.toFixed(6) + 'rem';
                     renderOnce = false;
                 } else {
                     rootElement.removeAttribute('style');
@@ -469,9 +474,6 @@ const defaults$1 = {
 const windowRef = window;
 const documentRef = windowRef.document;
 
-// Checks if string or number is a number.
-
-
 // A very simple compose function.
 const basicCompose = (a, b) => c => a(b(c));
 
@@ -500,6 +502,7 @@ const getRootElement = element => {
     return elements[element] ? elements[element](documentRef) : documentRef.querySelector(element);
 };
 
+// Default root selector. Not an option.
 const { rootSelector } = defaults$1;
 
 // The root font element.
@@ -695,10 +698,8 @@ const mimeticPartial = (initializeMimetic, defaults) => configurationObj => {
     };
 };
 
+// Object Assign polyfill.
 objectAssignPolyfill$1();
-
-// Object Freeze polyfill.
-objectFreezePolyfill();
 
 /*
  initializeMimetic initalizes resizilla
@@ -731,3 +732,4 @@ setRootFontSize, resizilla);
 const mimetic = mimeticPartial(initializeMimetic, defaults$1);
 
 export default mimetic;
+//# sourceMappingURL=mimetic.es.js.map
