@@ -1,17 +1,16 @@
+` IN PRODUCTION, USE AT OWN RISK `
 
 [![npm version](https://badge.fury.io/js/mimetic.svg)](https://badge.fury.io/js/mimetic) [![Build Status](https://travis-ci.org/julienetie/mimetic.svg?branch=master)](https://travis-ci.org/julienetie/mimetic)
 <img src="http://oi67.tinypic.com/1z4a421.jpg">
 
 
 ### Browser Support
-MIMETIC consistently supports **IE9+**, **Safari 6.2+**, Chrome, Firefox, Edge, Opera, etc.
-MIMETIC does not use any form of browser detection and does not modify element styles.
+- MIMETIC supports **IE9+**, **Safari 6.2+**, Chrome, Firefox, Edge, Opera, etc. Will be depreciating support for  IE9 + IE10 in releases beyond v0.7.3.
+- MIMETIC does not use user-agent detection nor does it modify element styles.
 
 # MIMETIC
 
 ## Scalable Fonts & Zoom Detection
-
-`Alpha release`
 
 ### What is this?
 <img src="https://media.giphy.com/media/13NkUb5hwB1afK/giphy.gif">
@@ -19,41 +18,44 @@ MIMETIC does not use any form of browser detection and does not modify element s
 #### (The sincerest form of flattery)
 
 
-MIMETIC is a JavaScript _viewport engine_, that quantifies relative units to the viewport and _devicePixelRatio_ conditionally. Which means **text can scale to the viewport's dimensions without breaking the browser’s ability to zoom**.
+MIMETIC is a JavaScript _viewport engine_, that quantifies relative units in accordance to the viewport and _devicePixelRatio_ conditionally. Which means **text can scale to the viewport's dimensions without breaking the browser’s ability to zoom**.
 
-### Why?
+### Myth Busting In Advance
+
+- **Bad for accessibility**: MIMETIC doesn't interfere with accessibility.
+- **Breaks site if JavaScript is disabled**: If JavaScript is disabled, the page will function as expected.
+- **Zoom is too proportional**: You can customise how zoom behaves better than the original.
+- **Prevents responsiveness**: Choose when MIMETIC kicks in.
+- **What if the web breaks**: If a vendor changes and MIMETIC breaks, whilst MIMETIC is included separate from the rest of the application code base, your website will not scale (as standard) and will operate the rest of your code as normal. 
+- **Vendor Lock-In**: Remove it to revert.
+
+
+
+### WHY?
 
 It enables developers to:
 - Design fluid website with fonts that scale to the viewport width.
-- Have less / no maintainability for retina and high resolutions displays.
+- Reduces/ eliminates maintainability for retina and high resolutions displays.
 - Normalise the perceived _devicePixelRatio_ for high resolution tablet devices (optional). 
 - Detect the zoom level on all modern desktop browsers IE9+
 - Improve and fine-tune accessibility when the user utilities zoom.
 - Control when and when not to scale via media queries.
-- Take an existing Responsive Website and convert it instantly to a Scalable Website.
-- Less screen resolutions to consider = Get more done in less time.
+- Take an existing Responsive Website and convert it instantly to a **Scalable Website**.
+- Less screen resolutions to consider for improved work flows.
 - Design more aesthetically pleasing websites.
 - Future proof designs from MIMETIC sized rem units to future relative-percentile units by simply changing the unit and root font-size. 
 
-### Why not use something else?
-There are a few existing libraries out there that attempt to scale fonts on the web accordingly but unfortunatley they suffer from a few side-effects such as...
+### An alternative?
+Alternatives seem to have some combination of the below issues:
 
-- Inconsistent browser compatibility.
-- Difficult to no ability to zoom, thus breaking accessibility.
-- Doesn't scale padding/ margin/ line-height and other relative dimensions and doesn’t respect the style attributes on elements (overwrite your inline styles). You must specify relative dimensions (padding/ margin)(More maintenance), or you can’t specify relative dimensions.
-- Scales to a container (which is the inverse effect of MIMETIC).
-- jQuery dependent
-- Does exactly what vw, vh, vmin, vmax does on mobile.
-- Fonts blur.
-- No longer being maintained.
+Inconsistent browser compatibility, difficult to no ability to zoom thus breaking accessibility, doesn't scale padding/ margin/ line-height and other relative dimensions, doesn’t respect the style attributes on elements. Must always specify relative dimensions (padding/ margin)(More maintenance), you can’t specify relative dimensions, scales to a container only, jQuery dependent, does exactly what vw, vh, vmin, vmax does on mobile, fonts blur, no longer being maintained.
 
 ### What do I need to know?
 There’s a few simple concepts you need to understand to create _Scalable Web Design_ via MIMETIC.
--  You must use relative units for all text preferably (REM units)
-- MIMETIC scales all quantities not just font-size margins/ padding, width, height etc.
-- Only work with percentiles and relative units when implementing layouts such as **%**, **vh**, **vw**, **rem**. 
-- vh and vw units are ideal for translate/ translate3d.
-- Mobile design is exactly as you know it.
+-  You must use relative units to keep in proportion (EM & REM units)
+- MIMETIC "can" scales all quantities not just font-size margins/ padding, width, height etc.
+- Avoid pixel units. 
+- Your website should be usable and functional with mimetic included and when left out.
 
 ### Install
 `npm i mimetic` 
@@ -62,23 +64,16 @@ or
 
 `yarn add mimetic`
 
+### First Meaningful Paint
+Ideally MIMETIC should execute before other scripts that directly alter or affect the DOM.
+But it does require the DOM to load first.
+
 ### Usage
-Because MIMETIC is considered as a crucial part of the document’s styling it is encouraged to either:
-
-- Inject the code directly within script tags in the head of your HTML
-
-or 
-
-- add the MIMETIC src via the script tag within the head of your HTML.
-
-Execute MIMETIC preferably before all other scripts.
 ```javascript
 Mimetic();
 ```
 
-### Use MIMETIC as a standalone zoom detection library
-MIMETIC can simply be used as a zoom detection library.
-Simply by disabling scale and using the provided onZoom callback arguments:
+### Standalone zoom detection
 ```javascript
 Mimetic({
   scale: false,
@@ -106,6 +101,6 @@ Below is the list of config options passed as an object:
 | scaleDelay | Number - Milliseconds | The debounced delay to call on resize | 16  |
 
 
-Thanks to [BrowserStack](https://www.browserstack.com) for sponsoring the cross browser & device testing of the project.
+Big thanks to [BrowserStack](https://www.browserstack.com) for sponsoring the cross browser & device testing of this project.
 
 MIT (c) 2017 Julien Etienne.
