@@ -12,11 +12,11 @@
 
 ## Scalable Fonts & Zoom Detection
 
-### What is this?
+<img src="https://raw.githubusercontent.com/julienetie/img/master/1_DQD6cIuZ82YzLI9GoHFcqA.gif">
+
+## The sincerest form of flattery
+_"Mimetic" - relating to, constituting, or habitually practising mimesis (T1000 Mimetic polyalloy)_ 
 <img src="https://media.giphy.com/media/13NkUb5hwB1afK/giphy.gif">
-
-#### (The sincerest form of flattery)
-
 
 MIMETIC is a JavaScript _viewport engine_, that quantifies relative units in accordance to the viewport and _devicePixelRatio_ conditionally. Which means **text can scale to the viewport's dimensions without breaking the browser’s ability to zoom**.
 
@@ -103,4 +103,4 @@ Below is the list of config options passed as an object:
 
 Big thanks to [BrowserStack](https://www.browserstack.com) for sponsoring the cross browser & device testing of this project.
 
-MIT (c) 2017 Julien Etienne.
+MIT (c) 2018 Julien Etienne.
