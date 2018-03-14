@@ -20,17 +20,6 @@ _"Mimetic" - relating to, constituting, or habitually practising mimesis (T1000 
 
 MIMETIC is a JavaScript _viewport engine_, that quantifies relative units in accordance to the viewport and _devicePixelRatio_ conditionally. Which means **text can scale to the viewport's dimensions without breaking the browser’s ability to zoom**.
 
-### Myth Busting In Advance
-
-- **Bad for accessibility**: MIMETIC doesn't interfere with accessibility.
-- **Breaks site if JavaScript is disabled**: If JavaScript is disabled, the page will function as expected.
-- **Zoom is too proportional**: You can customise how zoom behaves better than the original.
-- **Prevents responsiveness**: Choose when MIMETIC kicks in.
-- **What if the web breaks**: If a vendor changes and MIMETIC breaks, whilst MIMETIC is included separate from the rest of the application code base, your website will not scale (as standard) and will operate the rest of your code as normal. 
-- **Vendor Lock-In**: Remove it to revert.
-
-
-
 ### WHY?
 
 It enables developers to:
@@ -70,12 +59,12 @@ But it does require the DOM to load first.
 
 ### Usage
 ```javascript
-Mimetic();
+mimetic();
 ```
 
 ### Standalone zoom detection
 ```javascript
-Mimetic({
+mimetic({
   scale: false,
   onZoom: (a,b,c,d) => console.log(a,b,c,d);
 });
