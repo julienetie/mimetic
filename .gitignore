@@ -5,3 +5,4 @@ yarn.lock
 .env
 local.log
 dist
+errorShots

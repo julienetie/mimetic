@@ -1,0 +1,65 @@
+const http = require('http');
+const fs = require('fs');
+const webdriverio = require('webdriverio');
+const wdio = require('wdio');
+const options = { desiredCapabilities: { browserName: 'chrome' } };
+const client = webdriverio.remote(options);
+// const events = require('events').EventEmitter;
+// const emitter = new events.EventEmitter();
+
+// const PORT = 1234;
+
+// fs.readFile('./test/browser-automation/index.html', function(err, html) {
+//     if (err) {
+//         console.log(err);
+//     }
+//     http.createServer((req, res) => {
+//         res.writeHeader(200, { "Content-Type": "text/html" });
+//         res.write(html);
+//         res.end();
+//     }).listen(PORT);
+// });
+
+
+// describe('TEST 123', ()=>{
+//     it()
+// })
+// Basic automation without tests setup.
+// client
+//     .init()
+//     .url(`http://localhost:${PORT}`)
+//     .windowHandleSize({ width: 400, height: 400 })
+//     .pause(1000)
+//     .windowHandleSize({ width: 700, height: 500 })
+//     .pause(1000)
+//     .windowHandleSize({ width: 800, height: 600 })
+//     .pause(1000)
+//     .windowHandleSize({ width: 1300, height: 800 })
+//     .pause(1000)
+//     .windowHandleSize({ width: 1400, height: 900 })
+//     .pause(1000)
+//     .then(function(title) {
+//         client.end();
+//     })
+//     
+
+
+describe('my awesome website', function() {
+    it('should do some chai assertions', function() {
+        browser.url('http://webdriver.io');
+        browser.getTitle().should.be.equal('WebdriverIO - WebDriver bindings for Node.js');
+    });
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
