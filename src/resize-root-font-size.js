@@ -1,6 +1,7 @@
 import mutateRootFontSize from './mutate-root-font-size';
 import setCallbacks from './set-callbacks';
 import isMobileLikeDeviceTail from './is-mobile-like-device-tail';
+import store from './store.js';
 
 let lastDevicePixelRatio;
 let setRootFontSizeTimeoutId;
@@ -10,13 +11,12 @@ let lastScreenWidth;
 /**
  * Calculate and apply the new font size to the root element.
  */
-const resizeRootFontSize = (settings, setRootFontSizeTail) => {
+const resizeRootFontSize = (setRootFontSizeTail) => {
     const {
         innerWidth,
         outerWidth,
         designWidthRatio,
         calculatedDPR,
-        rootFontSize,
         enableScale,
         preserveDevicePixelRatio,
         onScale,
@@ -27,7 +27,7 @@ const resizeRootFontSize = (settings, setRootFontSizeTail) => {
         lateDetectionDelay,
         mediaQueryCutOff,
         deviceSplitting,
-    } = settings;
+    } = store.resizeSettings;
 
     // Assigns lastOuterWidth with an inital value, never expected to be zero.
     if (!lastOuterWidth) {
@@ -52,7 +52,7 @@ const resizeRootFontSize = (settings, setRootFontSizeTail) => {
     // Determine if the resize event was last with or without zoom.
     const resizeWithoutZoom2 = outerWidth === lastOuterWidth;
 
-    const rootFontSizeFinal = rootFontSize * designWidthRatio * evalDPR;
+    const rootFontSizeFinal = store.rootFontSize * designWidthRatio * evalDPR;
 
     const hasScaledOrDPRIsDefault = resizeWithoutZoom || isDevicePixelRatioDefault;
 

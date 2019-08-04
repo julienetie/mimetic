@@ -25,7 +25,7 @@ const defaults = {
      * will behave similarly to the depreciated max | min device-width / device-height
      * without the use of the depreciated syntax.
      */
-    deviceSplitting: false,
+    deviceSplitting: false
 };
 
 

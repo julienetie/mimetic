@@ -1,3 +1,4 @@
-const store = {
+export default {
+	rootFontSize: NaN,
+	resizeSettings: null
 }
-export default store;

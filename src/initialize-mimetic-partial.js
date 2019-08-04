@@ -3,6 +3,8 @@ import {
     pxToRem,
     getFontSize,
 } from './utilities';
+import resizilla from 'resizilla';
+import store from './store.js';
 /**
  * Sets up intializeMimetic via partial application.
  * @param {Function} document.
@@ -11,13 +13,8 @@ import {
  * @param {Function} setRootFontSize - Sets the new root font size.
  * @param {Function} resizilla - Calls handler on window resize and orientationchange events.
  */
-function initializeMimeticPartial(
-    // CSSUnitsToPixels,
-    setRootFontSize,
-    resizilla,
-) {
+function initializeMimeticPartial(setRootFontSize) {
     // A resize object to store MIMETIC's resizilla's requirements.
-    const resize = {};
 
     // Gets the root element value in REM units.
     const getRootREMValue = basicCompose(
@@ -29,52 +26,40 @@ function initializeMimeticPartial(
      * @param {object} config - The API parameters.
      */
     function initalizeMimeticFinal(config) {
-        // Destructured API parameters.
-        const {
-            scaleDelay,
-        } = config;
-
 
         // Store the scaleDelay for kill and revive.
-        resize.scaleDelay = scaleDelay;
+        store.scaleDelay = config.scaleDelay;
 
 
         // The intial root font size.
-        const rootFontSize = getRootREMValue(document);
-
-
-        // // mobileWidth in pixels.
-        // const mobileWidthPX = CSSUnitsToPixels(mobileWidth);
-
-
-        // Cut off width in pixels.
-        // const cutOffWidthPX = CSSUnitsToPixels(cutOffWidth);
+        store.rootFontSize = getRootREMValue(document);
 
 
         // Provide parameters to setRootFontSize. @TODO remove config, only use what is needed.
-        const settings = Object.assign({
+        const resizeSettings = Object.assign({
             initialOuterHeight: window.outerHeight,
             initialOuterWidth: window.outerWidth,
-            rootFontSize,
             // mobileWidthPX,
             // cutOffWidthPX,
         }, config);
 
 
         // Store the settings for kill and revive.
-        resize.settings = settings;
+        store.resizeSettings = resizeSettings;
 
 
         // Immediately set the root font size according to MIMETIC.
-        const setRootFontSizeScope = () => setRootFontSize(settings);
-        resize.setRootFontSizeScope = setRootFontSizeScope;
-        setRootFontSizeScope();
+        store.setRootFontSizeScope = () => setRootFontSize(resizeSettings);
+        store.setRootFontSizeScope();
 
 
         // On window resize set the root font size according to MIMETIC.
-        resize.resizilla = resizilla(() => {
-            setRootFontSize(settings, setRootFontSizeScope);
-        }, scaleDelay, false);
+        // resize.resizilla = resizilla(() => {
+        //     setRootFontSize(settings, resize.setRootFontSizeScope);
+        // }, scaleDelay, false);
+
+        window.addEventListener('resize',()=> 
+            setRootFontSize(store.setRootFontSizeScope))
     }
 
 
@@ -89,8 +74,8 @@ function initializeMimeticPartial(
      */
     initalizeMimeticFinal.prototype.revive = function revive() {
         resize.resizilla = resizilla(() => {
-            setRootFontSize(resize.settings, resize.setRootFontSizeScope);
-        }, resize.scaleDelay, false);
+            setRootFontSize(store.setRootFontSizeScope);
+        }, store.scaleDelay, false);
     };
 
     return initalizeMimeticFinal;

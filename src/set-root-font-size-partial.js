@@ -1,3 +1,4 @@
+import store from './store.js';
 /**
  * Set Root Font Size.
  */
@@ -8,7 +9,6 @@ const setRootFontSizePartial = (resizeRootFontSize) => {
 
 
     return ({
-        rootFontSize,
         initialOuterWidth,
         relativeDesignWidth,
         preserveDevicePixelRatio,
@@ -75,7 +75,6 @@ const setRootFontSizePartial = (resizeRootFontSize) => {
             relativeDesignWidth,
             designWidthRatio,
             calculatedDPR,
-            rootFontSize,
             enableScale,
             preserveDevicePixelRatio,
             onScale,
