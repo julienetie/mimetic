@@ -1,3 +1,8 @@
+import {
+    basicCompose,
+    pxToRem,
+    getFontSize,
+} from './utilities';
 /**
  * Sets up intializeMimetic via partial application.
  * @param {Function} document.
@@ -7,16 +12,18 @@
  * @param {Function} resizilla - Calls handler on window resize and orientationchange events.
  */
 function initializeMimeticPartial(
-    document,
-    getRootREMValue,
     // CSSUnitsToPixels,
     setRootFontSize,
     resizilla,
-    ) {
+) {
     // A resize object to store MIMETIC's resizilla's requirements.
     const resize = {};
 
-
+    // Gets the root element value in REM units.
+    const getRootREMValue = basicCompose(
+        pxToRem,
+        getFontSize,
+    );
     /**
      * The intializeMimetic function.
      * @param {object} config - The API parameters.
@@ -91,4 +98,3 @@ function initializeMimeticPartial(
 
 
 export default initializeMimeticPartial;
-

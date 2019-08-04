@@ -6,11 +6,6 @@ import setRootFontSizePartial from './set-root-font-size-partial';
 import resizeRootFontSize from './resize-root-font-size';
 import mimeticPartial from './mimetic-partial';
 import defaults from './defaults';
-import {
-    basicCompose,
-    pxToRem,
-    getFontSize,
-} from './utilities';
 
 
 // Object Assign polyfill.
@@ -30,11 +25,7 @@ objectAssignPolyfill();
 const setRootFontSize = setRootFontSizePartial(resizeRootFontSize);
 
 
-// Gets the root element value in REM units.
-const getRootREMValue = basicCompose(
-    pxToRem,
-    getFontSize,
-);
+
 
 
 /*
@@ -46,8 +37,6 @@ const getRootREMValue = basicCompose(
  restart Mimetic's initalization.
 */
 const initializeMimetic = initializeMimeticPartial(
-    document,
-    getRootREMValue,
     // CSSUnitsToPixels,
     setRootFontSize,
     resizilla,
