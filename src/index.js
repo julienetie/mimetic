@@ -73,7 +73,7 @@ export default (config) => {
     const rootFontSize = getFontSizeRem(document);
 
     const resize = () => {
-        const mobileWidth = !window.matchMedia('(min-width: 80em)').matches;
+        const mobileWidth = !window.matchMedia(`(min-width: 80em)`).matches;
         if (mobileWidth) {
         	rootElement.removeAttribute('style');
             return;
@@ -120,7 +120,7 @@ export default (config) => {
         /**
          * The window width compared to the design width.
          */
-        const relativeDesignWidth = 1024;
+        const relativeDesignWidth = 1280;
         const designWidthRatio = innerWidth / relativeDesignWidth;
 
         const scaledFontSize = (rootFontSize * designWidthRatio * evalDPR) + 'rem';
@@ -139,3 +139,11 @@ export default (config) => {
     });
     window.requestAnimationFrame(resize);
 }
+
+/**
+
+Edge 18+ 
+Chrome 70 
+Firefox 63 
+
+**/
