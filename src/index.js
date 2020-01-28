@@ -1,5 +1,10 @@
 import defaults from './defaults';
-import { getFontSize, getRootElement, basicCompose, pxToRem } from './helpers';
+import {
+    getFontSize,
+    getRootElement,
+    basicCompose,
+    pxToRem
+} from './helpers';
 
 // https://github.com/ehtb/onFrame
 function debounce(func, frameLength = 10) {
@@ -75,7 +80,7 @@ export default (config) => {
     const resize = () => {
         const mobileWidth = !window.matchMedia(`(min-width: 80em)`).matches;
         if (mobileWidth) {
-        	rootElement.removeAttribute('style');
+            rootElement.removeAttribute('style');
             return;
         }
         // Real time DOM measurments.
@@ -128,7 +133,7 @@ export default (config) => {
     }
 
     const debounceResize = debounce(() => {
-    	window.requestAnimationFrame(resize);
+        window.requestAnimationFrame(resize);
         console.log('debounced resize')
     }, 20);
 
