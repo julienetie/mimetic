@@ -3,67 +3,10 @@ import {
     getFontSize,
     getRootElement,
     basicCompose,
-    pxToRem
+    pxToRem,
+    debounce
 } from './helpers';
 
-// https://github.com/ehtb/onFrame
-function debounce(func, frameLength = 10) {
-    let called = 0;
-    let frame;
-
-    const reset = function() {
-        called = 0;
-        frame = null;
-    };
-
-    const cancel = function() {
-        cancelAnimationFrame(frame);
-        reset();
-    };
-
-    const run = function(...args) {
-        const context = this;
-
-        if (frame != null) {
-            cancelAnimationFrame(frame);
-            reset();
-        }
-
-        frame = requestAnimationFrame(function tick() {
-            if (++called === frameLength) {
-                reset();
-
-                func.apply(context, args);
-            } else {
-                frame = requestAnimationFrame(tick);
-            }
-        });
-    };
-
-    run.cancel = cancel;
-
-    return run;
-};
-
-const delay = (callback, duration) => {
-    var startTime = 0,
-        terminate = false;
-
-    function loop(timestamp) {
-        if (!startTime) {
-            startTime = timestamp;
-        }
-
-        if (timestamp > startTime + duration && !terminate) {
-            if (callback) callback();
-            terminate = true;
-        } else {
-            requestAnimationFrame(loop);
-        }
-    }
-
-    requestAnimationFrame(loop);
-}
 
 export default (config) => {
     const windowRef = window;
@@ -138,8 +81,7 @@ export default (config) => {
     }, 20);
 
     window.addEventListener('resize', () => {
-        window.requestAnimationFrame(resize);
-        // delay(resize,500);
+        window.requestAnimationFrame(resize); 
         debounceResize();
     });
     window.requestAnimationFrame(resize);

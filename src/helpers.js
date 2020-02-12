@@ -37,3 +37,68 @@ export const getRootElement = (element) => {
     }
     return elements[element] ? elements[element](documentRef) : documentRef.querySelector(element);
 };
+
+/** 
+ * Generates the supplied function as debounced
+ * By https://github.com/ehtb/onFrame
+ */
+export const debounce = (func, frameLength = 10) => {
+    let called = 0;
+    let frame;
+
+    const reset = function() {
+        called = 0;
+        frame = null;
+    };
+
+    const cancel = function() {
+        cancelAnimationFrame(frame);
+        reset();
+    };
+
+    const run = function(...args) {
+        const context = this;
+
+        if (frame != null) {
+            cancelAnimationFrame(frame);
+            reset();
+        }
+
+        frame = requestAnimationFrame(function tick() {
+            if (++called === frameLength) {
+                reset();
+
+                func.apply(context, args);
+            } else {
+                frame = requestAnimationFrame(tick);
+            }
+        });
+    };
+
+    run.cancel = cancel;
+
+    return run;
+};
+
+
+// Delay
+export const delay = (callback, duration) => {
+    var startTime = 0,
+        terminate = false;
+
+    function loop(timestamp) {
+        if (!startTime) {
+            startTime = timestamp;
+        }
+
+        if (timestamp > startTime + duration && !terminate) {
+            if (callback) callback();
+            terminate = true;
+        } else {
+            requestAnimationFrame(loop);
+        }
+    }
+
+    requestAnimationFrame(loop);
+}
+
