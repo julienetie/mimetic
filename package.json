@@ -43,7 +43,7 @@
     "rollup-plugin-multi-entry": "^2.0.2",
     "rollup-plugin-node-resolve": "^3.2.0",
     "rollup-watch": "^4.3.1",
-    "serve": "^6.5.3",
+    "serve": "^11.3.2",
     "serve-static": "^1.13.2",
     "wdio": "^1.0.3",
     "wdio-mocha-framework": "^0.5.13",
