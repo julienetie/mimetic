@@ -1,18 +1,15 @@
 {
-    "extends": "airbnb-base",
-    "plugins": [
-        "import"
-    ],
-    "rules": {
-        "indent": [
-            "error",
-            4
-        ],
-        "arrow-body-style": [2, "as-needed"]
+    "env": {
+        "browser": true,
+        "es2021": true
     },
-    "comma-dangle" : ["error", {"functions": "never"}],
-    "globals": {
-        "document": true,
-         "window": true
+    "extends": "standard",
+    "overrides": [
+    ],
+    "parserOptions": {
+        "ecmaVersion": "latest",
+        "sourceType": "module"
+    },
+    "rules": {
     }
 }
