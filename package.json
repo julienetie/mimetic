@@ -12,7 +12,7 @@
     "unit-test-client": "./node_modules/.bin/concurrently \"node server.js\" \"./node_modules/.bin/rollup -c ./rollup/config.test.js -w\"",
     "lint": "./node_modules/.bin/eslint ./src ./test",
     "lint:src": "./node_modules/.bin/eslint ./src",
-    "lint-watch": "./node_modules/.bin/esw -w ./src ./test"
+    "lint:watch": "./node_modules/.bin/esw -w ./src ./test"
   },
   "repository": {
     "type": "git",

@@ -54,9 +54,9 @@
     }
     </style>
     <!-- 2. Include Mimetic preferably in the head of the document -->
-    <script src="../../dist/mimetic.js"></script>
     <!-- 3. Call Mimetic, optionally configurate by passing an object -->
-    <script>
+    <script type="module">
+        import mimetic from '../../dist/mimetic.js'
     function addClass(element, newClassName) {
         if (element.classList) {
             element.classList.add(newClassName);

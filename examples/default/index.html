@@ -10,11 +10,12 @@
     <link rel="stylesheet" href="foundation.min.css">
 
     <!-- 2. Include Mimetic preferably in the head of the document -->
-    <script src="../../dist/mimetic.js"></script>
+    <!-- <script src="../../dist/mimetic.js"></script> -->
 
     <!-- 3. Call Mimetic, optionally configurate by passing an object -->
-    <script>
-      mimetic();
+    <script type="module">
+      import mimetic from '../../dist/mimetic.js'
+      mimetic({})
     </script>
 
     <!-- 4. Resize and zoom the browser to your hearts content -->

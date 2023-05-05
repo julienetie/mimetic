@@ -15,11 +15,11 @@ export default {
     ],
     output: [{
         name: "mimetic",
-        file: "dist/mimetic.js",
+        file: "dist/mimetic.umd.js",
         format: 'umd'
     }, {
         name: "datePicker",
-        file: "dist/mimetic.es.js",
+        file: "dist/mimetic.js",
         format: 'es'
     }],
     watch: {
