@@ -1,25 +1,33 @@
 # Mimetic
 ## A library for scaling fonts
+_"Mimetic" - relating to, constituting, or habitually practising mimesis_
 
-### Scaling fonts
-CSS features various units for scaling fronts somewhat relative to the viewport:
-vw, vh, vmin, vmax, svw, svh, lvw, lvh, dvw, dvh
+<img src="https://user-images.githubusercontent.com/7676299/236578193-a523cc8c-7187-45bf-8ef4-c6ef9c295eb8.gif">
 
-### The Problem 
-In an ideal world, typoography that scales with it's surroundings produces more harmonised astetics and can upscalling automatically.
-We could achieve this with viewport units though unfortunately they break the browser's zoom which is not practical or ideal for accessibility.
+### The Problem
+You want your fonts to scale to the viewport because its not the 1970s. It is possible to scale fonts using _viewport units_ but it's not recommended:
+- Fonts using viewport units will not be affeced by the browser's built-in zoom, thus breaking accessibiilty.
+- Responsive desing becomes more tedious since each font will require an additonal viewport value to be paired with a fixed set of values.
 
-### The Solution
-Mimetic does not do any sourcery, it simply scales `rem` units to the viewport size and the devicePixelRatio.
+### The solution
+Mimetic scales your _rem_ and _em_ values relative to the browser's viewport whilst respecting the device-pixel-ratio.
 This means: 
-- `rem` and `em` units scale with the browser's viewport
-- Zooming in and out will affect `rem` units accordingly
+- Fonts and other elements can scale when you resize the window
+- The browser's zoom will also increase/ decrease your pages entities
+- There's no need to create breakpoints beyond the mimetic-breakpoint _[default 1024px/ 64em]_
 
-### Working with Mimetic
-When you enable Mimetic, you essentially build websites in the same way you usally do with some minor differences:
-- Use % and or rem units for containers
-- Use rem units for fonts
-- Your designs are within 1024px width. Your rem units will scale automatically above 1024px (64rem)
+### How it works
+The mimetic-breakpoint is the viewport width when Mimetic begins to scale your rem and em values.
+- Create your responsive/ mobile first webiste as normal within the mimetic-breakpoint _[0 to 1024px/ 64em]_
+- Ensure all the px and font values are in rem units (em works too but it's recommended to use rem to avoid compounding)
+- Import the mimetic function and call it ideally in the head of the document
+- Resize the window past the mimetic-breakpoint
+
+### Can Mimetic detect the desktop browser's zoom level
+Yes, but despite that I recommend not making your applicaton rely on it. Treat this feature as an enhancement not a necessity.
+
+### Why Mimetic
+In an ideal world, typoography that scales with it's surroundings produces more harmonised astetics and can upscalling automatically.
 
 ### Support
 Mimetic supports all everygreen browsers.  your 1024px design on unsupported browsers.
@@ -38,7 +46,7 @@ Mimetic supports all everygreen browsers.  your 1024px design on unsupported bro
 
 ## Scalable Fonts & Zoom Detection
 
-<img src="https://raw.githubusercontent.com/julienetie/img/master/1_DQD6cIuZ82YzLI9GoHFcqA.gif">
+
 
 ## The sincerest form of flattery
 _"Mimetic" - relating to, constituting, or habitually practising mimesis (T1000 Mimetic polyalloy)_ 
