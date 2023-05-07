@@ -1,7 +1,28 @@
 # Mimetic
-### Problem
-We have these viewport units:
-But...
+## A library for scaling fonts
+
+### Scaling fonts
+CSS features various units for scaling fronts somewhat relative to the viewport:
+vw, vh, vmin, vmax, svw, svh, lvw, lvh, dvw, dvh
+
+### The Problem 
+In an ideal world, typoography that scales with it's surroundings produces more harmonised astetics and can upscalling automatically.
+We could achieve this with viewport units though unfortunately they break the browser's zoom which is not practical or ideal for accessibility.
+
+### The Solution
+Mimetic does not do any sourcery, it simply scales `rem` units to the viewport size and the devicePixelRatio.
+This means: 
+- `rem` and `em` units scale with the browser's viewport
+- Zooming in and out will affect `rem` units accordingly
+
+### Working with Mimetic
+When you enable Mimetic, you essentially build websites in the same way you usally do with some minor differences:
+- Use % and or rem units for containers
+- Use rem units for fonts
+- Your designs are within 1024px width. Your rem units will scale automatically above 1024px (64rem)
+
+### Support
+Mimetic supports all everygreen browsers.  your 1024px design on unsupported browsers.
 
 [![BrowserStack Status](https://www.browserstack.com/automate/badge.svg?badge_key=QVBtZ2RDRExvK1drZUs4c1A5RnhEM3RlZVEvZnI0clpFemFhYmptR3hlMD0tLUJ4MEJ5RWIrZDd3UWtKcDZyMUZOU1E9PQ==--7858aba08fb319a6a4a42f0ea75b6d8063b8f192)](https://www.browserstack.com/automate/public-build)
 
