@@ -4,17 +4,17 @@ _"Mimetic" - relating to, constituting, or habitually practising mimesis_
 
 <img src="https://user-images.githubusercontent.com/7676299/236578193-a523cc8c-7187-45bf-8ef4-c6ef9c295eb8.gif">
 
-### The Problem
-You want your fonts to scale to the [viewport](https://developer.mozilla.org/en-US/docs/Web/CSS/Viewport_concepts#what_is_a_viewport) because its not the 1970s. Although you can scale fonts using _[viewport-percentage lengths](https://www.w3.org/TR/css-values-3/#viewport-relative-lengths)_ it's not usually recommended:
-- Fonts using viewport units will not be affeced by the browser's built-in zoom, thus breaking [accessibiilty](https://developer.mozilla.org/en-US/docs/Learn/Accessibility/What_is_accessibility)
-- Responsive desing becomes more tedious since each font will require an additonal viewport value to be paired with a fixed set of values
-
-### The solution
-Mimetic scales your _[rem](https://developer.mozilla.org/en-US/docs/Learn/CSS/Building_blocks/Values_and_units#relative_length_units)_ and _[em](https://developer.mozilla.org/en-US/docs/Learn/CSS/Building_blocks/Values_and_units#relative_length_units)_ values relative to the browser's viewport whilst respecting the [device-pixel-ratio](https://developer.mozilla.org/en-US/docs/Web/API/Window/devicePixelRatio)
-which means: 
-- Fonts and other elements can scale when you resize the window
-- The browser's zoom will be able to increase and decrease your pages entities
-- There is no need to create breakpoints beyond the _mimetic-breakpoint_ _[default 1024px/ 64em]_
+> ### The Problem
+> **You want your fonts to scale to the [viewport](https://developer.mozilla.org/en-US/docs/Web/CSS/Viewport_concepts#what_is_a_viewport) because its not the 1970s**. Although you can scale fonts using _[viewport-percentage lengths](https://www.w3.org/TR/css-values-3/#viewport-relative-lengths)_ it's not usually recommended:
+> - Fonts using viewport units will not be affeced by the browser's built-in zoom, thus breaking [accessibiilty](https://developer.mozilla.org/en-US/docs/Learn/Accessibility/What_is_accessibility)
+> - Responsive desing becomes more tedious since each font will require an additonal viewport value to be paired with a fixed set of values
+>
+> ### The solution
+> Mimetic scales your _[rem](https://developer.mozilla.org/en-US/docs/Learn/CSS/Building_blocks/Values_and_units#relative_length_units)_ and _[em](https://developer.mozilla.org/en-US/docs/Learn/CSS/Building_blocks/Values_and_units#relative_length_units)_ values relative to the browser's viewport whilst respecting the [device-pixel-ratio](https://developer.mozilla.org/en-US/docs/Web/API/Window/devicePixelRatio)
+> which means: 
+> - Fonts and other elements can scale when you resize the window
+> - The browser's zoom will be able to increase and decrease your pages entities
+> - There is no need to create breakpoints beyond the _mimetic-breakpoint_ _[default 1024px/ 64em]_
 
 ### How it works
 The _mimetic-breakpoint_ is the viewport width when Mimetic begins to scale your rem and em values.
@@ -23,19 +23,22 @@ The _mimetic-breakpoint_ is the viewport width when Mimetic begins to scale your
 - Import the mimetic function and call it ideally in the head of the document
 - Resize the window past the mimetic-breakpoint
 
-### Can Mimetic detect the desktop browser's zoom level
+### Can Mimetic detect the desktop browser's zoom level?
 Yes. Although this is possible, it's not recommended to make your applicaton rely on it. Treat this feature as an enhancement not a necessity.
 
-### Why is Mimetic a thing
-In an ideal world, typoography that scales with it's surroundings produces more harmonised astetics and can upscalling automatically.
 
 ### Support
 Mimetic supports all everygreen browsers and gracefully falls back to your 1024px (64em) design for unsupported browsers.
 
-### What about alternatives?
-Most alternatives appear to have some combination of the below issues:
+**By default, Mimetic is not a JavaScript dependency pre-se. If Mimetic or JavaScript fails, the web page will still be accessible**
 
-Inconsistent browser compatibility, difficult to no ability to zoom thus breaking accessibility, doesn't scale padding/ margin/ line-height and other relative dimensions, doesn’t respect the style attributes on elements. Must always specify relative dimensions (padding/ margin)(More maintenance), you can’t specify relative dimensions, scales to a container only, framework dependent, lacks a breakpoint, fonts blur or is no longer being maintained.
+> ### Why is Mimetic a thing
+> In an ideal world, typoography that scales with it's surroundings produces more harmonised astetics and can upscalling automatically.
+>
+> ### What about alternatives?
+> Most alternatives appear to have some combination of the below issues:
+>
+> Inconsistent browser compatibility, difficult to no ability to zoom thus breaking accessibility, doesn't scale padding/ margin/ line-height and other relative dimensions, doesn’t respect the style attributes on elements. Must always specify relative dimensions (padding/ margin)(More maintenance), you can’t specify relative dimensions, scales to a container only, framework dependent, lacks a breakpoint, fonts blur or is no longer being maintained.
 
 ### Install
 `npm i mimetic` 
