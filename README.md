@@ -32,14 +32,6 @@ Mimetic supports all everygreen browsers and gracefully falls back to your 1024p
 
 **By default, Mimetic is not a JavaScript dependency pre-se. If Mimetic or JavaScript fails, the web page will still be accessible**
 
-> ### Why is Mimetic a thing
-> In an ideal world, typoography that scales with it's surroundings produces more harmonised astetics and can upscalling automatically.
->
-> ### What about alternatives?
-> Most alternatives appear to have some combination of the below issues:
->
-> Inconsistent browser compatibility, difficult to no ability to zoom thus breaking accessibility, doesn't scale padding/ margin/ line-height and other relative dimensions, doesn’t respect the style attributes on elements. Must always specify relative dimensions (padding/ margin)(More maintenance), you can’t specify relative dimensions, scales to a container only, framework dependent, lacks a breakpoint, fonts blur or is no longer being maintained.
-
 ### Install
 `npm i mimetic` 
 
@@ -74,6 +66,16 @@ Below is the list of config options passed as an object:
 | preserveDevicePixelRatio | Boolean | Normalises the device pixel ratio for high ratio devices | false |
 | relativeDesignWidth | String - CSS units  | The width relative to the font size | "1024px" |
 | scaleDelay | Number - Milliseconds | The debounced delay to call on resize | 16  |
+
+
+> ### Why is Mimetic a thing
+> In an ideal world, typoography that scales with it's surroundings produces more harmonised astetics and can upscalling automatically.
+>
+> ### What about alternatives?
+> Most alternatives appear to have some combination of the below issues:
+>
+> Inconsistent browser compatibility, difficult to no ability to zoom thus breaking accessibility, doesn't scale padding/ margin/ line-height and other relative dimensions, doesn’t respect the style attributes on elements. Must always specify relative dimensions (padding/ margin)(More maintenance), you can’t specify relative dimensions, scales to a container only, framework dependent, lacks a breakpoint, fonts blur or is no longer being maintained.
+
 
 Big thanks to [BrowserStack](https://www.browserstack.com) for sponsoring the cross browser & device testing of this project.
 
