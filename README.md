@@ -5,87 +5,40 @@ _"Mimetic" - relating to, constituting, or habitually practising mimesis_
 <img src="https://user-images.githubusercontent.com/7676299/236578193-a523cc8c-7187-45bf-8ef4-c6ef9c295eb8.gif">
 
 ### The Problem
-You want your fonts to scale to the viewport because its not the 1970s. It is possible to scale fonts using _viewport units_ but it's not recommended:
-- Fonts using viewport units will not be affeced by the browser's built-in zoom, thus breaking accessibiilty.
-- Responsive desing becomes more tedious since each font will require an additonal viewport value to be paired with a fixed set of values.
+You want your fonts to scale to the [viewport](https://developer.mozilla.org/en-US/docs/Web/CSS/Viewport_concepts#what_is_a_viewport) because its not the 1970s. Although you can scale fonts using _[viewport-percentage lengths](https://www.w3.org/TR/css-values-3/#viewport-relative-lengths)_ it's not usually recommended:
+- Fonts using viewport units will not be affeced by the browser's built-in zoom, thus breaking [accessibiilty](https://developer.mozilla.org/en-US/docs/Learn/Accessibility/What_is_accessibility)
+- Responsive desing becomes more tedious since each font will require an additonal viewport value to be paired with a fixed set of values
 
 ### The solution
-Mimetic scales your _rem_ and _em_ values relative to the browser's viewport whilst respecting the device-pixel-ratio.
-This means: 
+Mimetic scales your _[rem](https://developer.mozilla.org/en-US/docs/Learn/CSS/Building_blocks/Values_and_units#relative_length_units)_ and _[em](https://developer.mozilla.org/en-US/docs/Learn/CSS/Building_blocks/Values_and_units#relative_length_units)_ values relative to the browser's viewport whilst respecting the [device-pixel-ratio](https://developer.mozilla.org/en-US/docs/Web/API/Window/devicePixelRatio)
+which means: 
 - Fonts and other elements can scale when you resize the window
-- The browser's zoom will also increase/ decrease your pages entities
-- There's no need to create breakpoints beyond the mimetic-breakpoint _[default 1024px/ 64em]_
+- The browser's zoom will be able to increase and decrease your pages entities
+- There is no need to create breakpoints beyond the _mimetic-breakpoint_ _[default 1024px/ 64em]_
 
 ### How it works
-The mimetic-breakpoint is the viewport width when Mimetic begins to scale your rem and em values.
+The _mimetic-breakpoint_ is the viewport width when Mimetic begins to scale your rem and em values.
 - Create your responsive/ mobile first webiste as normal within the mimetic-breakpoint _[0 to 1024px/ 64em]_
 - Ensure all the px and font values are in rem units (em works too but it's recommended to use rem to avoid compounding)
 - Import the mimetic function and call it ideally in the head of the document
 - Resize the window past the mimetic-breakpoint
 
 ### Can Mimetic detect the desktop browser's zoom level
-Yes, but despite that I recommend not making your applicaton rely on it. Treat this feature as an enhancement not a necessity.
+Yes. Although this is possible, it's not recommended to make your applicaton rely on it. Treat this feature as an enhancement not a necessity.
 
-### Why Mimetic
+### Why is Mimetic a thing
 In an ideal world, typoography that scales with it's surroundings produces more harmonised astetics and can upscalling automatically.
 
 ### Support
-Mimetic supports all everygreen browsers.  your 1024px design on unsupported browsers.
+Mimetic supports all everygreen browsers and gracefully falls back to your 1024px (64em) design for unsupported browsers.
 
-[![BrowserStack Status](https://www.browserstack.com/automate/badge.svg?badge_key=QVBtZ2RDRExvK1drZUs4c1A5RnhEM3RlZVEvZnI0clpFemFhYmptR3hlMD0tLUJ4MEJ5RWIrZDd3UWtKcDZyMUZOU1E9PQ==--7858aba08fb319a6a4a42f0ea75b6d8063b8f192)](https://www.browserstack.com/automate/public-build)
+### What about alternatives?
+Most alternatives appear to have some combination of the below issues:
 
-[![npm version](https://badge.fury.io/js/mimetic.svg)](https://badge.fury.io/js/mimetic) [![Build Status](https://travis-ci.org/julienetie/mimetic.svg?branch=master)](https://travis-ci.org/julienetie/mimetic)
-<img src="http://oi67.tinypic.com/1z4a421.jpg">
-
-
-### Browser Support
-- MIMETIC supports **IE9+**, **Safari 6.2+**, Chrome, Firefox, Edge, Opera, etc. Will be depreciating support for  IE9 + IE10 in releases beyond v0.7.3.
-- MIMETIC does not use user-agent detection nor does it modify element styles.
-
-# MIMETIC
-
-## Scalable Fonts & Zoom Detection
-
-
-
-## The sincerest form of flattery
-_"Mimetic" - relating to, constituting, or habitually practising mimesis (T1000 Mimetic polyalloy)_ 
-<img src="https://media.giphy.com/media/13NkUb5hwB1afK/giphy.gif">
-
-MIMETIC is a JavaScript _viewport engine_, that quantifies relative units in accordance to the viewport and _devicePixelRatio_ conditionally. Which means **text can scale to the viewport's dimensions without breaking the browser’s ability to zoom**.
-
-### WHY?
-
-It enables developers to:
-- Design fluid website with fonts that scale to the viewport width.
-- Reduces/ eliminates maintainability for retina and high resolutions displays.
-- Normalise the perceived _devicePixelRatio_ for high resolution tablet devices (optional). 
-- Detect the zoom level on all modern desktop browsers IE9+
-- Improve and fine-tune accessibility when the user utilities zoom.
-- Control when and when not to scale via media queries.
-- Take an existing Responsive Website and convert it instantly to a **Scalable Website**.
-- Less screen resolutions to consider for improved work flows.
-- Design more aesthetically pleasing websites.
-- Future proof designs from MIMETIC sized rem units to future relative-percentile units by simply changing the unit and root font-size. 
-
-### An alternative?
-Alternatives seem to have some combination of the below issues:
-
-Inconsistent browser compatibility, difficult to no ability to zoom thus breaking accessibility, doesn't scale padding/ margin/ line-height and other relative dimensions, doesn’t respect the style attributes on elements. Must always specify relative dimensions (padding/ margin)(More maintenance), you can’t specify relative dimensions, scales to a container only, jQuery dependent, does exactly what vw, vh, vmin, vmax does on mobile, fonts blur, no longer being maintained.
-
-### What do I need to know?
-There’s a few simple concepts you need to understand to create _Scalable Web Design_ via MIMETIC.
--  You must use relative units to keep in proportion (EM & REM units)
-- MIMETIC "can" scales all quantities not just font-size margins/ padding, width, height etc.
-- Avoid pixel units. 
-- Your website should be usable and functional with mimetic included and when left out.
+Inconsistent browser compatibility, difficult to no ability to zoom thus breaking accessibility, doesn't scale padding/ margin/ line-height and other relative dimensions, doesn’t respect the style attributes on elements. Must always specify relative dimensions (padding/ margin)(More maintenance), you can’t specify relative dimensions, scales to a container only, framework dependent, lacks a breakpoint, fonts blur or is no longer being maintained.
 
 ### Install
 `npm i mimetic` 
-
-or 
-
-`yarn add mimetic`
 
 ### First Meaningful Paint
 Ideally MIMETIC should execute before other scripts that directly alter or affect the DOM.
@@ -95,7 +48,6 @@ But it does require the DOM to load first.
 ```javascript
 mimetic();
 ```
-
 ### Standalone zoom detection
 ```javascript
 mimetic({
@@ -103,9 +55,6 @@ mimetic({
   onZoom: (a,b,c,d) => console.log(a,b,c,d);
 });
 ```
-
-### Size
-MIMETIC has a **2.5kb gzip size** and will not exceed a 3.5kb gzip size. 
 
 ### Options
 Below is the list of config options passed as an object:
@@ -122,7 +71,6 @@ Below is the list of config options passed as an object:
 | preserveDevicePixelRatio | Boolean | Normalises the device pixel ratio for high ratio devices | false |
 | relativeDesignWidth | String - CSS units  | The width relative to the font size | "1024px" |
 | scaleDelay | Number - Milliseconds | The debounced delay to call on resize | 16  |
-
 
 Big thanks to [BrowserStack](https://www.browserstack.com) for sponsoring the cross browser & device testing of this project.
 
