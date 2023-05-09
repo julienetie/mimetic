@@ -1,5 +1,5 @@
 # Mimetic
-## A library for scaling fonts
+## A mini library elegantly scaling fonts
 _"Mimetic" - relating to, constituting, or habitually practising mimesis_
 
 <img src="https://user-images.githubusercontent.com/7676299/236578193-a523cc8c-7187-45bf-8ef4-c6ef9c295eb8.gif">
@@ -17,32 +17,28 @@ _"Mimetic" - relating to, constituting, or habitually practising mimesis_
 > - There is no need to create breakpoints beyond the _mimetic-breakpoint_ _[default 1024px/ 64em]_
 
 ### How it works
-The _mimetic-breakpoint_ is the viewport width when Mimetic begins to scale your rem and em values.
-- Create your responsive/ mobile first webiste as normal within the mimetic-breakpoint _[0 to 1024px/ 64em]_
-- Ensure all the px and font values are in rem units (em works too but it's recommended to use rem to avoid compounding)
-- Import the mimetic function and call it ideally in the head of the document
-- Resize the window past the mimetic-breakpoint
-
-### Can Mimetic detect the desktop browser's zoom level?
-Yes. Although this is possible, it's not recommended to make your applicaton rely on it. Treat this feature as an enhancement not a necessity.
+#### Mimetic scales your fonts and any containers that use rem or em units
+The **_mimesis-breakpoint_** is the viewport width when Mimetic begins to scale your rem and em values
+- Create your responsive layout as normal within the _mimesis-breakpoint_ _[0 to 1024px/ 64em]_
+- _px_ will not scale, so ensure fonts and fixed dimensions you want to scale are in _rem_ or _em_ units _(rem should be prefered to avoid compounding)_
+- Import the mimetic function and call it early within the head of the document to avoid jittering the [first meaningful paint](https://developer.chrome.com/en/docs/lighthouse/performance/first-meaningful-paint/)
+- Resize the window past the _mimesis-breakpoint_ to see it in effect
 
 
 ### Support
-Mimetic supports all everygreen browsers and gracefully falls back to your 1024px (64em) design for unsupported browsers.
+Mimetic supports all everygreen browsers and gracefully falls back to your 1024px (64em) design for unsupported browsers and devices.
 
-**By default, Mimetic is not a JavaScript dependency pre-se. If Mimetic or JavaScript fails, the web page will still be accessible**
-
-### Install
-`npm i mimetic` 
-
-### First Meaningful Paint
-Ideally MIMETIC should execute before other scripts that directly alter or affect the DOM.
-But it does require the DOM to load first.
-
-### Usage
+### Install and use use
 ```javascript
-mimetic();
+<script type="module">
+  import mimetic from './mimetic.js'
+  mimetic()
+</script>
 ```
+or 
+
+`npm i mimetic`
+
 ### Standalone zoom detection
 ```javascript
 mimetic({
@@ -67,6 +63,9 @@ Below is the list of config options passed as an object:
 | relativeDesignWidth | String - CSS units  | The width relative to the font size | "1024px" |
 | scaleDelay | Number - Milliseconds | The debounced delay to call on resize | 16  |
 
+
+### Can Mimetic detect the desktop browser's zoom level?
+Yes. Although this is possible, it's not recommended to make your applicaton rely on it. Treat this feature as an enhancement not a necessity.
 
 > ### Why is Mimetic a thing
 > In an ideal world, typoography that scales with it's surroundings produces more harmonised astetics and can upscalling automatically.
