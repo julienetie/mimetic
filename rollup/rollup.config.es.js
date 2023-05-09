@@ -15,7 +15,7 @@ export default {
     output: {
         name: 'mimetic',
         format: 'es',
-        file: './dist/mimetic.es.js',
+        file: './dist/mimetic.js',
         sourcemap: true
     }
 };

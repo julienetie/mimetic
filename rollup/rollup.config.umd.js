@@ -15,7 +15,7 @@ export default {
     output: {
         name: 'mimetic',
         format: 'umd',
-        file: './dist/mimetic.js',
+        file: './dist/mimetic.umd.js',
         sourcemap: true
     }
 };

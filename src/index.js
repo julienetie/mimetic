@@ -1,61 +1,92 @@
-import resizilla from 'resizilla';
-import objectAssignPolyfill from '../libs/object-assign-polyfill';
-// import CSSUnitsToPixels from './css-units-to-pixels';
-import initializeMimeticPartial from './initialize-mimetic-partial';
-import setRootFontSizePartial from './set-root-font-size-partial';
-import resizeRootFontSize from './resize-root-font-size';
-import mimeticPartial from './mimetic-partial';
-import defaults from './defaults';
+import defaults from './defaults'
 import {
-    basicCompose,
+  getFontSize,
+  getRootElement,
+  basicCompose,
+  pxToRem,
+  debounce
+} from './helpers'
+
+export default (config) => {
+  const windowRef = window
+  const documentRef = document
+
+  const rootSelector = config.rootSelector || defaults.rootSelector
+  const rootElement = getRootElement(rootSelector)
+  const getFontSizeRem = basicCompose(
     pxToRem,
-    getFontSize,
-} from './utilities';
+    getFontSize
+  )
+  const rootFontSize = getFontSizeRem(document)
 
+  const resize = () => {
+    const mobileWidth = !window.matchMedia('(min-width: 80em)').matches
+    if (mobileWidth) {
+      rootElement.removeAttribute('style')
+      return
+    }
+    // Real time DOM measurments.
+    const innerWidth = windowRef.innerWidth
+    const outerWidth = windowRef.outerWidth
+    const clientWidth = documentRef.documentElement.clientWidth
+    const DPR = windowRef.devicePixelRatio
 
-// Object Assign polyfill.
-objectAssignPolyfill();
+    // Ratio between the outer and client width.
+    const outerClientRatio = outerWidth / clientWidth
 
+    // A calulated DPR within the proximity of 0.05. for devices (eg.safari)
+    // that have a fixed DPR.
+    // @TODO check on large display devices with DPRs greater than 1.
+    const OCRProximity = outerClientRatio < 1.05 && outerClientRatio > 0.95
+      ? 1
+      : outerClientRatio
 
-/*
- initializeMimetic initalizes resizilla
- (A window resize plugin) to call setRootFontSize
- on window resize.
+    // A calculated DPR safe for safari browsers.
+    const safariSafeDPR = Number((OCRProximity).toFixed(5))
 
- setRootFontSize -> resizeRootFontSize which does
- `rootElement.style.fontSize = 'xrem';`
+    // Legacy internet explorer devicePixelRatio.
+    const IEDPR = Number(windowRef.screen.deviceXDPI / windowRef.screen.logicalXDPI)
 
- This function is initally called on resize.
-*/
-const setRootFontSize = setRootFontSizePartial(resizeRootFontSize);
+    // The devicePixelRatio with polyfilled support.
+    const alt = DPR === 1 ? safariSafeDPR : DPR
+    const calculatedDPR = Math.abs(IEDPR || alt)
 
+    // The default device pixel ratio.
+    const defaultDPR = Math.round(clientWidth * (calculatedDPR / outerWidth))
 
-// Gets the root element value in REM units.
-const getRootREMValue = basicCompose(
-    pxToRem,
-    getFontSize,
-);
+    // Calculates the devicePixelRatio as if the default was 1.
+    const normalizedDPR = (1 / defaultDPR) * calculatedDPR
 
+    // The preserved or non-preserved DPR via API settings.
+    const preserveDevicePixelRatio = false
 
-/*
- Called initally and on prototype.revivie() to
- setup and implement resizilla's event listeners.
+    const evalDPR = preserveDevicePixelRatio ? calculatedDPR : normalizedDPR
+    /**
+         * The window width compared to the design width.
+         */
+    const relativeDesignWidth = 1280
+    const designWidthRatio = innerWidth / relativeDesignWidth
 
- initalizeMimetic contains a kill method to remove
- resizilla's event listeners and a revive method to
- restart Mimetic's initalization.
-*/
-const initializeMimetic = initializeMimeticPartial(
-    document,
-    getRootREMValue,
-    // CSSUnitsToPixels,
-    setRootFontSize,
-    resizilla,
-);
+    const scaledFontSize = (rootFontSize * designWidthRatio * evalDPR) + 'rem'
+    rootElement.style.fontSize = scaledFontSize
+  }
 
+  const debounceResize = debounce(() => {
+    window.requestAnimationFrame(resize)
+    console.log('debounced resize')
+  }, 20)
 
-// The MIMETIC API.
-const mimetic = mimeticPartial(initializeMimetic, defaults);
+  window.addEventListener('resize', () => {
+    window.requestAnimationFrame(resize)
+    debounceResize()
+  })
+  window.requestAnimationFrame(resize)
+}
 
+/**
 
-export default mimetic;
+Edge 18+
+Chrome 70
+Firefox 63
+
+**/
