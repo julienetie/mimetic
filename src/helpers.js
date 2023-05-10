@@ -32,10 +32,9 @@ export const getRootElement = (element) => {
   return elements[element] ? elements[element](documentRef) : documentRef.querySelector(element)
 }
 
-/**
- * Generates the supplied function as debounced
- * By https://github.com/ehtb/onFrame
- */
+/*
+Generates the supplied function as debounced
+By https://github.com/ehtb/onFrame */
 export const debounce = (func, frameLength = 10) => {
   let called = 0
   let frame

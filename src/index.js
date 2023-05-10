@@ -25,6 +25,7 @@ export default (config) => {
       rootElement.removeAttribute('style')
       return
     }
+    
     // Real time DOM measurments.
     const innerWidth = windowRef.innerWidth
     const outerWidth = windowRef.outerWidth
@@ -82,11 +83,3 @@ export default (config) => {
   })
   window.requestAnimationFrame(resize)
 }
-
-/**
-
-Edge 18+
-Chrome 70
-Firefox 63
-
-**/
