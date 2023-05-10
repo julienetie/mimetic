@@ -5,9 +5,10 @@ const defaults = {
   rootSelector: 'html', // The element used to manipulate em and rem units
   memisisBreakpoint: '64em', // The viewport width breakpoint to begin scaling
   scale: true, // Enable/ disable scaling
-
   loadEvent: 'DOMContentLoaded', // Load type
-  scaleDelay: 16, // Miliseconds between calls on resize.
+  resizeDelay: 20, // Debounce delay between calls on resize.
+
+
   preserveDevicePixelRatio: false, // Preserve the device pixel ratio on zoom.
 
   onScale: undefined,

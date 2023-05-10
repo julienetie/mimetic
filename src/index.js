@@ -7,13 +7,15 @@ import {
   debounce
 } from './helpers'
 
-export default (config = {}) => {
+const mimetic = (config = {}) => {
   const windowRef = window
   const documentRef = document
 
   const rootSelector = Object.hasOwn(config, 'rootSelector') ? config.rootSelector : defaults.rootSelector
   const memisisBreakpoint = Object.hasOwn(config, 'memisisBreakpoint') ? config.memisisBreakpoint : defaults.memisisBreakpoint
   const scale = Object.hasOwn(config, 'scale') ? config.scale : defaults.scale
+  const loadEvent = Object.hasOwn(config, 'loadEvent') ? config.loadEvent : defaults.loadEvent
+  const resizeDelay = Object.hasOwn(config, 'resizeDelay') ? config.resizeDelay : defaults.resizeDelay
 
   // If scale is false, disable.
   if (!scale) return
@@ -81,11 +83,22 @@ export default (config = {}) => {
   const debounceResize = debounce(() => {
     window.requestAnimationFrame(resize)
     console.log('debounced resize')
-  }, 20)
+  }, resizeDelay)
 
-  window.addEventListener('resize', () => {
+
+
+
+  const actionMimetic = () => {
+    window.addEventListener('resize', () => {
+      window.requestAnimationFrame(resize)
+      debounceResize()
+    })
     window.requestAnimationFrame(resize)
-    debounceResize()
-  })
-  window.requestAnimationFrame(resize)
+  }
+
+    // Initalize mimetic on load.
+    window.addEventListener(loadEvent, () => actionMimetic())
 }
+
+
+export { mimetic }
