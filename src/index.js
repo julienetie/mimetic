@@ -7,11 +7,17 @@ import {
   debounce
 } from './helpers'
 
-export default (config) => {
+export default (config = {}) => {
   const windowRef = window
   const documentRef = document
 
-  const rootSelector = config.rootSelector || defaults.rootSelector
+  const rootSelector = Object.hasOwn(config, 'rootSelector') ? config.rootSelector : defaults.rootSelector
+  const memisisBreakpoint = Object.hasOwn(config, 'memisisBreakpoint') ? config.memisisBreakpoint : defaults.memisisBreakpoint
+  const scale = Object.hasOwn(config, 'scale') ? config.scale : defaults.scale
+
+  // If scale is false, disable.
+  if (!scale) return
+
   const rootElement = getRootElement(rootSelector)
   const getFontSizeRem = basicCompose(
     pxToRem,
@@ -20,12 +26,12 @@ export default (config) => {
   const rootFontSize = getFontSizeRem(document)
 
   const resize = () => {
-    const mobileWidth = !window.matchMedia('(min-width: 80em)').matches
+    const mobileWidth = !window.matchMedia(`(min-width: ${memisisBreakpoint})`).matches
     if (mobileWidth) {
       rootElement.removeAttribute('style')
       return
     }
-    
+
     // Real time DOM measurments.
     const innerWidth = windowRef.innerWidth
     const outerWidth = windowRef.outerWidth
