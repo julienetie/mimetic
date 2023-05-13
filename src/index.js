@@ -13,7 +13,6 @@ const isString = value => typeof value === 'string'
 const isFunction = value => typeof value === 'function'
 let lastDevicePixelRatio
 
-
 const mimetic = (config = {}) => {
   const windowRef = window
   const documentRef = document
@@ -40,8 +39,7 @@ const mimetic = (config = {}) => {
   const rootFontSize = getFontSizeRem(document)
 
   const resize = () => {
-
-    /* 
+    /*
     The memisisBreakpoint defines the breakpoint width or an array of breakpoint widths that enable or disables scaling */
     if (isString(memisisBreakpoint)) {
       if (!window.matchMedia(`(min-width: ${memisisBreakpoint})`).matches) {
@@ -84,7 +82,7 @@ const mimetic = (config = {}) => {
     const calculatedDPR = Math.abs(IEDPR || alt)
 
     const resizeWithoutZoom = calculatedDPR === lastDevicePixelRatio
-    
+
     // The default device pixel ratio.
     const defaultDPR = Math.round(clientWidth * (calculatedDPR / outerWidth))
 
@@ -105,23 +103,29 @@ const mimetic = (config = {}) => {
     const scaledFontSize = x + 'rem'
     rootElement.style.fontSize = scaledFontSize
 
+    // The parameters passed to each callback as an object.
+    const callbackParams = {
+      viewportWidth: clientWidth * calculatedDPR,
+      innerWidth,
+      evalDPR,
+      calculatedDPR,
+      normalizedDPR,
+    }
 
     // Callbacks
     // Action onScale during resize without zoom.
     if (isFunction(onScale) && resizeWithoutZoom) {
-      onScale(APIParameters);
+      onScale(callbackParams)
     }
-
 
     // Action onZoom during resize without scale.
     if (isFunction(onZoom) && !resizeWithoutZoom) {
-      onZoom(APIParameters);
+      onZoom(callbackParams)
     }
-
 
     // Action onResize during either zoom or scale.
     if (isFunction(onResize)) {
-      onResize(APIParameters);
+      onResize(callbackParams)
     }
 
     lastDevicePixelRatio = calculatedDPR
@@ -131,9 +135,6 @@ const mimetic = (config = {}) => {
     window.requestAnimationFrame(resize)
     console.log('debounced resize')
   }, resizeDelay)
-
-
-
 
   const actionMimetic = () => {
     window.addEventListener('resize', () => {
@@ -146,6 +147,5 @@ const mimetic = (config = {}) => {
   // Initalize mimetic on load.
   window.addEventListener(loadEvent, () => actionMimetic())
 }
-
 
 export { mimetic }
