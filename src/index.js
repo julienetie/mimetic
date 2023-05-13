@@ -7,6 +7,13 @@ import {
   debounce
 } from './helpers'
 
+const { isArray } = Array
+
+const isString = value => typeof value === 'string'
+const isFunction = value => typeof value === 'function'
+let lastDevicePixelRatio
+
+
 const mimetic = (config = {}) => {
   const windowRef = window
   const documentRef = document
@@ -16,6 +23,11 @@ const mimetic = (config = {}) => {
   const scale = Object.hasOwn(config, 'scale') ? config.scale : defaults.scale
   const loadEvent = Object.hasOwn(config, 'loadEvent') ? config.loadEvent : defaults.loadEvent
   const resizeDelay = Object.hasOwn(config, 'resizeDelay') ? config.resizeDelay : defaults.resizeDelay
+  const calc = Object.hasOwn(config, 'calc') ? config.calc : defaults.calc
+  const relativeDesignWidth = Object.hasOwn(config, 'relativeDesignWidth') ? config.relativeDesignWidth : defaults.relativeDesignWidth
+  const onScale = Object.hasOwn(config, 'onScale') ? config.onScale : defaults.onScale
+  const onZoom = Object.hasOwn(config, 'onZoom') ? config.onZoom : defaults.onZoom
+  const onResize = Object.hasOwn(config, 'onResize') ? config.onResize : defaults.onResize
 
   // If scale is false, disable.
   if (!scale) return
@@ -28,10 +40,21 @@ const mimetic = (config = {}) => {
   const rootFontSize = getFontSizeRem(document)
 
   const resize = () => {
-    const mobileWidth = !window.matchMedia(`(min-width: ${memisisBreakpoint})`).matches
-    if (mobileWidth) {
-      rootElement.removeAttribute('style')
-      return
+
+    /* 
+    The memisisBreakpoint defines the breakpoint width or an array of breakpoint widths that enable or disables scaling */
+    if (isString(memisisBreakpoint)) {
+      if (!window.matchMedia(`(min-width: ${memisisBreakpoint})`).matches) {
+        rootElement.removeAttribute('style')
+        return
+      }
+    } else if (isArray(memisisBreakpoint) && memisisBreakpoint.every(isString)) {
+      if (memisisBreakpoint.some(mediaQueryString => !window.matchMedia(mediaQueryString).matches)) {
+        rootElement.removeAttribute('style')
+        return
+      }
+    } else {
+      console.error('Mimetic: memisisBreakpoint should be a string or an Array of strings')
     }
 
     // Real time DOM measurments.
@@ -60,6 +83,8 @@ const mimetic = (config = {}) => {
     const alt = DPR === 1 ? safariSafeDPR : DPR
     const calculatedDPR = Math.abs(IEDPR || alt)
 
+    const resizeWithoutZoom = calculatedDPR === lastDevicePixelRatio
+    
     // The default device pixel ratio.
     const defaultDPR = Math.round(clientWidth * (calculatedDPR / outerWidth))
 
@@ -71,13 +96,35 @@ const mimetic = (config = {}) => {
 
     const evalDPR = preserveDevicePixelRatio ? calculatedDPR : normalizedDPR
     /**
-         * The window width compared to the design width.
-         */
-    const relativeDesignWidth = 1280
+     * The window width compared to the design width.
+     */
     const designWidthRatio = innerWidth / relativeDesignWidth
 
-    const scaledFontSize = (rootFontSize * designWidthRatio * evalDPR) + 'rem'
+    const scaledFontValue = rootFontSize * designWidthRatio * evalDPR
+    const x = calc ? calc(scaledFontValue, rootFontSize, designWidthRatio, evalDPR) : scaledFontValue
+    const scaledFontSize = x + 'rem'
     rootElement.style.fontSize = scaledFontSize
+
+
+    // Callbacks
+    // Action onScale during resize without zoom.
+    if (isFunction(onScale) && resizeWithoutZoom) {
+      onScale(APIParameters);
+    }
+
+
+    // Action onZoom during resize without scale.
+    if (isFunction(onZoom) && !resizeWithoutZoom) {
+      onZoom(APIParameters);
+    }
+
+
+    // Action onResize during either zoom or scale.
+    if (isFunction(onResize)) {
+      onResize(APIParameters);
+    }
+
+    lastDevicePixelRatio = calculatedDPR
   }
 
   const debounceResize = debounce(() => {
@@ -96,8 +143,8 @@ const mimetic = (config = {}) => {
     window.requestAnimationFrame(resize)
   }
 
-    // Initalize mimetic on load.
-    window.addEventListener(loadEvent, () => actionMimetic())
+  // Initalize mimetic on load.
+  window.addEventListener(loadEvent, () => actionMimetic())
 }
 
 
