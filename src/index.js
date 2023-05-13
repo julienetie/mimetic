@@ -112,7 +112,6 @@ const mimetic = (config = {}) => {
       normalizedDPR,
     }
 
-    // Callbacks
     // Action onScale during resize without zoom.
     if (isFunction(onScale) && resizeWithoutZoom) {
       onScale(callbackParams)
