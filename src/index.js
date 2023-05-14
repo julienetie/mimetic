@@ -1,4 +1,4 @@
-import defaults from './defaults'
+import defaults from './defaults.js'
 import {
   getFontSize,
   getRootElement,
