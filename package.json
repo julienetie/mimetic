@@ -1,18 +1,14 @@
 {
   "name": "mimetic",
-  "version": "0.7.3",
+  "version": "0.8.0",
   "description": "Scalable Fonts & Zoom Detection",
   "main": "dist/mimetic.js",
   "jsnext:main": "dist/mimetic.es.js",
   "scripts": {
     "watch": "./node_modules/.bin/concurrently \"./node_modules/.bin/rollup -c ./rollup/rollup.config.js -w\"",
     "build": "./node_modules/.bin/rollup -c ./rollup/rollup.config.js",
-    "unit-test": "./node_modules/.bin/mocha --compilers js:babel-register --recursive",
-    "e2e": "http-server ./ -p 1234 & node_modules/.bin/wdio",
-    "unit-test-client": "./node_modules/.bin/concurrently \"node server.js\" \"./node_modules/.bin/rollup -c ./rollup/config.test.js -w\"",
-    "lint": "./node_modules/.bin/eslint ./src ./test",
-    "lint:src": "./node_modules/.bin/eslint ./src",
-    "lint:watch": "./node_modules/.bin/esw -w ./src ./test"
+    "lint": "./node_modules/.bin/eslint ./src ./rollup --fix",
+    "lint:watch": "./node_modules/.bin/esw -w ./src ./test --fix"
   },
   "repository": {
     "type": "git",

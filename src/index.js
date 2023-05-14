@@ -1,4 +1,4 @@
-import defaults from './defaults'
+import defaults from './defaults.js'
 import {
   getFontSize,
   getRootElement,
@@ -7,11 +7,30 @@ import {
   debounce
 } from './helpers'
 
-export default (config) => {
+const { isArray } = Array
+
+const isString = value => typeof value === 'string'
+const isFunction = value => typeof value === 'function'
+let lastDevicePixelRatio
+
+const mimetic = (config = {}) => {
   const windowRef = window
   const documentRef = document
 
-  const rootSelector = config.rootSelector || defaults.rootSelector
+  const rootSelector = Object.hasOwn(config, 'rootSelector') ? config.rootSelector : defaults.rootSelector
+  const memisisBreakpoint = Object.hasOwn(config, 'memisisBreakpoint') ? config.memisisBreakpoint : defaults.memisisBreakpoint
+  const scale = Object.hasOwn(config, 'scale') ? config.scale : defaults.scale
+  const loadEvent = Object.hasOwn(config, 'loadEvent') ? config.loadEvent : defaults.loadEvent
+  const resizeDelay = Object.hasOwn(config, 'resizeDelay') ? config.resizeDelay : defaults.resizeDelay
+  const calc = Object.hasOwn(config, 'calc') ? config.calc : defaults.calc
+  const relativeDesignWidth = Object.hasOwn(config, 'relativeDesignWidth') ? config.relativeDesignWidth : defaults.relativeDesignWidth
+  const onScale = Object.hasOwn(config, 'onScale') ? config.onScale : defaults.onScale
+  const onZoom = Object.hasOwn(config, 'onZoom') ? config.onZoom : defaults.onZoom
+  const onResize = Object.hasOwn(config, 'onResize') ? config.onResize : defaults.onResize
+
+  // If scale is false, disable.
+  if (!scale) return
+
   const rootElement = getRootElement(rootSelector)
   const getFontSizeRem = basicCompose(
     pxToRem,
@@ -20,11 +39,22 @@ export default (config) => {
   const rootFontSize = getFontSizeRem(document)
 
   const resize = () => {
-    const mobileWidth = !window.matchMedia('(min-width: 80em)').matches
-    if (mobileWidth) {
-      rootElement.removeAttribute('style')
-      return
+    /*
+    The memisisBreakpoint defines the breakpoint width or an array of breakpoint widths that enable or disables scaling */
+    if (isString(memisisBreakpoint)) {
+      if (!window.matchMedia(`(min-width: ${memisisBreakpoint})`).matches) {
+        rootElement.removeAttribute('style')
+        return
+      }
+    } else if (isArray(memisisBreakpoint) && memisisBreakpoint.every(isString)) {
+      if (memisisBreakpoint.some(mediaQueryString => !window.matchMedia(mediaQueryString).matches)) {
+        rootElement.removeAttribute('style')
+        return
+      }
+    } else {
+      console.error('Mimetic: memisisBreakpoint should be a string or an Array of strings')
     }
+
     // Real time DOM measurments.
     const innerWidth = windowRef.innerWidth
     const outerWidth = windowRef.outerWidth
@@ -51,6 +81,8 @@ export default (config) => {
     const alt = DPR === 1 ? safariSafeDPR : DPR
     const calculatedDPR = Math.abs(IEDPR || alt)
 
+    const resizeWithoutZoom = calculatedDPR === lastDevicePixelRatio
+
     // The default device pixel ratio.
     const defaultDPR = Math.round(clientWidth * (calculatedDPR / outerWidth))
 
@@ -62,31 +94,57 @@ export default (config) => {
 
     const evalDPR = preserveDevicePixelRatio ? calculatedDPR : normalizedDPR
     /**
-         * The window width compared to the design width.
-         */
-    const relativeDesignWidth = 1280
+     * The window width compared to the design width.
+     */
     const designWidthRatio = innerWidth / relativeDesignWidth
 
-    const scaledFontSize = (rootFontSize * designWidthRatio * evalDPR) + 'rem'
+    const scaledFontValue = rootFontSize * designWidthRatio * evalDPR
+    const x = calc ? calc(scaledFontValue, rootFontSize, designWidthRatio, evalDPR) : scaledFontValue
+    const scaledFontSize = x + 'rem'
     rootElement.style.fontSize = scaledFontSize
+
+    // The parameters passed to each callback as an object.
+    const callbackParams = {
+      viewportWidth: clientWidth * calculatedDPR,
+      innerWidth,
+      evalDPR,
+      calculatedDPR,
+      normalizedDPR,
+    }
+
+    // Action onScale during resize without zoom.
+    if (isFunction(onScale) && resizeWithoutZoom) {
+      onScale(callbackParams)
+    }
+
+    // Action onZoom during resize without scale.
+    if (isFunction(onZoom) && !resizeWithoutZoom) {
+      onZoom(callbackParams)
+    }
+
+    // Action onResize during either zoom or scale.
+    if (isFunction(onResize)) {
+      onResize(callbackParams)
+    }
+
+    lastDevicePixelRatio = calculatedDPR
   }
 
   const debounceResize = debounce(() => {
     window.requestAnimationFrame(resize)
     console.log('debounced resize')
-  }, 20)
+  }, resizeDelay)
 
-  window.addEventListener('resize', () => {
+  const actionMimetic = () => {
+    window.addEventListener('resize', () => {
+      window.requestAnimationFrame(resize)
+      debounceResize()
+    })
     window.requestAnimationFrame(resize)
-    debounceResize()
-  })
-  window.requestAnimationFrame(resize)
+  }
+
+  // Initalize mimetic on load.
+  window.addEventListener(loadEvent, () => actionMimetic())
 }
 
-/**
-
-Edge 18+
-Chrome 70
-Firefox 63
-
-**/
+export { mimetic }
