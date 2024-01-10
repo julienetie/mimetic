@@ -7,10 +7,10 @@ import {
   debounce
 } from './helpers'
 
-export default (config) => {
+const mimetic = (config) => {
   const windowRef = window
-  const documentRef = document
-
+  const documentRef = windowRef.document
+  const raf = windowRef.requestAnimationFrame
   const rootSelector = config.rootSelector || defaults.rootSelector
   const rootElement = getRootElement(rootSelector)
   const getFontSizeRem = basicCompose(
@@ -62,8 +62,8 @@ export default (config) => {
 
     const evalDPR = preserveDevicePixelRatio ? calculatedDPR : normalizedDPR
     /**
-         * The window width compared to the design width.
-         */
+     * The window width compared to the design width.
+     */
     const relativeDesignWidth = 1280
     const designWidthRatio = innerWidth / relativeDesignWidth
 
@@ -72,21 +72,15 @@ export default (config) => {
   }
 
   const debounceResize = debounce(() => {
-    window.requestAnimationFrame(resize)
+    raf(resize)
     console.log('debounced resize')
   }, 20)
 
   window.addEventListener('resize', () => {
-    window.requestAnimationFrame(resize)
+    raf(resize)
     debounceResize()
   })
-  window.requestAnimationFrame(resize)
+  raf(resize)
 }
 
-/**
-
-Edge 18+
-Chrome 70
-Firefox 63
-
-**/
+export default mimetic
