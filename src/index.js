@@ -1,11 +1,134 @@
-import defaults from './defaults'
-import {
-  getFontSize,
-  getRootElement,
-  basicCompose,
-  pxToRem,
-  debounce
-} from './helpers'
+// Temporarily removed imports
+
+/*
+ Default config properties if not provided.
+*/
+const defaults = {
+  loadEvent: 'DOMContentLoaded', // Load type
+  scaleDelay: 16, // Miliseconds between calls on resize.
+  preserveDevicePixelRatio: false, // Preserve the device pixel ratio on zoom.
+  rootSelector: 'html', // Use the HTML element as the root element.
+  onScale: undefined,
+  onZoom: undefined,
+  onResize: undefined,
+  // cutOffWidth: 0, // The minimum width to disable resizing.
+  relativeDesignWidth: 1024, // The width relative to the font size.
+  enableScale: true,
+  /*
+    This is crucial, especially when users maximize and revert the browser window. This delay not
+    only establishes the debounce threshold but also influences the trailing-edge call.
+  */
+  lateDetectionDelay: 500,
+  mediaQueryCutOff: '(min-width: 40.063em)',
+  /*
+   This is an experimental feature that exclusively activates MIMETIC for non-mobile-like devices.
+   Consequently, media queries for max and min width and height will behave similarly to the
+   deprecated max and min device-width/device-height, but without the use of the deprecated syntax.
+   */
+  deviceSplitting: false
+}
+
+// import defaults from './defaults'
+const windowRef = window
+const documentRef = windowRef.document
+const raf = windowRef.requestAnimationFrame
+const caf = windowRef.cancelAnimationFrame
+
+// A very simple compose function.
+const basicCompose = (a, b) => c => a(b(c))
+
+// converts pixels to REM values.
+const pxToRem = fontSizePx => parseInt(fontSizePx, 10) / 16
+
+// Gets the element's root font size.
+const getFontSize = element => windowRef.getComputedStyle(element.documentElement, null).getPropertyValue('font-size')
+
+// Gets the root element.
+const getRootElement = (element) => {
+  const elements = {
+    html: parent => parent.documentElement,
+    body: parent => parent.body
+  }
+
+  if (element instanceof windowRef.Element) {
+    if (element.nodeType === 1) {
+      return element
+    }
+    throw new Error('rootElement is not a valid element')
+  }
+  return elements[element] ? elements[element](documentRef) : documentRef.querySelector(element)
+}
+
+/*
+ Generates the supplied function as debounced
+ By https://github.com/ehtb/onFrame
+*/
+const debounce = (func, frameLength = 10) => {
+  let called = 0
+  let frame
+
+  const reset = function () {
+    called = 0
+    frame = null
+  }
+
+  const cancel = function () {
+    caf(frame)
+    reset()
+  }
+
+  const run = function (...args) {
+    const context = this
+
+    if (frame != null) {
+      caf(frame)
+      reset()
+    }
+
+    frame = raf(function tick () {
+      if (++called === frameLength) {
+        reset()
+
+        func.apply(context, args)
+      } else {
+        frame = raf(tick)
+      }
+    })
+  }
+
+  run.cancel = cancel
+
+  return run
+}
+
+// Delay
+const delay = (callback, duration) => {
+  let startTime = 0
+  let terminate = false
+
+  function loop (timestamp) {
+    if (!startTime) {
+      startTime = timestamp
+    }
+
+    if (timestamp > startTime + duration && !terminate) {
+      if (callback) callback()
+      terminate = true
+    } else {
+      raf(loop)
+    }
+  }
+
+  raf(loop)
+}
+
+// import {
+//   getFontSize,
+//   getRootElement,
+//   basicCompose,
+//   pxToRem,
+//   debounce
+// } from './helpers'
 
 const mimetic = (config) => {
   const windowRef = window
