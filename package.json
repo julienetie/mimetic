@@ -4,6 +4,10 @@
   "description": "Scalable Fonts & Zoom Detection",
   "main": "dist/mimetic.js",
   "type": "module",
+  "exports": {
+    "import": "./dist/mimetic.js",
+    "require": "./dist/mimetic.cjs"
+  },
   "scripts": {
     "build": "node setup/create-distribution.js",
     "unit-test": "./node_modules/.bin/mocha --compilers js:babel-register --recursive",
