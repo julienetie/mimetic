@@ -85,7 +85,7 @@ const debounce = (func, frameLength = 10) => {
       reset()
     }
 
-    frame = raf(function tick () {
+    frame = raf(function tick() {
       if (++called === frameLength) {
         reset()
 
@@ -106,7 +106,7 @@ const delay = (callback, duration) => {
   let startTime = 0
   let terminate = false
 
-  function loop (timestamp) {
+  function loop(timestamp) {
     if (!startTime) {
       startTime = timestamp
     }
@@ -141,6 +141,20 @@ const mimetic = (config) => {
     getFontSize
   )
   const rootFontSize = getFontSizeRem(document)
+
+  if (!config.hideWarning === true) {
+    console.warn(`
+    :: Mimetic - Disclaimer
+  
+    Attention: Due to the intricacies of Mimetic's dimension calculations, 
+    the expected results won't be accurate if DevTools is docked to the 
+    left or right of the screen. For proper visualization, it is essential 
+    to dock DevTools below the window or open it in a separate window.
+  
+    To suppress this warning, include the option: \`{ hideWarning: true }\` 
+    in the mimetic function call.
+  `);
+  }
 
   const resize = () => {
     const mobileWidth = !window.matchMedia('(min-width: 80em)').matches
