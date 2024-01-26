@@ -75,4 +75,4 @@ Below is the list of config options passed as an object:
 
 Big thanks to [BrowserStack](https://www.browserstack.com) for sponsoring the cross-browser & device testing of this project.
 
-MIT © 2023 Julien Etienne
+MIT © 2024 Julien Etienne
