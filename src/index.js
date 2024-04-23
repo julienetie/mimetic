@@ -1,5 +1,14 @@
-// Temporarily removed imports
+const warningMessage = `
+:: Mimetic - Disclaimer
 
+Attention: Due to the intricacies of Mimetic's dimension calculations, 
+the expected results won't be accurate if DevTools is docked to the 
+left or right of the screen. For proper visualization, it is essential 
+to dock DevTools below the window or open it in a separate window.
+
+To suppress this warning, include the option: \`{ hideWarning: true }\` 
+in the mimetic function call.
+`
 /*
  Default config properties if not provided.
 */
@@ -85,10 +94,9 @@ const debounce = (func, frameLength = 10) => {
       reset()
     }
 
-    frame = raf(function tick () {
+    frame = raf(function tick() {
       if (++called === frameLength) {
         reset()
-
         func.apply(context, args)
       } else {
         frame = raf(tick)
@@ -101,60 +109,20 @@ const debounce = (func, frameLength = 10) => {
   return run
 }
 
-// Delay
-const delay = (callback, duration) => {
-  let startTime = 0
-  let terminate = false
+const getFontSizeRem = basicCompose(
+  pxToRem,
+  getFontSize
+)
 
-  function loop (timestamp) {
-    if (!startTime) {
-      startTime = timestamp
-    }
-
-    if (timestamp > startTime + duration && !terminate) {
-      if (callback) callback()
-      terminate = true
-    } else {
-      raf(loop)
-    }
-  }
-
-  raf(loop)
-}
-
-// import {
-//   getFontSize,
-//   getRootElement,
-//   basicCompose,
-//   pxToRem,
-//   debounce
-// } from './helpers'
-
-const mimetic = (config) => {
+const mimetic = (config = {}) => {
   const windowRef = window
   const documentRef = windowRef.document
   const raf = windowRef.requestAnimationFrame
-  const rootSelector = config.rootSelector || defaults.rootSelector
+  const rootSelector = config?.rootSelector || defaults.rootSelector
   const rootElement = getRootElement(rootSelector)
-  const getFontSizeRem = basicCompose(
-    pxToRem,
-    getFontSize
-  )
   const rootFontSize = getFontSizeRem(document)
 
-  if (!config.hideWarning === true) {
-    console.warn(`
-    :: Mimetic - Disclaimer
-  
-    Attention: Due to the intricacies of Mimetic's dimension calculations, 
-    the expected results won't be accurate if DevTools is docked to the 
-    left or right of the screen. For proper visualization, it is essential 
-    to dock DevTools below the window or open it in a separate window.
-  
-    To suppress this warning, include the option: \`{ hideWarning: true }\` 
-    in the mimetic function call.
-  `)
-  }
+  if (!config.hideWarning === true) console.warn(warningMessage)
 
   const resize = () => {
     const mobileWidth = !window.matchMedia('(min-width: 80em)').matches
@@ -196,22 +164,17 @@ const mimetic = (config) => {
 
     // The preserved or non-preserved DPR via API settings.
     const preserveDevicePixelRatio = false
-
     const evalDPR = preserveDevicePixelRatio ? calculatedDPR : normalizedDPR
     /**
      * The window width compared to the design width.
      */
     const relativeDesignWidth = 1280
     const designWidthRatio = innerWidth / relativeDesignWidth
-
     const scaledFontSize = (rootFontSize * designWidthRatio * evalDPR) + 'rem'
     rootElement.style.fontSize = scaledFontSize
   }
 
-  const debounceResize = debounce(() => {
-    raf(resize)
-    console.log('debounced resize')
-  }, 20)
+  const debounceResize = debounce(() => raf(resize), 20)
 
   window.addEventListener('resize', () => {
     raf(resize)
